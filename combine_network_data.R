@@ -13,29 +13,29 @@ e <- read.csv(file.path(directory, "CENT_18_49_V8_2_ENT.csv"))
 
 # aggregate data at show level
 brvo_showlevel <- plyr::ddply(subset(brvo, Source == "Nielsen" & LF_Season == 1), 
-                              c("Network", "Broadcast_Year", "Cable_Qtr", "Date",
-                                "Show_Name", "Episode_num", "Season_num", "Start_Time", "End_Time"), 
+                              c("Network", "Broadcast_Year", "Cable_Qtr", "DOW", "Date", "Show_Name", 
+                                "Episode_num", "Season_num", "Start_Time", "End_Time", "Genre"), 
                               summarize, 
                               C3_Dur = sum(SC3_C_Dur),
                               C3_Imps = sum(SC3_Impressions * SC3_C_Dur)/C3_Dur)
 
 syfy_showlevel <- plyr::ddply(subset(syfy, Source == "Nielsen" & LF_Season == 1), 
-                              c("Network", "Broadcast_Year", "Cable_Qtr", "Date",
-                                "Show_Name", "Episode_num", "Season_num", "Start_Time", "End_Time"), 
+                              c("Network", "Broadcast_Year", "Cable_Qtr", "DOW", "Date", "Show_Name", 
+                                "Episode_num", "Season_num", "Start_Time", "End_Time", "Genre"), 
                               summarize, 
                               C3_Dur = sum(SC3_C_Dur),
                               C3_Imps = sum(SC3_Impressions * SC3_C_Dur)/C3_Dur)
 
 usa_showlevel <- plyr::ddply(subset(usa, Source == "Nielsen" & LF_Season == 1), 
-                             c("Network", "Broadcast_Year", "Cable_Qtr", "Date",
-                               "Show_Name", "Episode_num", "Season_num", "Start_Time", "End_Time"), 
+                             c("Network", "Broadcast_Year", "Cable_Qtr", "DOW", "Date", "Show_Name", 
+                               "Episode_num", "Season_num", "Start_Time", "End_Time", "Genre"), 
                              summarize, 
                              C3_Dur = sum(SC3_C_Dur),
                              C3_Imps = sum(SC3_Impressions * SC3_C_Dur)/C3_Dur)
 
 e_showlevel <- plyr::ddply(subset(e, Source == "Nielsen" & LF_Season == 1), 
-                           c("Network", "Broadcast_Year", "Cable_Qtr", "Date",
-                             "Show_Name", "Episode_num", "Season_num", "Start_Time", "End_Time"), 
+                           c("Network", "Broadcast_Year", "Cable_Qtr", "DOW", "Date", "Show_Name", 
+                             "Episode_num", "Season_num", "Start_Time", "End_Time", "Genre"), 
                            summarize, 
                            C3_Dur = sum(SC3_C_Dur),
                            C3_Imps = sum(SC3_Impressions * SC3_C_Dur)/C3_Dur)
@@ -62,5 +62,3 @@ showlevel_data <- rbind(brvo_showlevel, syfy_showlevel, usa_showlevel, e_showlev
 
 #write
 write.csv(showlevel_data, "CENT_showlevel.csv")
-
-
