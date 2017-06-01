@@ -64,3 +64,7 @@ e_showlevel <- e_showlevel %>% group_by(Show_Name, Season_num) %>%
 ```{r combine network data}
 showlevel_data <- rbind(brvo_showlevel, syfy_showlevel, usa_showlevel, e_showlevel)
 ```
+
+```{r write file}
+write.csv(showlevel_data, "CENT_showlevel.csv")
+```
