@@ -1,0 +1,63 @@
+```{r}
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(scales)
+library(syuzhet)
+library(purrr)
+library(tidyr)
+```
+
+Read Data
+```{r}
+df <- read.csv("CENT_showlevel.csv")
+df <- select(df, -X)
+
+#keep only shows that have both a first and second season in the data
+df <- df %>% group_by(Network, Show_Name) %>%
+  filter(all(c(1, 2) %in% Season_num))
+
+```
+
+```{r}
+df <- df[df$Show_Name != "RHOM", ]
+```
+
+```{r}
+df_curves <- df %>% 
+  group_by(Network, Show_Name, Season_num) %>% 
+  summarise(imps = list(C3_Imps), 
+            episode_count_max = max(Episode_num)) %>% 
+  filter(episode_count_max >= 3)
+
+```
+
+```{r}
+dct <- function(x){
+  get_dct_transform(
+      x, 
+      low_pass_size = 3, 
+      x_reverse_len = 100,
+      scale_vals = FALSE,
+      scale_range = TRUE
+      )
+}
+
+```
+
+```{r}
+df_with_dct <- df_curves %>% 
+  mutate(dct_values = map(imps, dct)) %>% 
+  select(-c(imps, episode_count_max)) %>% 
+  unnest(dct_values) %>% 
+  group_by(Network, Show_Name, Season_num) %>% 
+  mutate(period = row_number()) 
+
+```
+
+
+```{r}
+df_final <- df_with_dct %>% 
+  spread(key = period, value = dct_values)
+
+```
