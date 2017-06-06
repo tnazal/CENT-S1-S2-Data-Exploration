@@ -1,0 +1,447 @@
+
+##################################################################################
+inputs: CENT_dct.csv, CENT_dct_cont_spread.csv, CENT_dct_spread.csv,
+        s1_s2_cont_dct.csv, dct_s1_s2.csv
+output: K-means clustering (3 and 5 clusters for S1, S1 & S2 normalized separately,
+        and S1 & S2 normalized together)
+##################################################################################
+
+```{r}
+library(dplyr)
+library(broom)
+library(ggplot2)
+library(plotly)
+library(factoextra)
+library(dtwclust)
+```
+
+# Season 1 Curve Clustering
+
+Using examples from https://cran.r-project.org/web/packages/broom/vignettes/kmeans.html.
+
+```{r}
+dct_df <- read.csv("CENT_dct.csv")
+dct_spread <- read.csv("CENT_dct_spread.csv")
+```
+
+```{r}
+cluster_s1 <- dct_spread %>% 
+  filter(Season_num == 1) %>%
+  ungroup() %>%
+  select(-X, -Network, -Season_num, -Show_Name)
+```
+
+## General K-Means Clustering
+
+```{r}
+set.seed(12)
+kclusts_s1 <- data.frame(k = 1:5) %>% 
+  group_by(k) %>% 
+  do(kclust = kmeans(cluster_s1, centers = .$k, nstart = 50))
+```
+
+```{r}
+clusters_s1 <- kclusts_s1 %>% group_by(k) %>% do(tidy(.$kclust[[1]]))
+assignments_s1 <- kclusts_s1 %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s1))
+clusterings_s1 <- kclusts_s1 %>% group_by(k) %>% do(glance(.$kclust[[1]]))
+```
+
+### Optimal Number of Clusters
+
+```{r}
+ggplot(clusterings_s1, aes(k, tot.withinss)) + 
+  geom_line() +
+  scale_x_discrete(limits = seq(1, 5))
+```
+
+```{r}
+fviz_nbclust(cluster_s1, 
+             kmeans, 
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1, 
+             cluster::pam, 
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1, 
+             hcut, 
+             hc_method = "single",
+             hc_metric = "euclidean",
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1, 
+             hcut, 
+             hc_method = "single",
+             hc_metric = "pearson",
+             method = "silhouette",
+             k.max = 5,
+             nboot = 500)
+```
+
+### 3 Clusters (K-Means)
+
+```{r}
+clusters3_s1 <- assignments_s1 %>% 
+  filter(k == 3) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_3 = .cluster) %>% 
+  bind_cols(filter(dct_spread, Season_num == 1)) 
+
+clusters3_s1 <- merge(clusters3_s1[, c("cluster_kmeans_3", 
+                                       "Show_Name")], 
+                      dct_df, by = "Show_Name")
+
+clusters3_s1_plot <- clusters3_s1 %>% 
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_3)
+
+ggplotly(clusters3_s1_plot)
+```
+
+```{r}
+s1_3clusters_cluster1 <- unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 1, ]$Show_Name)
+s1_3clusters_cluster2 <- unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 2, ]$Show_Name)
+s1_3clusters_cluster3 <- unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 3, ]$Show_Name)
+
+(s1_3clusters_cluster1 <- as.data.frame(s1_3clusters_cluster1))
+(s1_3clusters_cluster2 <- as.data.frame(s1_3clusters_cluster2))
+(s1_3clusters_cluster3 <- as.data.frame(s1_3clusters_cluster3))
+```
+
+### 5 Clusters (K-Means)
+
+```{r}
+clusters5_s1 <- assignments_s1 %>% 
+  filter(k == 5) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_5 = .cluster) %>% 
+  bind_cols(filter(dct_spread, Season_num == 1)) 
+
+clusters5_s1 <- merge(clusters5_s1[, c("cluster_kmeans_5", 
+                                       "Show_Name")], 
+                      dct_df, by = "Show_Name")
+
+clusters5_s1_plot <- clusters5_s1 %>% 
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, 
+             color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5)
+
+ggplotly(clusters5_s1_plot)
+```
+
+```{r}
+s1_5clusters_cluster1 <- unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 1, ]$Show_Name)
+s1_5clusters_cluster2 <- unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 2, ]$Show_Name)
+s1_5clusters_cluster3 <- unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 3, ]$Show_Name)
+s1_5clusters_cluster4 <- unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 4, ]$Show_Name)
+s1_5clusters_cluster5 <- unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 5, ]$Show_Name)
+
+(s1_5clusters_cluster1 <- as.data.frame(s1_5clusters_cluster1))
+(s1_5clusters_cluster2 <- as.data.frame(s1_5clusters_cluster2))
+(s1_5clusters_cluster3 <- as.data.frame(s1_5clusters_cluster3))
+(s1_5clusters_cluster4 <- as.data.frame(s1_5clusters_cluster4))
+(s1_5clusters_cluster5 <- as.data.frame(s1_5clusters_cluster5))
+```
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+# Season 1 and 2 Curve Clustering
+
+```{r}
+temp1 <- filter(dct_spread, Season_num == 1)
+temp2 <- filter(dct_spread, Season_num == 2)
+temp2_newcols <- c(paste("X", 101:200, sep = ""))
+colnames(temp2)[5:ncol(temp2)] <- c(temp2_newcols)
+
+dct_spread_s1_s2 <- bind_cols(temp1, temp2[, 5:ncol(temp2)])
+rm(temp1, temp2, temp2_newcols)
+
+cluster_s1_s2 <- dct_spread_s1_s2 %>%
+  select(-X, -Network, -Season_num, -Show_Name)
+
+dct_s1_s2 <- read.csv("CENT_dct_s1_s2.csv")
+```
+
+## General K-Means Clustering
+
+```{r}
+set.seed(12)
+kclusts_s1_s2 <- data.frame(k = 1:5) %>% 
+  group_by(k) %>% 
+  do(kclust = kmeans(cluster_s1_s2, centers = .$k, nstart = 50))
+```
+
+```{r}
+clusters_s1_s2 <- kclusts_s1_s2 %>% group_by(k) %>% do(tidy(.$kclust[[1]]))
+assignments_s1_s2 <- kclusts_s1_s2 %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s1_s2))
+clusterings_s1_s2 <- kclusts_s1_s2 %>% group_by(k) %>% do(glance(.$kclust[[1]]))
+```
+
+### Optimal Number of Clusters
+
+```{r}
+ggplot(clusterings_s1_s2, aes(k, tot.withinss)) + 
+  geom_line() +
+  scale_x_discrete(limits = seq(1, 5))
+```
+
+```{r}
+fviz_nbclust(cluster_s1_s2, 
+             kmeans, 
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1_s2, 
+             cluster::pam, 
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1_s2, 
+             hcut, 
+             hc_method = "single",
+             hc_metric = "euclidean",
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1_s2, 
+             hcut, 
+             hc_method = "single",
+             hc_metric = "pearson",
+             method = "silhouette",
+             k.max = 5,
+             nboot = 500)
+```
+
+### 3 Clusters (K-Means)
+
+```{r}
+clusters3_s1_s2 <- assignments_s1_s2 %>% 
+  filter(k == 3) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_3 = .cluster) %>% 
+  bind_cols(dct_spread_s1_s2) 
+
+clusters3_s1_s2 <- merge(clusters3_s1_s2[, c("cluster_kmeans_3", 
+                                       "Show_Name")], 
+                         dct_s1_s2, by = "Show_Name")
+
+clusters3_s1_s2_plot <- clusters3_s1_s2 %>% 
+  ggplot(aes(x = period, y = dct_values, 
+             color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_3)
+
+ggplotly(clusters3_s1_s2_plot)
+```
+
+```{r}
+s1_s2_3clusters_cluster1 <- unique(clusters3_s1_s2[clusters3_s1_s2$cluster_kmeans_3 == 1, ]$Show_Name)
+s1_s2_3clusters_cluster2 <- unique(clusters3_s1_s2[clusters3_s1_s2$cluster_kmeans_3 == 2, ]$Show_Name)
+s1_s2_3clusters_cluster3 <- unique(clusters3_s1_s2[clusters3_s1_s2$cluster_kmeans_3 == 3, ]$Show_Name)
+
+(s1_s2_3clusters_cluster1 <- as.data.frame(s1_s2_3clusters_cluster1))
+(s1_s2_3clusters_cluster2 <- as.data.frame(s1_s2_3clusters_cluster2))
+(s1_s2_3clusters_cluster3 <- as.data.frame(s1_s2_3clusters_cluster3))
+```
+
+### 5 Clusters (K-Means)
+
+```{r}
+clusters5_s1_s2 <- assignments_s1_s2 %>% 
+  filter(k == 5) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_5 = .cluster) %>% 
+  bind_cols(dct_spread_s1_s2) 
+
+clusters5_s1_s2 <- merge(clusters5_s1_s2[, c("cluster_kmeans_5", 
+                                       "Show_Name")], 
+                         dct_s1_s2, by = "Show_Name")
+
+clusters5_s1_s2_plot <- clusters5_s1_s2 %>% 
+  ggplot(aes(x = period, y = dct_values, 
+             color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5)
+
+ggplotly(clusters5_s1_s2_plot)
+```
+
+```{r}
+s1_s2_5clusters_cluster1 <- unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 1, ]$Show_Name)
+s1_s2_5clusters_cluster2 <- unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 2, ]$Show_Name)
+s1_s2_5clusters_cluster3 <- unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 3, ]$Show_Name)
+s1_s2_5clusters_cluster4 <- unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 4, ]$Show_Name)
+s1_s2_5clusters_cluster5 <- unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 5, ]$Show_Name)
+
+(s1_s2_5clusters_cluster1 <- as.data.frame(s1_s2_5clusters_cluster1))
+(s1_s2_5clusters_cluster2 <- as.data.frame(s1_s2_5clusters_cluster2))
+(s1_s2_5clusters_cluster3 <- as.data.frame(s1_s2_5clusters_cluster3))
+(s1_s2_5clusters_cluster4 <- as.data.frame(s1_s2_5clusters_cluster4))
+(s1_s2_5clusters_cluster5 <- as.data.frame(s1_s2_5clusters_cluster5))
+```
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+#Season 1 and 2 Continuous Curve Clustering
+
+```{r}
+dct_cont <- read.csv("CENT_dct_cont.csv")
+dct_spread_cont <- read.csv("CENT_dct_spread_cont.csv")
+cluster_cont <- dct_spread_cont %>%
+  select(-X, -Network, -Show_Name)
+```
+
+## General K-Means Clustering
+
+```{r}
+set.seed(12)
+kclusts_cont <- data.frame(k = 1:5) %>% 
+  group_by(k) %>% 
+  do(kclust = kmeans(cluster_cont, centers = .$k, nstart = 50))
+```
+
+```{r}
+clusters_cont <- kclusts_cont %>% group_by(k) %>% do(tidy(.$kclust[[1]]))
+assignments_cont <- kclusts_cont %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_cont))
+clusterings_cont <- kclusts_cont %>% group_by(k) %>% do(glance(.$kclust[[1]]))
+```
+
+### Optimal Number of Clusters
+
+```{r}
+ggplot(clusterings_cont, aes(k, tot.withinss)) + 
+  geom_line() +
+  scale_x_discrete(limits = seq(1, 5))
+```
+
+```{r}
+fviz_nbclust(cluster_cont, 
+             kmeans, 
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_cont, 
+             cluster::pam, 
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_cont, 
+             hcut, 
+             hc_method = "single",
+             hc_metric = "euclidean",
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_cont, 
+             hcut, 
+             hc_method = "single",
+             hc_metric = "pearson",
+             method = "silhouette",
+             k.max = 5,
+             nboot = 500)
+```
+
+### 3 Clusters (K-Means)
+
+```{r}
+clusters3_cont <- assignments_cont %>% 
+  filter(k == 3) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_3 = .cluster) %>% 
+  bind_cols(dct_spread_cont) 
+
+clusters3_cont <- merge(clusters3_cont[, c("cluster_kmeans_3", 
+                                       "Show_Name")], 
+                         dct_cont, by = "Show_Name")
+
+clusters3_cont_plot <- clusters3_cont %>% 
+  ggplot(aes(x = period, y = dct_values, 
+             color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_3)
+
+ggplotly(clusters3_cont_plot)
+```
+
+```{r}
+cont_3clusters_cluster1 <- unique(clusters3_cont[clusters3_cont$cluster_kmeans_3 == 1, ]$Show_Name)
+cont_3clusters_cluster2 <- unique(clusters3_cont[clusters3_cont$cluster_kmeans_3 == 2, ]$Show_Name)
+cont_3clusters_cluster3 <- unique(clusters3_cont[clusters3_cont$cluster_kmeans_3 == 3, ]$Show_Name)
+
+(cont_3clusters_cluster1 <- as.data.frame(cont_3clusters_cluster1))
+(cont_3clusters_cluster2 <- as.data.frame(cont_3clusters_cluster2))
+(cont_3clusters_cluster3 <- as.data.frame(cont_3clusters_cluster3))
+```
+
+### 5 Clusters (K-Means)
+
+```{r}
+clusters5_cont <- assignments_cont %>% 
+  filter(k == 5) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_5 = .cluster) %>% 
+  bind_cols(dct_spread_cont) 
+
+clusters5_cont <- merge(clusters5_cont[, c("cluster_kmeans_5", 
+                                       "Show_Name")], 
+                          dct_cont, by = "Show_Name")
+
+clusters5_cont_plot <- clusters5_cont %>%
+  ggplot(aes(x = period, y = dct_values, 
+             color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5)
+
+ggplotly(clusters5_cont_plot)
+```
+
+```{r}
+cont_5clusters_cluster1 <- unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 1, ]$Show_Name)
+cont_5clusters_cluster2 <- unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 2, ]$Show_Name)
+cont_5clusters_cluster3 <- unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 3, ]$Show_Name)
+cont_5clusters_cluster4 <- unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 4, ]$Show_Name)
+cont_5clusters_cluster5 <- unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 5, ]$Show_Name)
+
+(cont_5clusters_cluster1 <- as.data.frame(cont_5clusters_cluster1))
+(cont_5clusters_cluster2 <- as.data.frame(cont_5clusters_cluster2))
+(cont_5clusters_cluster3 <- as.data.frame(cont_5clusters_cluster3))
+(cont_5clusters_cluster4 <- as.data.frame(cont_5clusters_cluster4))
+(cont_5clusters_cluster5 <- as.data.frame(cont_5clusters_cluster5))
+```
