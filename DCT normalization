@@ -15,7 +15,10 @@ df <- select(df, -X)
 
 #keep only shows that have both a first and second season in the data
 df <- df %>% group_by(Network, Show_Name) %>%
-  filter(all(c(1, 2) %in% Season_num))
+  filter(all(c(1, 2) %in% Season_num)) %>% 
+  ungroup() %>% 
+  group_by(Network, Show_Name, Season_num) %>% 
+  filter(max(Episode_num) >= 3)
 
 ```
 
@@ -26,9 +29,7 @@ df <- df[df$Show_Name != "RHOM", ]
 ```{r}
 df_curves <- df %>% 
   group_by(Network, Show_Name, Season_num) %>% 
-  summarise(imps = list(C3_Imps), 
-            episode_count_max = max(Episode_num)) %>% 
-  filter(episode_count_max >= 3)
+  summarise(imps = list(C3_Imps))
 
 ```
 
@@ -48,7 +49,7 @@ dct <- function(x){
 ```{r}
 df_with_dct <- df_curves %>% 
   mutate(dct_values = map(imps, dct)) %>% 
-  select(-c(imps, episode_count_max)) %>% 
+  select(-imps) %>% 
   unnest(dct_values) %>% 
   group_by(Network, Show_Name, Season_num) %>% 
   mutate(period = row_number()) 
@@ -63,7 +64,8 @@ df_final <- df_with_dct %>%
 ```
 
 ```{r}
-write.csv(df_with_dct, "CENT_dct.csv")
+
 write.csv(df_final, "CENT_dct_spread.csv")
+write.csv(df_with_dct, "CENT_dct.csv")
 
 ```
