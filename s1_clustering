@@ -2,6 +2,18 @@
 # Season 1 Show Curve Clustering
 
 ```{r}
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(purrr)
+library(tidyverse)
+library(syuzhet)
+library(broom)
+library(factoextra)
+library(dtwclust)
+```
+
+```{r}
 dct <- read.csv("CENT_dct.csv")
 dct_spread <- read.csv("CENT_dct_spread.csv")
 ```
