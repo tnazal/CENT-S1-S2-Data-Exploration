@@ -18,7 +18,10 @@ df <- df %>% group_by(Network, Show_Name) %>%
   filter(all(c(1, 2) %in% Season_num)) %>% 
   ungroup() %>% 
   group_by(Network, Show_Name, Season_num) %>% 
-  filter(max(Episode_num) >= 3)
+  filter(max(Episode_num) >= 3) %>% 
+  ungroup() %>% 
+  group_by(Network, Show_Name) %>%
+  filter(all(c(1, 2) %in% Season_num)) 
 
 ```
 
@@ -69,3 +72,4 @@ write.csv(df_final, "CENT_dct_spread.csv")
 write.csv(df_with_dct, "CENT_dct.csv")
 
 ```
+
