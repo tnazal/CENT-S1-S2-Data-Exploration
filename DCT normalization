@@ -71,5 +71,33 @@ df_final <- df_with_dct %>%
 write.csv(df_final, "CENT_dct_spread.csv")
 write.csv(df_with_dct, "CENT_dct.csv")
 
-```
+#For matching with clusters on s1 & s2
+s1_s2_dct <- df_curves %>% 
+  mutate(dct_values = map(imps, dct)) %>% 
+  select(-imps) %>% 
+  unnest(dct_values) %>% 
+  filter(Season_num == 1 | Season_num == 2) %>% 
+  group_by(Network, Show_Name) %>% 
+  mutate(period = row_number()) 
 
+
+write.csv(s1_s2_dct, "s1_s2_dct.csv")
+
+#S1 & S2 continuous normalization
+df_dct_s1_s2_continuous <- df %>% 
+  group_by(Network, Show_Name) %>% 
+  summarise(imps = list(C3_Imps)) %>%
+  ungroup() %>% 
+  mutate(dct_values = map(imps, dct)) %>% 
+  select(-imps) %>% 
+  unnest(dct_values) %>% 
+  group_by(Network, Show_Name) %>% 
+  mutate(period = row_number()) 
+
+df_final_continuous <- df_dct_s1_s2_continuous  %>% 
+  spread(key = period, value = dct_values)
+
+
+write.csv(df_dct_s1_s2_continuous, "s1_s2_cont_dct.csv")
+write.csv(df_final_continuous, "CENT_dct_cont_spread.csv")
+```
