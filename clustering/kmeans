@@ -5,9 +5,9 @@ output: html_notebook
 
 ##################################################################################
 inputs: CENT_dct.csv, CENT_dct_cont_spread.csv, CENT_dct_spread.csv,
-        s1_s2_cont_dct.csv, dct_s1_s2.csv
+        s1_s2_cont_dct.csv, dct_s1_s2.csv  
 purpose: K-Means clustering (3 and 5 clusters for S1, S1 & S2 normalized separately,
-        and S1 & S2 normalized together)
+          and S1 & S2 normalized together)
 ##################################################################################
 
 ```{r setup, include=FALSE}
@@ -128,6 +128,7 @@ ggplotly(clusters3_s1_plot)
 s1_3clusters <- list(as.character(unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 1,]$Show_Name)),
                      as.character(unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 2,]$Show_Name)),
                      as.character(unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 3,]$Show_Name)))
+s1_3clusters
 ```
 
 ### 5 Clusters (K-Means)
@@ -162,6 +163,7 @@ s1_5clusters <- list(as.character(unique(clusters5_s1[clusters5_s1$cluster_kmean
                      as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 3,]$Show_Name)), 
                      as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 4,]$Show_Name)), 
                      as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 5,]$Show_Name)))
+s1_5clusters
 ```
 
 
@@ -267,6 +269,7 @@ ggplotly(clusters3_s2_plot)
 s2_3clusters <- list(as.character(unique(clusters3_s2[clusters3_s2$cluster_kmeans_3 == 1,]$Show_Name)),
                      as.character(unique(clusters3_s2[clusters3_s2$cluster_kmeans_3 == 2,]$Show_Name)),
                      as.character(unique(clusters3_s2[clusters3_s2$cluster_kmeans_3 == 3,]$Show_Name)))
+s2_3clusters
 ```
 
 ### 5 Clusters (K-Means)
@@ -301,6 +304,7 @@ s2_5clusters <- list(as.character(unique(clusters5_s2[clusters5_s2$cluster_kmean
                      as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 3,]$Show_Name)),
                      as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 4,]$Show_Name)),
                      as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 5,]$Show_Name)))
+s2_5clusters
 ```
 
 
@@ -415,6 +419,7 @@ ggplotly(clusters3_s1_s2_plot)
 s1_s2_3clusters <- list(as.character(unique(clusters3_s1_s2[clusters3_s1_s2$cluster_kmeans_3 == 1,]$Show_Name)),
                         as.character(unique(clusters3_s1_s2[clusters3_s1_s2$cluster_kmeans_3 == 2,]$Show_Name)),
                         as.character(unique(clusters3_s1_s2[clusters3_s1_s2$cluster_kmeans_3 == 3,]$Show_Name)))
+s1_s2_3clusters
 ```
 
 ### 5 Clusters (K-Means)
@@ -446,6 +451,7 @@ s1_s2_5clusters <- list(as.character(unique(clusters5_s1_s2[clusters5_s1_s2$clus
                         as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 3,]$Show_Name)),
                         as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 4,]$Show_Name)),
                         as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 5,]$Show_Name)))
+s1_s2_5clusters
 ```
 
 
@@ -551,6 +557,7 @@ ggplotly(clusters3_cont_plot)
 cont_3clusters <- list(as.character(unique(clusters3_cont [clusters3_cont $cluster_kmeans_3 == 1,]$Show_Name)),
                        as.character(unique(clusters3_cont [clusters3_cont $cluster_kmeans_3 == 2,]$Show_Name)),
                        as.character(unique(clusters3_cont [clusters3_cont $cluster_kmeans_3 == 3,]$Show_Name)))
+cont_3clusters
 ```
 
 ### 5 Clusters (K-Means)
@@ -584,4 +591,5 @@ cont_5clusters <- list(as.character(unique(clusters5_cont[clusters5_cont$cluster
                        as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 3,]$Show_Name)),
                        as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 4,]$Show_Name)),
                        as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 5,]$Show_Name)))
+cont_5clusters
 ```
