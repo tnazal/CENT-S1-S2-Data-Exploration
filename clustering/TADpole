@@ -1,0 +1,211 @@
+
+```{r}
+##################################################################################
+# inputs:  CENT_dct_spread.csv, CENT_dct_spread_cont.csv, CENT_dct_cont.csv
+#
+# purpose: tadpole clustering (3 and 5 clusters for S1, S2,
+#          and S1 & S2 normalized together)
+##################################################################################
+```
+
+
+```{r}
+library(plyr)
+library(dplyr)
+library(dtwclust)
+library(ggplot2)
+```
+
+
+#Season 1 clustering
+
+##Tadpole Clustering, 5 Clusters
+```{r}
+dct_spread <- read.csv("CENT_dct_spread.csv")
+
+
+dtw_df_s1 <- dct_spread %>% 
+  filter(Season_num == 1) %>%
+  select(-X, -Network, -Season_num, -Show_Name)
+
+```
+
+
+```{r}
+set.seed(12)
+tadpole_clust5_s1 <- TADPole(dtw_df_s1, k = 5L, window.size = 25, dc = 2)
+
+tadpole_clust5_s1_df<- dct_spread %>% 
+  filter(Season_num == 1) %>% 
+  select(-Season_num)
+
+tadpole_clust5_s1_df$cluster <- tadpole_clust5_s1$cl  
+```
+
+
+```{r}
+tadpole5_s1_long <- gather(tadpole_clust5_s1_df, key = period, value = dct_values ,X1:X100) %>% 
+  select(-X)
+tadpole5_s1_long$period <- as.numeric(sub("X", "", tadpole5_s1_long$period))
+tadpole5_s1_long$period <- as.numeric(tadpole5_s1_long$period)
+
+
+
+tadpole5_s1_plot <- tadpole5_s1_long %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster)
+
+ggplotly(tadpole5_s1_plot)
+```
+
+
+
+##Tadpole Clustering, 3 Clusters
+
+```{r}
+set.seed(12)
+tadpole_clust3_s1 <- TADPole(dtw_df_s1, k = 3L, window.size = 25, dc = 2)
+
+tadpole_clust3_s1_df<- dct_spread %>% 
+  filter(Season_num == 1) %>% 
+  select(-Season_num)
+
+tadpole_clust3_s1_df$cluster <- tadpole_clust3_s1$cl  
+```
+
+
+```{r}
+tadpole3_s1_long <- gather(tadpole_clust3_s1_df, key = period, value = dct_values ,X1:X100) %>% 
+  select(-X)
+tadpole3_s1_long$period <- as.numeric(sub("X", "", tadpole3_s1_long$period))
+tadpole3_s1_long$period <- as.numeric(tadpole3_s1_long$period)
+
+
+
+tadpole3_s1_plot <- tadpole3_s1_long %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster)
+
+ggplotly(tadpole3_s1_plot)
+```
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+#Season 2 clustering
+
+##Tadpole Clustering, 5 Clusters
+```{r}
+
+dtw_df_s2 <- dct_spread %>% 
+  filter(Season_num == 2) %>%
+  select(-X, -Network, -Season_num, -Show_Name)
+
+```
+
+
+```{r}
+set.seed(12)
+tadpole_clust5_s2 <- TADPole(dtw_df_s2, k = 5L, window.size = 2, dc = 2)
+
+tadpole_clust5_s2_df<- dct_spread %>% 
+  filter(Season_num == 2) %>% 
+  select(-Season_num)
+
+tadpole_clust5_s2_df$cluster <- tadpole_clust5_s2$cl  
+```
+
+
+```{r}
+tadpole5_s2_long <- gather(tadpole_clust5_s2_df, key = period, value = dct_values ,X1:X100) %>% 
+  select(-X)
+tadpole5_s2_long$period <- as.numeric(sub("X", "", tadpole5_s2_long$period ))
+tadpole5_s2_long$period <- as.numeric(tadpole5_s2_long$period)
+
+
+
+tadpole5_s2_plot <- tadpole5_s2_long %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster)
+
+ggplotly(tadpole5_s2_plot)
+```
+
+
+
+##Tadpole Clustering, 3 Clusters
+
+```{r}
+set.seed(12)
+tadpole_clust3_s2 <- TADPole(dtw_df_s2, k = 3L, window.size = 2, dc = 2)
+
+tadpole_clust3_s2_df<- dct_spread %>% 
+  filter(Season_num == 2) %>% 
+  select(-Season_num)
+
+tadpole_clust3_s2_df$cluster <- tadpole_clust3_s2 $cl  
+```
+
+
+```{r}
+tadpole3_s2_long <- gather(tadpole_clust3_s2_df, key = period, value = dct_values ,X1:X100) %>% 
+  select(-X)
+tadpole3_s2_long$period <- as.numeric(sub("X", "", tadpole3_s2_long$period ))
+tadpole3_s2_long$period <- as.numeric(tadpole3_s2_long$period)
+
+
+
+tadpole3_s2_plot <- tadpole3_s2_long %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster)
+
+ggplotly(tadpole3_s2_plot)
+```
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+#continuous S01-S02 clustering
+
+##Tadpole Clustering, 5 Clusters
+```{r}
+dct_cont <- read.csv("CENT_dct_cont.csv")
+dct_spread_cont <- read.csv("CENT_dct_spread_cont.csv")
+dtw_df_cont <- dct_spread_cont %>%
+  select(-X, -Network, -Show_Name)
+```
+
+
+```{r}
+set.seed(12)
+tadpole_clust5_cont <- TADPole(dtw_df_cont, k = 5L, window.size = 25, dc = 2)
+
+tadpole_clust5_cont_df<- dct_spread_cont
+
+tadpole_clust5_cont_df$cluster <- tadpole_clust5_cont$cl  
+```
+
+
+```{r}
+tadpole5_cont_long <- gather(tadpole_clust5_cont_df, key = period, value = dct_values ,X1:X100) %>% 
+  select(-X)
+tadpole5_cont_long$period <- as.numeric(sub("X", "", tadpole5_cont_long$period ))
+tadpole5_cont_long$period <- as.numeric(tadpole5_cont_long$period)
+
+
+
+tadpole5_cont_plot <- tadpole5_cont_long %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster)
+
+ggplotly(tadpole5_cont_plot)
+```
