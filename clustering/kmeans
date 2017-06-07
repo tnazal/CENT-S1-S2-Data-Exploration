@@ -6,9 +6,13 @@ output: html_notebook
 ##################################################################################
 inputs: CENT_dct.csv, CENT_dct_cont_spread.csv, CENT_dct_spread.csv,
         s1_s2_cont_dct.csv, dct_s1_s2.csv
-purpose: K-means clustering (3 and 5 clusters for S1, S1 & S2 normalized separately,
+purpose: K-Means clustering (3 and 5 clusters for S1, S1 & S2 normalized separately,
         and S1 & S2 normalized together)
 ##################################################################################
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
 
 ```{r}
 library(dplyr)
@@ -20,6 +24,8 @@ library(dtwclust)
 ```
 
 # Season 1 Curve Clustering
+
+Using examples from https://cran.r-project.org/web/packages/broom/vignettes/kmeans.html.
 
 ```{r}
 dct_df <- read.csv("CENT_dct.csv")
@@ -39,21 +45,25 @@ cluster_s1 <- dct_spread %>%
 set.seed(12)
 kclusts_s1 <- data.frame(k = 1:5) %>% 
   group_by(k) %>% 
-  do(kclust = kmeans(cluster_s1, centers = .$k, nstart = 50))
-```
+  do(kclust = kmeans(cluster_s1, centers = .$k, nstart = 20))
 
-```{r}
-clusters_s1 <- kclusts_s1 %>% group_by(k) %>% do(tidy(.$kclust[[1]]))
 assignments_s1 <- kclusts_s1 %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s1))
-clusterings_s1 <- kclusts_s1 %>% group_by(k) %>% do(glance(.$kclust[[1]]))
 ```
 
 ### Optimal Number of Clusters
 
 ```{r}
-ggplot(clusterings_s1, aes(k, tot.withinss)) + 
-  geom_line() +
-  scale_x_discrete(limits = seq(1, 5))
+fviz_nbclust(cluster_s1, 
+             kmeans, 
+             method = "wss",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1, 
+             kmeans, 
+             method = "silhouette",
+             k.max = 5)
 ```
 
 ```{r}
@@ -112,14 +122,13 @@ clusters3_s1_plot <- clusters3_s1 %>%
 ggplotly(clusters3_s1_plot)
 ```
 
-####List Show Names within clusters
+#### List Show Names within Clusters
 
 ```{r}
 s1_3clusters <- list(as.character(unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 1,]$Show_Name)),
-      as.character(unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 2,]$Show_Name)),
-      as.character(unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 3,]$Show_Name)))
+                     as.character(unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 2,]$Show_Name)),
+                     as.character(unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 3,]$Show_Name)))
 ```
-
 
 ### 5 Clusters (K-Means)
 
@@ -145,25 +154,22 @@ clusters5_s1_plot <- clusters5_s1 %>%
 ggplotly(clusters5_s1_plot)
 ```
 
-####List Show Names within clusters
+#### List Show Names within Clusters
 
 ```{r}
-s1_5clusters <- list(as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 1,]$Show_Name)),
-      as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 2,]$Show_Name)),
-      as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 3,]$Show_Name)),
-      as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 4,]$Show_Name)),
-      as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 5,]$Show_Name)))
+s1_5clusters <- list(as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 1,]$Show_Name)), 
+                     as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 2,]$Show_Name)), 
+                     as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 3,]$Show_Name)), 
+                     as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 4,]$Show_Name)), 
+                     as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 5,]$Show_Name)))
 ```
 
 
------------------------------------------------------------------------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
 
 
 # Season 2 Curve Clustering
-
-Using examples from https://cran.r-project.org/web/packages/broom/vignettes/kmeans.html.
-
 
 ```{r}
 cluster_s2 <- dct_spread %>% 
@@ -178,13 +184,58 @@ cluster_s2 <- dct_spread %>%
 set.seed(12)
 kclusts_s2 <- data.frame(k = 1:5) %>% 
   group_by(k) %>% 
-  do(kclust = kmeans(cluster_s2, centers = .$k, nstart = 50))
+  do(kclust = kmeans(cluster_s2, centers = .$k, nstart = 20))
+
+assignments_s2 <- kclusts_s2 %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s2))
+```
+
+### Optimal Number of Clusters
+
+```{r}
+fviz_nbclust(cluster_s2, 
+             kmeans, 
+             method = "wss",
+             k.max = 5)
 ```
 
 ```{r}
-clusters_s2 <- kclusts_s2 %>% group_by(k) %>% do(tidy(.$kclust[[1]]))
-assignments_s2 <- kclusts_s2 %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s2))
-clusterings_s2 <- kclusts_s2 %>% group_by(k) %>% do(glance(.$kclust[[1]]))
+fviz_nbclust(cluster_s2, 
+             kmeans, 
+             method = "silhouette",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s2, 
+             kmeans, 
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s2, 
+             cluster::pam, 
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s2, 
+             hcut, 
+             hc_method = "single",
+             hc_metric = "euclidean",
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s2, 
+             hcut, 
+             hc_method = "single",
+             hc_metric = "pearson",
+             method = "silhouette",
+             k.max = 5,
+             nboot = 500)
 ```
 
 ### 3 Clusters (K-Means)
@@ -210,12 +261,12 @@ clusters3_s2_plot <- clusters3_s2 %>%
 ggplotly(clusters3_s2_plot)
 ```
 
-####List Show Names within clusters
+#### List Show Names within Clusters
 
 ```{r}
 s2_3clusters <- list(as.character(unique(clusters3_s2[clusters3_s2$cluster_kmeans_3 == 1,]$Show_Name)),
-      as.character(unique(clusters3_s2[clusters3_s2$cluster_kmeans_3 == 2,]$Show_Name)),
-      as.character(unique(clusters3_s2[clusters3_s2$cluster_kmeans_3 == 3,]$Show_Name)))
+                     as.character(unique(clusters3_s2[clusters3_s2$cluster_kmeans_3 == 2,]$Show_Name)),
+                     as.character(unique(clusters3_s2[clusters3_s2$cluster_kmeans_3 == 3,]$Show_Name)))
 ```
 
 ### 5 Clusters (K-Means)
@@ -242,19 +293,19 @@ clusters5_s2_plot <- clusters5_s2 %>%
 ggplotly(clusters5_s2_plot)
 ```
 
-####List Show Names within clusters
+#### List Show Names within Clusters
 
 ```{r}
 s2_5clusters <- list(as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 1,]$Show_Name)),
-      as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 2,]$Show_Name)),
-      as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 3,]$Show_Name)),
-      as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 4,]$Show_Name)),
-      as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 5,]$Show_Name)))
+                     as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 2,]$Show_Name)),
+                     as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 3,]$Show_Name)),
+                     as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 4,]$Show_Name)),
+                     as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 5,]$Show_Name)))
 ```
 
 
------------------------------------------------------------------------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
 
 
 # Season 1 and 2 Curve Clustering
@@ -280,21 +331,25 @@ dct_s1_s2 <- read.csv("CENT_dct_s1_s2.csv")
 set.seed(12)
 kclusts_s1_s2 <- data.frame(k = 1:5) %>% 
   group_by(k) %>% 
-  do(kclust = kmeans(cluster_s1_s2, centers = .$k, nstart = 50))
-```
+  do(kclust = kmeans(cluster_s1_s2, centers = .$k, nstart = 20))
 
-```{r}
-clusters_s1_s2 <- kclusts_s1_s2 %>% group_by(k) %>% do(tidy(.$kclust[[1]]))
 assignments_s1_s2 <- kclusts_s1_s2 %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s1_s2))
-clusterings_s1_s2 <- kclusts_s1_s2 %>% group_by(k) %>% do(glance(.$kclust[[1]]))
 ```
 
 ### Optimal Number of Clusters
 
 ```{r}
-ggplot(clusterings_s1_s2, aes(k, tot.withinss)) + 
-  geom_line() +
-  scale_x_discrete(limits = seq(1, 5))
+fviz_nbclust(cluster_s1_s2, 
+             kmeans, 
+             method = "wss",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1_s2, 
+             kmeans, 
+             method = "silhouette",
+             k.max = 5)
 ```
 
 ```{r}
@@ -310,6 +365,7 @@ fviz_nbclust(cluster_s1_s2,
              method = "gap_stat",
              k.max = 5)
 ```
+
 
 ```{r}
 fviz_nbclust(cluster_s1_s2, 
@@ -353,12 +409,12 @@ clusters3_s1_s2_plot <- clusters3_s1_s2 %>%
 ggplotly(clusters3_s1_s2_plot)
 ```
 
-####List Show Names within clusters
+#### List Show Names within Clusters
 
 ```{r}
 s1_s2_3clusters <- list(as.character(unique(clusters3_s1_s2[clusters3_s1_s2$cluster_kmeans_3 == 1,]$Show_Name)),
-      as.character(unique(clusters3_s1_s2[clusters3_s1_s2$cluster_kmeans_3 == 2,]$Show_Name)),
-      as.character(unique(clusters3_s1_s2[clusters3_s1_s2$cluster_kmeans_3 == 3,]$Show_Name)))
+                        as.character(unique(clusters3_s1_s2[clusters3_s1_s2$cluster_kmeans_3 == 2,]$Show_Name)),
+                        as.character(unique(clusters3_s1_s2[clusters3_s1_s2$cluster_kmeans_3 == 3,]$Show_Name)))
 ```
 
 ### 5 Clusters (K-Means)
@@ -384,20 +440,17 @@ clusters5_s1_s2_plot <- clusters5_s1_s2 %>%
 ggplotly(clusters5_s1_s2_plot)
 ```
 
-####List Show Names within clusters
-
 ```{r}
 s1_s2_5clusters <- list(as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 1,]$Show_Name)),
-      as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 2,]$Show_Name)),
-      as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 3,]$Show_Name)),
-      as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 4,]$Show_Name)),
-      as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 5,]$Show_Name)))
-
+                        as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 2,]$Show_Name)),
+                        as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 3,]$Show_Name)),
+                        as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 4,]$Show_Name)),
+                        as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 5,]$Show_Name)))
 ```
 
 
------------------------------------------------------------------------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
 
 
 #Season 1 and 2 Continuous Curve Clustering
@@ -415,21 +468,25 @@ cluster_cont <- dct_spread_cont %>%
 set.seed(12)
 kclusts_cont <- data.frame(k = 1:5) %>% 
   group_by(k) %>% 
-  do(kclust = kmeans(cluster_cont, centers = .$k, nstart = 50))
-```
+  do(kclust = kmeans(cluster_cont, centers = .$k, nstart = 20))
 
-```{r}
-clusters_cont <- kclusts_cont %>% group_by(k) %>% do(tidy(.$kclust[[1]]))
 assignments_cont <- kclusts_cont %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_cont))
-clusterings_cont <- kclusts_cont %>% group_by(k) %>% do(glance(.$kclust[[1]]))
 ```
 
 ### Optimal Number of Clusters
 
 ```{r}
-ggplot(clusterings_cont, aes(k, tot.withinss)) + 
-  geom_line() +
-  scale_x_discrete(limits = seq(1, 5))
+fviz_nbclust(cluster_cont, 
+             kmeans, 
+             method = "wss",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_cont, 
+             kmeans, 
+             method = "silhouette",
+             k.max = 5)
 ```
 
 ```{r}
@@ -488,12 +545,12 @@ clusters3_cont_plot <- clusters3_cont %>%
 ggplotly(clusters3_cont_plot)
 ```
 
-####List Show Names within clusters
+#### List Show Names within Clusters
 
 ```{r}
 cont_3clusters <- list(as.character(unique(clusters3_cont [clusters3_cont $cluster_kmeans_3 == 1,]$Show_Name)),
-      as.character(unique(clusters3_cont [clusters3_cont $cluster_kmeans_3 == 2,]$Show_Name)),
-      as.character(unique(clusters3_cont [clusters3_cont $cluster_kmeans_3 == 3,]$Show_Name)))
+                       as.character(unique(clusters3_cont [clusters3_cont $cluster_kmeans_3 == 2,]$Show_Name)),
+                       as.character(unique(clusters3_cont [clusters3_cont $cluster_kmeans_3 == 3,]$Show_Name)))
 ```
 
 ### 5 Clusters (K-Means)
@@ -519,13 +576,12 @@ clusters5_cont_plot <- clusters5_cont %>%
 ggplotly(clusters5_cont_plot)
 ```
 
-####List Show Names within clusters
+#### List Show Names within Clusters
 
 ```{r}
 cont_5clusters <- list(as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 1,]$Show_Name)),
-      as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 2,]$Show_Name)),
-      as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 3,]$Show_Name)),
-      as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 4,]$Show_Name)),
-      as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 5,]$Show_Name)))
+                       as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 2,]$Show_Name)),
+                       as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 3,]$Show_Name)),
+                       as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 4,]$Show_Name)),
+                       as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 5,]$Show_Name)))
 ```
-
