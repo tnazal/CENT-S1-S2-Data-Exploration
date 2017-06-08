@@ -137,39 +137,6 @@ s1_3clusters <- list(as.character(unique(clusters3_s1[clusters3_s1$cluster_kmean
 s1_3clusters
 ```
 
-```{r}
-# TEST PLOT FOR S1 CLUSTERS & S2 TRENDS
-s2_spread <- dct_spread %>% 
-  filter(Season_num == 2) %>%
-  ungroup() %>%
-  select(-X, -Network, -Season_num)
-
-s2_spread_newcols <- c(paste("X", 101:200, sep = ""))
-colnames(s2_spread)[2:ncol(s2_spread)] <- c(s2_spread_newcols)
-
-s1_3clusters_s2_trends <- bind_cols(clusters3_s1_spread, s2_spread[, 2:ncol(s2_spread)])
-
-s1_3clusters_s2_trends <- merge(s1_3clusters_s2_trends[, c("cluster_kmeans_3", 
-                                                         "Show_Name")], 
-                               dct_df, by = "Show_Name")
-
-dct_s1_3clusters_s2_trends <- s1_3clusters_s2_trends %>% 
-  filter(Season_num == 1 | Season_num == 2) %>% 
-  group_by(Network, Show_Name) %>% 
-  mutate(period = row_number())
-
-s1_3clusters_s2_trends_plot <- dct_s1_3clusters_s2_trends %>%
-  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
-  geom_line() + 
-  facet_wrap(~ cluster_kmeans_3, nrow = 3) + 
-  theme(axis.title.x = element_blank(), 
-        axis.title.y = element_blank())
-
-ggplotly(s1_3clusters_s2_trends_plot) %>% 
-  layout(title = "Season 1 Shows with 3 Clusters & Season 2 Trends", 
-         margin = list(t = 150))
-```
-
 ### 4 Clusters (K-Means)
 
 ```{r}
@@ -205,31 +172,6 @@ s1_4clusters <- list(as.character(unique(clusters4_s1[clusters4_s1$cluster_kmean
                      as.character(unique(clusters4_s1[clusters4_s1$cluster_kmeans_4 == 3,]$Show_Name)), 
                      as.character(unique(clusters4_s1[clusters4_s1$cluster_kmeans_4 == 4,]$Show_Name)))
 s1_4clusters
-```
-
-```{r}
-# TEST PLOT FOR S1 CLUSTERS & S2 TRENDS
-s1_4clusters_s2_trends <- bind_cols(clusters4_s1_spread, s2_spread[, 2:ncol(s2_spread)])
-
-s1_4clusters_s2_trends <- merge(s1_4clusters_s2_trends[, c("cluster_kmeans_4", 
-                                                         "Show_Name")], 
-                                dct_df, by = "Show_Name")
-
-dct_s1_4clusters_s2_trends <- s1_4clusters_s2_trends %>% 
-  filter(Season_num == 1 | Season_num == 2) %>% 
-  group_by(Network, Show_Name) %>% 
-  mutate(period = row_number())
-
-s1_4clusters_s2_trends_plot <- dct_s1_4clusters_s2_trends %>%
-  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
-  geom_line() + 
-  facet_wrap(~ cluster_kmeans_4, nrow = 4) + 
-  theme(axis.title.x = element_blank(), 
-        axis.title.y = element_blank())
-
-ggplotly(s1_4clusters_s2_trends_plot) %>% 
-  layout(title = "Season 1 Shows with 4 Clusters & Season 2 Trends", 
-         margin = list(t = 150))
 ```
 
 ### 5 Clusters (K-Means)
@@ -269,31 +211,6 @@ s1_5clusters <- list(as.character(unique(clusters5_s1[clusters5_s1$cluster_kmean
                      as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 4,]$Show_Name)), 
                      as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 5,]$Show_Name)))
 s1_5clusters
-```
-
-```{r}
-# TEST PLOT FOR S1 CLUSTERS & S2 TRENDS
-s1_5clusters_s2_trends <- bind_cols(clusters5_s1_spread, s2_spread[, 2:ncol(s2_spread)])
-
-s1_5clusters_s2_trends <- merge(s1_5clusters_s2_trends[, c("cluster_kmeans_5", 
-                                                         "Show_Name")], 
-                                dct_df, by = "Show_Name")
-
-dct_s1_5clusters_s2_trends <- s1_5clusters_s2_trends %>% 
-  filter(Season_num == 1 | Season_num == 2) %>% 
-  group_by(Network, Show_Name) %>% 
-  mutate(period = row_number())
-
-s1_5clusters_s2_trends_plot <- dct_s1_5clusters_s2_trends %>%
-  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
-  geom_line() + 
-  facet_wrap(~ cluster_kmeans_5, nrow = 3) + 
-  theme(axis.title.x = element_blank(), 
-        axis.title.y = element_blank())
-
-ggplotly(s1_5clusters_s2_trends_plot) %>% 
-  layout(title = "Season 1 Shows with 5 Clusters & Season 2 Trends", 
-         margin = list(t = 150))
 ```
 
 
