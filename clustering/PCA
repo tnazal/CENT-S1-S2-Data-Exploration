@@ -5,6 +5,18 @@ library(ggplot2)
 library(plotly)
 ```
 
+
+```{r}
+##################################################################################
+# inputs:  CENT_dct_spread.csv, CENT_dct_spread_cont.csv
+#
+# purpose: PCA clustering (3 clusters (Cumulative proportion of variance = 1.0 at
+#          3 Principal components for all PCAs) for S1, S2,
+#          and S1 & S2 normalized together)
+##################################################################################
+```
+
+
 #PCA S1
 
 Read data, prepare data
