@@ -1,10 +1,3 @@
-```{r}
-library(tidyr)
-library(dplyr)
-library(ggplot2)
-library(plotly)
-```
-
 
 ```{r}
 ##################################################################################
@@ -16,6 +9,12 @@ library(plotly)
 ##################################################################################
 ```
 
+```{r}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+```
 
 #PCA S1
 
@@ -63,6 +62,17 @@ pca_s1_plot <- pca_s1_long %>%
 ggplotly(pca_s1_plot)
 ```
 
+
+###Shows in each cluster
+
+```{r}
+pca_s1_clusters <- list(as.character(unique(df_pcaclusters_s1[df_pcaclusters_s1$cluster == 1,]$Show_Name)),
+      as.character(unique(df_pcaclusters_s1[df_pcaclusters_s1$cluster == 2,]$Show_Name)),
+      as.character(unique(df_pcaclusters_s1[df_pcaclusters_s1$cluster == 3,]$Show_Name)))
+
+pca_s1_clusters 
+
+```
 
 -------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------
@@ -113,6 +123,17 @@ pca_s2_plot <- pca_s2_long %>%
 ggplotly(pca_s2_plot)
 ```
 
+###Shows in each cluster
+
+```{r}
+pca_s2_clusters <- list(as.character(unique(df_pcaclusters_s2[df_pcaclusters_s2$cluster == 1,]$Show_Name)),
+      as.character(unique(df_pcaclusters_s2[df_pcaclusters_s2$cluster == 2,]$Show_Name)),
+      as.character(unique(df_pcaclusters_s2[df_pcaclusters_s2$cluster == 3,]$Show_Name)))
+
+pca_s2_clusters 
+
+```
+
 
 -------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------
@@ -160,3 +181,15 @@ pca_cont_plot <- pca_cont_long %>%
 
 ggplotly(pca_cont_plot)
 ```
+
+###Shows in each cluster
+
+```{r}
+pca_cont_clusters <- list(as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 1,]$Show_Name)),
+      as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 2,]$Show_Name)),
+      as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 3,]$Show_Name)))
+
+pca_cont_clusters 
+
+```
+
