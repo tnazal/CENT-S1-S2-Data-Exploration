@@ -71,10 +71,10 @@ plot(kshape_s1$k_2, type = 'sc')
 
 ```{r}
 # export cluster predictions to the main data set
-clusters_s1_shape2 <- dct_spread %>% filter(Season_num == 1)
-clusters_s1_shape2$cluster_shape_2 <- kshape_s1$k_2@cluster
+clusters_s1_shape2_spread <- dct_spread %>% filter(Season_num == 1)
+clusters_s1_shape2_spread$cluster_shape_2 <- kshape_s1$k_2@cluster
 
-clusters_s1_shape2 <- merge(clusters_s1_shape2[, c("cluster_shape_2", 
+clusters_s1_shape2 <- merge(clusters_s1_shape2_spread[, c("cluster_shape_2", 
                                        "Show_Name")], 
                       dct_df, by = "Show_Name")
 ```
@@ -129,10 +129,10 @@ plot(dtw_s1$k_3, type = 'sc')
 
 ```{r}
 # export cluster predictions to the main data set
-clusters_s1_dtw3 <- dct_spread %>% filter(Season_num == 1)
-clusters_s1_dtw3$cluster_dtw_3 <- dtw_s1$k_3@cluster
+clusters_s1_dtw3_spread <- dct_spread %>% filter(Season_num == 1)
+clusters_s1_dtw3_spread$cluster_dtw_3 <- dtw_s1$k_3@cluster
 
-clusters_s1_dtw3 <- merge(clusters_s1_dtw3[, c("cluster_dtw_3", 
+clusters_s1_dtw3 <- merge(clusters_s1_dtw3_spread[, c("cluster_dtw_3", 
                                        "Show_Name")], 
                       dct_df, by = "Show_Name")
 ```
@@ -197,10 +197,10 @@ plot(kshape_s2$k_4, type = 'sc')
 
 ```{r}
 # export cluster predictions to the main data set
-clusters_s2_shape4 <- dct_spread %>% filter(Season_num == 2)
-clusters_s2_shape4$cluster_shape_4 <- kshape_s2$k_4@cluster
+clusters_s2_shape4_spread <- dct_spread %>% filter(Season_num == 2)
+clusters_s2_shape4_spread$cluster_shape_4 <- kshape_s2$k_4@cluster
 
-clusters_s2_shape4 <- merge(clusters_s2_shape4[, c("cluster_shape_4", 
+clusters_s2_shape4 <- merge(clusters_s2_shape4_spread[, c("cluster_shape_4", 
                                        "Show_Name")], 
                       dct_df, by = "Show_Name")
 ```
@@ -257,10 +257,10 @@ plot(dtw_s2$k_2, type = 'sc')
 
 ```{r}
 # export cluster predictions to the main data set
-clusters_s2_dtw2 <- dct_spread %>% filter(Season_num == 2)
-clusters_s2_dtw2$cluster_dtw_2 <- dtw_s2$k_2@cluster
+clusters_s2_dtw2_spread <- dct_spread %>% filter(Season_num == 2)
+clusters_s2_dtw2_spread$cluster_dtw_2 <- dtw_s2$k_2@cluster
 
-clusters_s2_dtw2 <- merge(clusters_s2_dtw2[, c("cluster_dtw_2", 
+clusters_s2_dtw2 <- merge(clusters_s2_dtw2_spread[, c("cluster_dtw_2", 
                                        "Show_Name")], 
                       dct_df, by = "Show_Name")
 ```
@@ -324,10 +324,10 @@ plot(kshape_cont$k_5, type = 'sc')
 
 ```{r}
 # export cluster predictions to the main data set
-clusters_cont_shape5 <- dct_spread_cont
-clusters_cont_shape5$cluster_shape_5 <- kshape_cont$k_5@cluster
+clusters_cont_shape5_spread <- dct_spread_cont
+clusters_cont_shape5_spread$cluster_shape_5 <- kshape_cont$k_5@cluster
 
-clusters_cont_shape5 <- merge(clusters_cont_shape5[, c("cluster_shape_5", 
+clusters_cont_shape5 <- merge(clusters_cont_shape5_spread[, c("cluster_shape_5", 
                                        "Show_Name")], 
                       dct_cont, by = "Show_Name")
 ```
@@ -384,10 +384,10 @@ plot(dtw_cont$k_3, type = 'sc')
 
 ```{r}
 # export cluster predictions to the main data set
-clusters_cont_dtw3 <- dct_spread_cont
-clusters_cont_dtw3$cluster_dtw_3 <- dtw_cont$k_3@cluster
+clusters_cont_dtw3_spread <- dct_spread_cont
+clusters_cont_dtw3_spread$cluster_dtw_3 <- dtw_cont$k_3@cluster
 
-clusters_cont_dtw3 <- merge(clusters_cont_dtw3[, c("cluster_dtw_3", 
+clusters_cont_dtw3 <- merge(clusters_cont_dtw3_spread[, c("cluster_dtw_3", 
                                        "Show_Name")], 
                       dct_cont, by = "Show_Name")
 ```
