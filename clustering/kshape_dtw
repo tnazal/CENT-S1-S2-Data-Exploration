@@ -241,7 +241,7 @@ dtw_s2 <- tsclust(cluster_s2,
                   seed = 12)
 
 names(dtw_s2) <- paste0('k_', 2:5)
-# sapply(dtw_s1, cvi)
+# sapply(dtw_s2, cvi)
 ```
 
 ```{r}
@@ -366,7 +366,7 @@ dtw_cont <- tsclust(cluster_cont,
                     seed = 12)
 
 names(dtw_cont) <- paste0('k_', 2:5)
-# sapply(dtw_s1, cvi)
+# sapply(dtw_cont, cvi)
 ```
 
 ```{r}
