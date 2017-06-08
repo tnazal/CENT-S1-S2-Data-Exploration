@@ -1,7 +1,6 @@
-
 ---
 title: "CENT S1-S2 Time Series Clustering"
-output: html_document
+output: html_notebook
 ---
 
 ```{r}
@@ -103,59 +102,60 @@ s1_2clusters_kshape
 ## Dynamic Time Warp Clustering
 
 ```{r}
-dtw_s1 <- tsclust(cluster_s1,
+dtw_s1 <- tsclust(cluster_cont,
                   type = 'partitional',
                   k = 2:5,
                   distance = 'dtw_lb',
                   centroid = 'pam',
-                  control = partitional_control(pam.precompute = FALSE, iter.max = 25),
-                  args = tsclust_args(dist = list(window.size = 20)),
+                  control = partitional_control(pam.precompute = FALSE, 
+                                                iter.max = 25),
+                  args = tsclust_args(dist = list()),
+                  window.size = 20,
                   trace = FALSE,
                   seed = 12)
 
 names(dtw_s1) <- paste0('k_', 2:5)
-# sapply(dtw_s1, cvi)
+sapply(dtw_s1, cvi)
+which.max(sapply(dtw_s1, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(dtw_s1$k_5@cluster)
+table(dtw_s1$k_3@cluster)
 ```
 
 ```{r}
-plot(dtw_s1$k_5, type = 'sc')
+plot(dtw_s1$k_3, type = 'sc')
 ```
 
 ```{r}
 # export cluster predictions to the main data set
-clusters_s1_dtw5 <- dct_spread %>% filter(Season_num == 1)
-clusters_s1_dtw5$cluster_dtw_5 <- dtw_s1$k_5@cluster
+clusters_s1_dtw3 <- dct_spread %>% filter(Season_num == 1)
+clusters_s1_dtw3$cluster_dtw_3 <- dtw_s1$k_3@cluster
 
-clusters_s1_dtw5 <- merge(clusters_s1_dtw5[, c("cluster_dtw_5", 
+clusters_s1_dtw3 <- merge(clusters_s1_dtw3[, c("cluster_dtw_3", 
                                        "Show_Name")], 
                       dct_df, by = "Show_Name")
 ```
 
 ```{r}
-clusters_s1_dtw5_plot <- clusters_s1_dtw5 %>%
+clusters_s1_dtw3_plot <- clusters_s1_dtw3 %>%
   filter(Season_num == 1) %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
-  facet_wrap(~ cluster_dtw_5, nrow = 3) +  
+  facet_wrap(~ cluster_dtw_3, nrow = 3) +  
   theme(axis.title.x = element_blank(), 
         axis.title.y = element_blank())
 
-ggplotly(clusters_s1_dtw5_plot) %>% 
-  layout(title = "Season 1 Shows with 5 DTW Clusters", 
+ggplotly(clusters_s1_dtw3_plot) %>% 
+  layout(title = "Season 1 Shows with 3 DTW Clusters", 
          margin = list(t = 150))
 ```
 
 ```{r}
-s1_5clusters_dtw <- list(as.character(unique(clusters_s1_dtw5[clusters_s1_dtw5$cluster_dtw_5 == 1,]$Show_Name)), 
-                         as.character(unique(clusters_s1_dtw5[clusters_s1_dtw5$cluster_dtw_5 == 2,]$Show_Name)), 
-                         as.character(unique(clusters_s1_dtw5[clusters_s1_dtw5$cluster_dtw_5 == 3,]$Show_Name)), 
-                         as.character(unique(clusters_s1_dtw5[clusters_s1_dtw5$cluster_dtw_5 == 4,]$Show_Name)), 
-                         as.character(unique(clusters_s1_dtw5[clusters_s1_dtw5$cluster_dtw_5 == 5,]$Show_Name)))
-s1_5clusters_dtw
+s1_3clusters_dtw <- list(as.character(unique(clusters_s1_dtw3[clusters_s1_dtw3$cluster_dtw_3 == 1,]$Show_Name)), 
+                         as.character(unique(clusters_s1_dtw3[clusters_s1_dtw3$cluster_dtw_3 == 2,]$Show_Name)), 
+                         as.character(unique(clusters_s1_dtw3[clusters_s1_dtw3$cluster_dtw_3 == 3,]$Show_Name)))
+s1_3clusters_dtw
 ```
 
 # Season 2 Time Series Clustering
@@ -230,18 +230,21 @@ s2_4clusters_kshape
 ## Dynamic Time Warp Clustering
 
 ```{r}
-dtw_s2 <- tsclust(cluster_s2,
+dtw_s2 <- tsclust(cluster_cont,
                   type = 'partitional',
                   k = 2:5,
                   distance = 'dtw_lb',
                   centroid = 'pam',
-                  control = partitional_control(pam.precompute = FALSE, iter.max = 25),
-                  args = tsclust_args(dist = list(window.size = 20)),
+                  control = partitional_control(pam.precompute = FALSE, 
+                                                iter.max = 25),
+                  args = tsclust_args(dist = list()),
+                  window.size = 20,
                   trace = FALSE,
                   seed = 12)
 
 names(dtw_s2) <- paste0('k_', 2:5)
-# sapply(dtw_s2, cvi)
+sapply(dtw_s2, cvi)
+which.max(sapply(dtw_s2, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
@@ -360,51 +363,52 @@ dtw_cont <- tsclust(cluster_cont,
                     k = 2:5,
                     distance = 'dtw_lb',
                     centroid = 'pam',
-                    control = partitional_control(pam.precompute = FALSE, iter.max = 25),
-                    args = tsclust_args(dist = list(window.size = 20)),
+                    control = partitional_control(pam.precompute = FALSE, 
+                                                  iter.max = 25),
+                    args = tsclust_args(dist = list()),
+                    window.size = 20,
                     trace = FALSE,
                     seed = 12)
 
 names(dtw_cont) <- paste0('k_', 2:5)
-# sapply(dtw_cont, cvi)
+sapply(dtw_cont, cvi)
+which.max(sapply(dtw_cont, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(dtw_cont$k_5@cluster)
+table(dtw_cont$k_3@cluster)
 ```
 
 ```{r}
-plot(dtw_cont$k_5, type = 'sc')
+plot(dtw_cont$k_3, type = 'sc')
 ```
 
 ```{r}
 # export cluster predictions to the main data set
-clusters_cont_dtw5 <- dct_spread_cont
-clusters_cont_dtw5$cluster_dtw_5 <- dtw_cont$k_5@cluster
+clusters_cont_dtw3 <- dct_spread_cont
+clusters_cont_dtw3$cluster_dtw_3 <- dtw_cont$k_3@cluster
 
-clusters_cont_dtw5 <- merge(clusters_cont_dtw5[, c("cluster_dtw_5", 
+clusters_cont_dtw3 <- merge(clusters_cont_dtw3[, c("cluster_dtw_3", 
                                        "Show_Name")], 
                       dct_cont, by = "Show_Name")
 ```
 
 ```{r}
-clusters_cont_dtw5_plot <- clusters_cont_dtw5 %>% 
+clusters_cont_dtw3_plot <- clusters_cont_dtw3 %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
-  facet_wrap(~ cluster_dtw_5, nrow = 3) +  
+  facet_wrap(~ cluster_dtw_3, nrow = 3) +  
   theme(axis.title.x = element_blank(), 
         axis.title.y = element_blank())
 
-ggplotly(clusters_cont_dtw5_plot) %>% 
-  layout(title = "Season 1-2 Shows with 5 DTW Clusters", 
+ggplotly(clusters_cont_dtw3_plot) %>% 
+  layout(title = "Season 1-2 Shows with 3 DTW Clusters", 
          margin = list(t = 150))
 ```
 
 ```{r}
-cont_5clusters_dtw <- list(as.character(unique(clusters_cont_dtw5[clusters_cont_dtw5$cluster_dtw_5 == 1,]$Show_Name)), 
-                           as.character(unique(clusters_cont_dtw5[clusters_cont_dtw5$cluster_dtw_5 == 2,]$Show_Name)), 
-                           as.character(unique(clusters_cont_dtw5[clusters_cont_dtw5$cluster_dtw_5 == 3,]$Show_Name)), 
-                           as.character(unique(clusters_cont_dtw5[clusters_cont_dtw5$cluster_dtw_5 == 4,]$Show_Name)), 
-                           as.character(unique(clusters_cont_dtw5[clusters_cont_dtw5$cluster_dtw_5 == 5,]$Show_Name)))
-cont_5clusters_dtw
+cont_3clusters_dtw <- list(as.character(unique(clusters_cont_dtw3[clusters_cont_dtw3$cluster_dtw_3 == 1,]$Show_Name)), 
+                           as.character(unique(clusters_cont_dtw3[clusters_cont_dtw3$cluster_dtw_3 == 2,]$Show_Name)), 
+                           as.character(unique(clusters_cont_dtw3[clusters_cont_dtw3$cluster_dtw_3 == 3,]$Show_Name)))
+cont_3clusters_dtw
 ```
