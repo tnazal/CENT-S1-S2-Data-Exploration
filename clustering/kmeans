@@ -1,7 +1,6 @@
-
 ---
 title: "CENT S1-S2 K-Means Clustering"
-output: html_notebook
+output: html_document
 ---
 
 ```{r}
@@ -105,14 +104,14 @@ fviz_nbclust(cluster_s1,
 ### 3 Clusters (K-Means)
 
 ```{r}
-clusters3_s1 <- assignments_s1 %>% 
+clusters3_s1_spread <- assignments_s1 %>% 
   filter(k == 3) %>% 
   ungroup() %>% 
   select(.cluster) %>% 
   rename(cluster_kmeans_3 = .cluster) %>% 
   bind_cols(filter(dct_spread, Season_num == 1)) 
 
-clusters3_s1 <- merge(clusters3_s1[, c("cluster_kmeans_3", 
+clusters3_s1 <- merge(clusters3_s1_spread[, c("cluster_kmeans_3", 
                                        "Show_Name")], 
                       dct_df, by = "Show_Name")
 
@@ -138,17 +137,50 @@ s1_3clusters <- list(as.character(unique(clusters3_s1[clusters3_s1$cluster_kmean
 s1_3clusters
 ```
 
+```{r}
+# TEST PLOT FOR S1 CLUSTERS & S2 TRENDS
+s2_spread <- dct_spread %>% 
+  filter(Season_num == 2) %>%
+  ungroup() %>%
+  select(-X, -Network, -Season_num)
+
+s2_spread_newcols <- c(paste("X", 101:200, sep = ""))
+colnames(s2_spread)[2:ncol(s2_spread)] <- c(s2_spread_newcols)
+
+s1_3clusters_s2_trends <- bind_cols(clusters3_s1_spread, s2_spread[, 2:ncol(s2_spread)])
+
+s1_3clusters_s2_trends <- merge(s1_3clusters_s2_trends[, c("cluster_kmeans_3", 
+                                                         "Show_Name")], 
+                               dct_df, by = "Show_Name")
+
+dct_s1_3clusters_s2_trends <- s1_3clusters_s2_trends %>% 
+  filter(Season_num == 1 | Season_num == 2) %>% 
+  group_by(Network, Show_Name) %>% 
+  mutate(period = row_number())
+
+s1_3clusters_s2_trends_plot <- dct_s1_3clusters_s2_trends %>%
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_3, nrow = 3) + 
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(s1_3clusters_s2_trends_plot) %>% 
+  layout(title = "Season 1 Shows with 3 Clusters & Season 2 Trends", 
+         margin = list(t = 150))
+```
+
 ### 4 Clusters (K-Means)
 
 ```{r}
-clusters4_s1 <- assignments_s1 %>% 
+clusters4_s1_spread <- assignments_s1 %>% 
   filter(k == 4) %>% 
   ungroup() %>% 
   select(.cluster) %>% 
   rename(cluster_kmeans_4 = .cluster) %>% 
   bind_cols(filter(dct_spread, Season_num == 1)) 
 
-clusters4_s1 <- merge(clusters4_s1[, c("cluster_kmeans_4", 
+clusters4_s1 <- merge(clusters4_s1_spread[, c("cluster_kmeans_4", 
                                        "Show_Name")], 
                       dct_df, by = "Show_Name")
 
@@ -175,17 +207,42 @@ s1_4clusters <- list(as.character(unique(clusters4_s1[clusters4_s1$cluster_kmean
 s1_4clusters
 ```
 
+```{r}
+# TEST PLOT FOR S1 CLUSTERS & S2 TRENDS
+s1_4clusters_s2_trends <- bind_cols(clusters4_s1_spread, s2_spread[, 2:ncol(s2_spread)])
+
+s1_4clusters_s2_trends <- merge(s1_4clusters_s2_trends[, c("cluster_kmeans_4", 
+                                                         "Show_Name")], 
+                                dct_df, by = "Show_Name")
+
+dct_s1_4clusters_s2_trends <- s1_4clusters_s2_trends %>% 
+  filter(Season_num == 1 | Season_num == 2) %>% 
+  group_by(Network, Show_Name) %>% 
+  mutate(period = row_number())
+
+s1_4clusters_s2_trends_plot <- dct_s1_4clusters_s2_trends %>%
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_4, nrow = 4) + 
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(s1_4clusters_s2_trends_plot) %>% 
+  layout(title = "Season 1 Shows with 4 Clusters & Season 2 Trends", 
+         margin = list(t = 150))
+```
+
 ### 5 Clusters (K-Means)
 
 ```{r}
-clusters5_s1 <- assignments_s1 %>% 
+clusters5_s1_spread <- assignments_s1 %>% 
   filter(k == 5) %>% 
   ungroup() %>% 
   select(.cluster) %>% 
   rename(cluster_kmeans_5 = .cluster) %>% 
   bind_cols(filter(dct_spread, Season_num == 1)) 
 
-clusters5_s1 <- merge(clusters5_s1[, c("cluster_kmeans_5", 
+clusters5_s1 <- merge(clusters5_s1_spread[, c("cluster_kmeans_5", 
                                        "Show_Name")], 
                       dct_df, by = "Show_Name")
 
@@ -212,6 +269,31 @@ s1_5clusters <- list(as.character(unique(clusters5_s1[clusters5_s1$cluster_kmean
                      as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 4,]$Show_Name)), 
                      as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 5,]$Show_Name)))
 s1_5clusters
+```
+
+```{r}
+# TEST PLOT FOR S1 CLUSTERS & S2 TRENDS
+s1_5clusters_s2_trends <- bind_cols(clusters5_s1_spread, s2_spread[, 2:ncol(s2_spread)])
+
+s1_5clusters_s2_trends <- merge(s1_5clusters_s2_trends[, c("cluster_kmeans_5", 
+                                                         "Show_Name")], 
+                                dct_df, by = "Show_Name")
+
+dct_s1_5clusters_s2_trends <- s1_5clusters_s2_trends %>% 
+  filter(Season_num == 1 | Season_num == 2) %>% 
+  group_by(Network, Show_Name) %>% 
+  mutate(period = row_number())
+
+s1_5clusters_s2_trends_plot <- dct_s1_5clusters_s2_trends %>%
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 3) + 
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(s1_5clusters_s2_trends_plot) %>% 
+  layout(title = "Season 1 Shows with 5 Clusters & Season 2 Trends", 
+         margin = list(t = 150))
 ```
 
 
@@ -291,14 +373,14 @@ fviz_nbclust(cluster_s2,
 ### 3 Clusters (K-Means)
 
 ```{r}
-clusters3_s2 <- assignments_s2 %>% 
+clusters3_s2_spread <- assignments_s2 %>% 
   filter(k == 3) %>% 
   ungroup() %>% 
   select(.cluster) %>% 
   rename(cluster_kmeans_3 = .cluster) %>% 
   bind_cols(filter(dct_spread, Season_num == 2)) 
 
-clusters3_s2 <- merge(clusters3_s2[, c("cluster_kmeans_3", 
+clusters3_s2 <- merge(clusters3_s2_spread[, c("cluster_kmeans_3", 
                                        "Show_Name")], 
                       dct_df, by = "Show_Name")
 
@@ -327,14 +409,14 @@ s2_3clusters
 ### 4 Clusters (K-Means)
 
 ```{r}
-clusters4_s2 <- assignments_s2 %>% 
+clusters4_s2_spread <- assignments_s2 %>% 
   filter(k == 4) %>% 
   ungroup() %>% 
   select(.cluster) %>% 
   rename(cluster_kmeans_4 = .cluster) %>% 
   bind_cols(filter(dct_spread, Season_num == 2)) 
 
-clusters4_s2 <- merge(clusters4_s2[, c("cluster_kmeans_4", 
+clusters4_s2 <- merge(clusters4_s2_spread[, c("cluster_kmeans_4", 
                                        "Show_Name")], 
                       dct_df, by = "Show_Name")
 
@@ -364,14 +446,14 @@ s2_4clusters
 ### 5 Clusters (K-Means)
 
 ```{r}
-clusters5_s2 <- assignments_s2 %>% 
+clusters5_s2_spread<- assignments_s2 %>% 
   filter(k == 5) %>% 
   ungroup() %>% 
   select(.cluster) %>% 
   rename(cluster_kmeans_5 = .cluster) %>% 
   bind_cols(filter(dct_spread, Season_num == 2)) 
 
-clusters5_s2 <- merge(clusters5_s2[, c("cluster_kmeans_5", 
+clusters5_s2 <- merge(clusters5_s2_spread[, c("cluster_kmeans_5", 
                                        "Show_Name")], 
                       dct_df, by = "Show_Name")
 
@@ -486,14 +568,14 @@ fviz_nbclust(cluster_s1_s2,
 ### 3 Clusters (K-Means)
 
 ```{r}
-clusters3_s1_s2 <- assignments_s1_s2 %>% 
+clusters3_s1_s2_spread <- assignments_s1_s2 %>% 
   filter(k == 3) %>% 
   ungroup() %>% 
   select(.cluster) %>% 
   rename(cluster_kmeans_3 = .cluster) %>% 
   bind_cols(dct_spread_s1_s2) 
 
-clusters3_s1_s2 <- merge(clusters3_s1_s2[, c("cluster_kmeans_3", 
+clusters3_s1_s2 <- merge(clusters3_s1_s2_spread[, c("cluster_kmeans_3", 
                                        "Show_Name")], 
                          dct_s1_s2, by = "Show_Name")
 
@@ -522,14 +604,14 @@ s1_s2_3clusters
 ### 5 Clusters (K-Means)
 
 ```{r}
-clusters5_s1_s2 <- assignments_s1_s2 %>% 
+clusters5_s1_s2_spread <- assignments_s1_s2 %>% 
   filter(k == 5) %>% 
   ungroup() %>% 
   select(.cluster) %>% 
   rename(cluster_kmeans_5 = .cluster) %>% 
   bind_cols(dct_spread_s1_s2) 
 
-clusters5_s1_s2 <- merge(clusters5_s1_s2[, c("cluster_kmeans_5", 
+clusters5_s1_s2 <- merge(clusters5_s1_s2_spread[, c("cluster_kmeans_5", 
                                        "Show_Name")], 
                          dct_s1_s2, by = "Show_Name")
 
@@ -632,14 +714,14 @@ fviz_nbclust(cluster_cont,
 ### 3 Clusters (K-Means)
 
 ```{r}
-clusters3_cont <- assignments_cont %>% 
+clusters3_cont_spread <- assignments_cont %>% 
   filter(k == 3) %>% 
   ungroup() %>% 
   select(.cluster) %>% 
   rename(cluster_kmeans_3 = .cluster) %>% 
   bind_cols(dct_spread_cont) 
 
-clusters3_cont <- merge(clusters3_cont[, c("cluster_kmeans_3", 
+clusters3_cont <- merge(clusters3_cont_spread[, c("cluster_kmeans_3", 
                                        "Show_Name")], 
                          dct_cont, by = "Show_Name")
 
@@ -668,14 +750,14 @@ cont_3clusters
 ### 5 Clusters (K-Means)
 
 ```{r}
-clusters5_cont <- assignments_cont %>% 
+clusters5_cont_spread <- assignments_cont %>% 
   filter(k == 5) %>% 
   ungroup() %>% 
   select(.cluster) %>% 
   rename(cluster_kmeans_5 = .cluster) %>% 
   bind_cols(dct_spread_cont) 
 
-clusters5_cont <- merge(clusters5_cont[, c("cluster_kmeans_5", 
+clusters5_cont <- merge(clusters5_cont_spread[, c("cluster_kmeans_5", 
                                        "Show_Name")], 
                           dct_cont, by = "Show_Name")
 
