@@ -145,17 +145,13 @@ for (n in 1:length(d_names)){
   diagnostic_df[n, 3] <- d_list[[n]]["average.within"]
   diagnostic_df[n, 4] <- d_list[[n]]["within.cluster.ss"]
   diagnostic_df[n, 5] <- d_list[[n]]["widestgap"]
-  diagnostic_df[n, 5] <- d_list[[n]]["entropy"]
+  diagnostic_df[n, 6] <- d_list[[n]]["entropy"]
+  diagnostic_df[n, 7] <- d_list[[n]]["cluster.number"]
 }
 
 
 #add information for decision making
 colnames(diagnostic_df)[1] <- "name"
-diagnostic_df$clusters <- ifelse(grepl("5cl", diagnostic_df$name) == 1, 5,
-                                 ifelse(grepl("4cl", diagnostic_df$name) == 1, 4,
-                                 ifelse(grepl("3cl", diagnostic_df$name) == 1, 3,
-                                 ifelse(grepl("2cl", diagnostic_df$name) == 1, 2, 0))))
-
 
 diagnostic_df$algorithm <- ifelse(grepl("kmeans", diagnostic_df$name) == 1, "kmeans",
                                  ifelse(grepl("kshape", diagnostic_df$name) == 1, "kshape",
@@ -177,7 +173,5 @@ write.csv(diagnostic_df, "cluster diagnostics - raw normalized.csv")
 
 View(diagnostic_df)
 ```
-
-
 
 
