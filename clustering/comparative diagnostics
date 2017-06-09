@@ -143,7 +143,9 @@ for (n in 1:length(d_names)){
   diagnostic_df[n, 1] <- paste(d_names[n])
   diagnostic_df[n, 2] <- d_list[[n]]["average.between"]
   diagnostic_df[n, 3] <- d_list[[n]]["average.within"]
-  diagnostic_df[n, 4] <- d_list[[n]]["entropy"]
+  diagnostic_df[n, 4] <- d_list[[n]]["within.cluster.ss"]
+  diagnostic_df[n, 5] <- d_list[[n]]["widestgap"]
+  diagnostic_df[n, 5] <- d_list[[n]]["entropy"]
 }
 
 
@@ -173,6 +175,9 @@ diagnostic_df$data <- ifelse(grepl("s1_s2", diagnostic_df$name) == 1, "s1_s2",
 ```{r}
 write.csv(diagnostic_df, "cluster diagnostics - raw normalized.csv")
 
-a <- datatable(diagnostic_df)
-
+View(diagnostic_df)
 ```
+
+
+
+
