@@ -101,8 +101,8 @@ s1_2clusters_kshape
 ```
 
 ```{r}
-s1_2clusters_d <- dist(clusters_s1_shape2_spread[, 5:105])
-(kshape_diag_s1_2clusters <- cluster.stats(s1_2clusters_d, as.numeric(clusters_s1_shape2_spread$cluster_shape_2)))
+kshape_s1_2cl_d  <- dist(clusters_s1_shape2_spread[, 5:105])
+diagnostics_kshape_s1_2cl <- cluster.stats(kshape_s1_2cl_d, as.numeric(clusters_s1_shape2_spread$cluster_shape_2))
 ```
 
 ## Dynamic Time Warp Clustering
@@ -165,8 +165,8 @@ s1_3clusters_dtw
 ```
 
 ```{r}
-s1_3clusters_d <- dist(clusters_s1_dtw3_spread[, 5:105])
-(kshape_diag_s1_3clusters <- cluster.stats(s1_3clusters_d, as.numeric(clusters_s1_dtw3_spread$cluster_dtw_3)))
+dtw_s1_3cl_d <- dist(clusters_s1_dtw3_spread[, 5:105])
+diagnostics_dtw_s1_3cl <- cluster.stats(dtw_s1_3cl_d, as.numeric(clusters_s1_dtw3_spread$cluster_dtw_3))
 ```
 
 # Season 2 Time Series Clustering
@@ -239,8 +239,8 @@ s2_4clusters_kshape
 ```
 
 ```{r}
-s2_4clusters_d <- dist(clusters_s2_shape4_spread[, 5:105])
-(kshape_diag_s2_4clusters <- cluster.stats(s2_4clusters_d, as.numeric(clusters_s2_shape4_spread$cluster_shape_4)))
+kshape_s2_4cl_d <- dist(clusters_s2_shape4_spread[, 5:105])
+diagnostics_kshape_s2_4cl <- cluster.stats(kshape_s2_4cl_d, as.numeric(clusters_s2_shape4_spread$cluster_shape_4))
 ```
 
 ## Dynamic Time Warp Clustering
@@ -302,8 +302,8 @@ s2_2clusters_dtw
 ```
 
 ```{r}
-s2_2clusters_d <- dist(clusters_s2_dtw2_spread[, 5:105])
-(kshape_diag_s2_2clusters <- cluster.stats(s2_2clusters_d, as.numeric(clusters_s2_dtw2_spread$cluster_dtw_2)))
+dtw_s2_2cl_d <- dist(clusters_s2_dtw2_spread[, 5:105])
+diagnostics_dtw_s2_2cl <- cluster.stats(dtw_s2_2cl_d, as.numeric(clusters_s2_dtw2_spread$cluster_dtw_2))
 ```
 
 # Season 1-2 (Continuous) Time Series Clustering
@@ -376,8 +376,8 @@ cont_5clusters_kshape
 ```
 
 ```{r}
-cont_5clusters_d <- dist(clusters_cont_shape5_spread[, 4:104])
-(kshape_diag_cont_5clusters <- cluster.stats(cont_5clusters_d, as.numeric(clusters_cont_shape5_spread$cluster_shape_5)))
+kshape_cont_5cl_d <- dist(clusters_cont_shape5_spread[, 4:104])
+diagnostics_kshape_cont_5cl <- cluster.stats(kshape_cont_5cl_d, as.numeric(clusters_cont_shape5_spread$cluster_shape_5))
 ```
 
 ## Dynamic Time Warp Clustering
@@ -439,7 +439,6 @@ cont_3clusters_dtw
 ```
 
 ```{r}
-cont_3clusters_d <- dist(clusters_cont_dtw3_spread[, 4:104])
-(kshape_diag_cont_3clusters <- cluster.stats(cont_3clusters_d, as.numeric(clusters_cont_dtw3_spread$cluster_dtw_3)))
+dtw_cont_3cl_d <- dist(clusters_cont_dtw3_spread[, 4:104])
+diagnostics_dtw_cont_3cl <- cluster.stats(dtw_cont_3cl_d, as.numeric(clusters_cont_dtw3_spread$cluster_dtw_3))
 ```
-
