@@ -101,8 +101,8 @@ s1_2clusters_kshape
 ```
 
 ```{r}
-kshape_s1_2cl_d  <- dist(clusters_s1_shape2_spread[, 5:105])
-diagnostics_kshape_s1_2cl <- cluster.stats(kshape_s1_2cl_d, as.numeric(clusters_s1_shape2_spread$cluster_shape_2))
+s1_2clusters_d <- dist(clusters_s1_shape2_spread[, 5:105])
+(kshape_diag_s1_2clusters <- cluster.stats(s1_2clusters_d, as.numeric(clusters_s1_shape2_spread$cluster_shape_2)))
 ```
 
 ## Dynamic Time Warp Clustering
@@ -165,8 +165,8 @@ s1_3clusters_dtw
 ```
 
 ```{r}
-dtw_s1_3cl_d <- dist(clusters_s1_dtw3_spread[, 5:105])
-diagnostics_dtw_s1_3cl <- cluster.stats(dtw_s1_3cl_d, as.numeric(clusters_s1_dtw3_spread$cluster_dtw_3))
+s1_3clusters_d <- dist(clusters_s1_dtw3_spread[, 5:105])
+(kshape_diag_s1_3clusters <- cluster.stats(s1_3clusters_d, as.numeric(clusters_s1_dtw3_spread$cluster_dtw_3)))
 ```
 
 # Season 2 Time Series Clustering
@@ -239,8 +239,8 @@ s2_4clusters_kshape
 ```
 
 ```{r}
-kshape_s2_4cl_d <- dist(clusters_s2_shape4_spread[, 5:105])
-diagnostics_kshape_s2_4cl <- cluster.stats(kshape_s2_4cl_d, as.numeric(clusters_s2_shape4_spread$cluster_shape_4))
+s2_4clusters_d <- dist(clusters_s2_shape4_spread[, 5:105])
+(kshape_diag_s2_4clusters <- cluster.stats(s2_4clusters_d, as.numeric(clusters_s2_shape4_spread$cluster_shape_4)))
 ```
 
 ## Dynamic Time Warp Clustering
@@ -302,8 +302,8 @@ s2_2clusters_dtw
 ```
 
 ```{r}
-dtw_s2_2cl_d <- dist(clusters_s2_dtw2_spread[, 5:105])
-diagnostics_dtw_s2_2cl <- cluster.stats(dtw_s2_2cl_d, as.numeric(clusters_s2_dtw2_spread$cluster_dtw_2))
+s2_2clusters_d <- dist(clusters_s2_dtw2_spread[, 5:105])
+(kshape_diag_s2_2clusters <- cluster.stats(s2_2clusters_d, as.numeric(clusters_s2_dtw2_spread$cluster_dtw_2)))
 ```
 
 # Season 1-2 (Continuous) Time Series Clustering
@@ -336,48 +336,47 @@ which.max(sapply(kshape_cont, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(kshape_cont$k_5@cluster)
+table(kshape_cont$k_4@cluster)
 ```
 
 ```{r}
-plot(kshape_cont$k_5, type = 'sc')
+plot(kshape_cont$k_4, type = 'sc')
 ```
 
 ```{r}
 # export cluster predictions to the main data set
-clusters_cont_shape5_spread <- dct_spread_cont
-clusters_cont_shape5_spread$cluster_shape_5 <- kshape_cont$k_5@cluster
+clusters_cont_shape4_spread <- dct_spread_cont
+clusters_cont_shape4_spread$cluster_shape_4 <- kshape_cont$k_4@cluster
 
-clusters_cont_shape5 <- merge(clusters_cont_shape5_spread[, c("cluster_shape_5", 
+clusters_cont_shape4 <- merge(clusters_cont_shape4_spread[, c("cluster_shape_4", 
                                        "Show_Name")], 
                       dct_cont, by = "Show_Name")
 ```
 
 ```{r}
-clusters_cont_shape5_plot <- clusters_cont_shape5 %>%
+clusters_cont_shape4_plot <- clusters_cont_shape4 %>%
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
-  facet_wrap(~ cluster_shape_5, nrow = 2) +  
+  facet_wrap(~ cluster_shape_4) +  
   theme(axis.title.x = element_blank(), 
         axis.title.y = element_blank())
 
-ggplotly(clusters_cont_shape5_plot) %>% 
-  layout(title = "Season 1-2 Shows with 5 K-Shape Clusters", 
+ggplotly(clusters_cont_shape4_plot) %>% 
+  layout(title = "Season 1-2 Shows with 4 K-Shape Clusters", 
          margin = list(t = 150))
 ```
 
 ```{r}
-cont_5clusters_kshape <- list(as.character(unique(clusters_cont_shape5[clusters_cont_shape5$cluster_shape_5 == 1,]$Show_Name)), 
-                              as.character(unique(clusters_cont_shape5[clusters_cont_shape5$cluster_shape_5 == 2,]$Show_Name)), 
-                              as.character(unique(clusters_cont_shape5[clusters_cont_shape5$cluster_shape_5 == 3,]$Show_Name)), 
-                              as.character(unique(clusters_cont_shape5[clusters_cont_shape5$cluster_shape_5 == 4,]$Show_Name)), 
-                              as.character(unique(clusters_cont_shape5[clusters_cont_shape5$cluster_shape_5 == 5,]$Show_Name)))
-cont_5clusters_kshape
+cont_4clusters_kshape <- list(as.character(unique(clusters_cont_shape4[clusters_cont_shape4$cluster_shape_4 == 1,]$Show_Name)), 
+                              as.character(unique(clusters_cont_shape4[clusters_cont_shape4$cluster_shape_4 == 2,]$Show_Name)), 
+                              as.character(unique(clusters_cont_shape4[clusters_cont_shape4$cluster_shape_4 == 3,]$Show_Name)), 
+                              as.character(unique(clusters_cont_shape4[clusters_cont_shape4$cluster_shape_4 == 4,]$Show_Name)))
+cont_4clusters_kshape
 ```
 
 ```{r}
-kshape_cont_5cl_d <- dist(clusters_cont_shape5_spread[, 4:104])
-diagnostics_kshape_cont_5cl <- cluster.stats(kshape_cont_5cl_d, as.numeric(clusters_cont_shape5_spread$cluster_shape_5))
+cont_4clusters_d <- dist(clusters_cont_shape4_spread[, 4:104])
+(kshape_diag_cont_4clusters <- cluster.stats(cont_4clusters_d, as.numeric(clusters_cont_shape4_spread$cluster_shape_4)))
 ```
 
 ## Dynamic Time Warp Clustering
@@ -401,44 +400,46 @@ which.max(sapply(dtw_cont, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(dtw_cont$k_3@cluster)
+table(dtw_cont$k_4@cluster)
 ```
 
 ```{r}
-plot(dtw_cont$k_3, type = 'sc')
+plot(dtw_cont$k_4, type = 'sc')
 ```
 
 ```{r}
 # export cluster predictions to the main data set
-clusters_cont_dtw3_spread <- dct_spread_cont
-clusters_cont_dtw3_spread$cluster_dtw_3 <- dtw_cont$k_3@cluster
+clusters_cont_dtw4_spread <- dct_spread_cont
+clusters_cont_dtw4_spread$cluster_dtw_4 <- dtw_cont$k_4@cluster
 
-clusters_cont_dtw3 <- merge(clusters_cont_dtw3_spread[, c("cluster_dtw_3", 
+clusters_cont_dtw4 <- merge(clusters_cont_dtw4_spread[, c("cluster_dtw_4", 
                                        "Show_Name")], 
                       dct_cont, by = "Show_Name")
 ```
 
 ```{r}
-clusters_cont_dtw3_plot <- clusters_cont_dtw3 %>% 
+clusters_cont_dtw4_plot <- clusters_cont_dtw4 %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
-  facet_wrap(~ cluster_dtw_3, nrow = 3) +  
+  facet_wrap(~ cluster_dtw_4) +  
   theme(axis.title.x = element_blank(), 
         axis.title.y = element_blank())
 
-ggplotly(clusters_cont_dtw3_plot) %>% 
-  layout(title = "Season 1-2 Shows with 3 DTW Clusters", 
+ggplotly(clusters_cont_dtw4_plot) %>% 
+  layout(title = "Season 1-2 Shows with 4 DTW Clusters", 
          margin = list(t = 150))
 ```
 
 ```{r}
-cont_3clusters_dtw <- list(as.character(unique(clusters_cont_dtw3[clusters_cont_dtw3$cluster_dtw_3 == 1,]$Show_Name)), 
-                           as.character(unique(clusters_cont_dtw3[clusters_cont_dtw3$cluster_dtw_3 == 2,]$Show_Name)), 
-                           as.character(unique(clusters_cont_dtw3[clusters_cont_dtw3$cluster_dtw_3 == 3,]$Show_Name)))
-cont_3clusters_dtw
+cont_4clusters_dtw <- list(as.character(unique(clusters_cont_dtw4[clusters_cont_dtw4$cluster_dtw_4 == 1,]$Show_Name)), 
+                           as.character(unique(clusters_cont_dtw4[clusters_cont_dtw4$cluster_dtw_4 == 2,]$Show_Name)), 
+                           as.character(unique(clusters_cont_dtw4[clusters_cont_dtw4$cluster_dtw_4 == 3,]$Show_Name)), 
+                           as.character(unique(clusters_cont_dtw4[clusters_cont_dtw4$cluster_dtw_4 == 4,]$Show_Name)))
+cont_4clusters_dtw
 ```
 
 ```{r}
-dtw_cont_3cl_d <- dist(clusters_cont_dtw3_spread[, 4:104])
-diagnostics_dtw_cont_3cl <- cluster.stats(dtw_cont_3cl_d, as.numeric(clusters_cont_dtw3_spread$cluster_dtw_3))
+cont_4clusters_d <- dist(clusters_cont_dtw4_spread[, 4:104])
+(kshape_diag_cont_4clusters <- cluster.stats(cont_4clusters_d, as.numeric(clusters_cont_dtw4_spread$cluster_dtw_4)))
 ```
+
