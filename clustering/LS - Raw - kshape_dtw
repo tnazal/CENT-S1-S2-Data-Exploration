@@ -1,6 +1,8 @@
 ---
 title: "CENT S1-S2 Time Series Clustering for LS Impressions"
-output: html_notebook
+output:
+  html_notebook: default
+  html_document: default
 ---
 
 ```{r}
@@ -311,6 +313,150 @@ s2_5clusters_dtw
 s2_5clusters_d <- dist(clusters_s2_dtw5_spread[, 5:105])
 (kshape_diag_s2_5clusters <- cluster.stats(s2_5clusters_d, as.numeric(clusters_s2_dtw5_spread$cluster_dtw_5)))
 ```
+
+
+# Season 1 and 2 Time Series Clustering
+
+```{r}
+temp1 <- filter(dct_spread, Season_num == 1)
+temp2 <- filter(dct_spread, Season_num == 2)
+temp2_newcols <- c(paste("X", 101:200, sep = ""))
+colnames(temp2)[5:ncol(temp2)] <- c(temp2_newcols)
+
+dct_spread_s1_s2 <- bind_cols(temp1, temp2[, 5:ncol(temp2)])
+rm(temp1, temp2, temp2_newcols)
+
+cluster_s1_s2 <- dct_spread_s1_s2 %>%
+  select(-X, -Network, -Season_num, -Show_Name)
+
+dct_s1_s2 <- read.csv("CENT_LS_dct_s1_s2.csv")
+```
+
+```{r}
+kshape_s1_s2 <- tsclust(cluster_s1_s2, 
+                        type = 'partitional',
+                        k = 2:5,
+                        preproc = zscore,
+                        distance = 'sbd',
+                        centroid = 'shape',
+                        trace = FALSE,
+                        seed = 12)
+
+names(kshape_s1_s2) <- paste0('k_', 2:5)
+sapply(kshape_s1_s2, cvi, type = 'internal')
+```
+
+```{r}
+which.max(sapply(kshape_s1_s2, cvi, type = 'internal')['Sil',])
+```
+
+```{r}
+table(kshape_s1_s2$k_5@cluster)
+```
+
+```{r}
+plot(kshape_s1_s2$k_5, type = 'sc')
+```
+
+```{r}
+# export cluster predictions to the main data set
+clusters_s1_s2_shape5_spread <- dct_spread_s1_s2
+clusters_s1_s2_shape5_spread$cluster_shape_5 <- kshape_s1_s2$k_5@cluster
+
+clusters_s1_s2_shape5 <- merge(clusters_s1_s2_shape5_spread[, c("cluster_shape_5", 
+                                       "Show_Name")], 
+                      dct_s1_s2, by = "Show_Name")
+```
+
+```{r}
+clusters_s1_s2_shape5_plot <- clusters_s1_s2_shape5 %>%
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_shape_5, nrow = 3) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(clusters_s1_s2_shape5_plot) %>% 
+  layout(title = "Season 1-2 Shows with 5 K-Shape Clusters", 
+         margin = list(t = 150))
+```
+
+```{r}
+s1_s2_5clusters_kshape <- list(as.character(unique(clusters_s1_s2_shape5[clusters_s1_s2_shape5$cluster_shape_5 == 1,]$Show_Name)), 
+                               as.character(unique(clusters_s1_s2_shape5[clusters_s1_s2_shape5$cluster_shape_5 == 2,]$Show_Name)), 
+                               as.character(unique(clusters_s1_s2_shape5[clusters_s1_s2_shape5$cluster_shape_5 == 3,]$Show_Name)), 
+                               as.character(unique(clusters_s1_s2_shape5[clusters_s1_s2_shape5$cluster_shape_5 == 4,]$Show_Name)), 
+                               as.character(unique(clusters_s1_s2_shape5[clusters_s1_s2_shape5$cluster_shape_5 == 5,]$Show_Name)))
+s1_s2_5clusters_kshape
+```
+
+```{r}
+s1_s2_5clusters_d <- dist(clusters_s1_s2_shape5_spread[, 5:205])
+(kshape_diag_s1_s2_5clusters <- cluster.stats(s1_s2_5clusters_d, as.numeric(clusters_s1_s2_shape5_spread$cluster_shape_5)))
+```
+
+## Dynamic Time Warp Clustering
+
+```{r}
+dtw_s1_s2 <- tsclust(cluster_s1_s2,
+                     type = 'partitional',
+                     k = 2:5,
+                     distance = 'dtw_lb',
+                     centroid = 'pam',
+                     control = partitional_control(pam.precompute = FALSE, 
+                                                   iter.max = 25),
+                     args = tsclust_args(dist = list()),
+                     window.size = 20,
+                     trace = FALSE,
+                     seed = 12)
+
+names(dtw_s1_s2) <- paste0('k_', 2:5)
+sapply(dtw_s1_s2, cvi)
+which.max(sapply(dtw_s1_s2, cvi, type = 'internal')['Sil',])
+```
+
+```{r}
+table(dtw_s1_s2$k_2@cluster)
+```
+
+```{r}
+plot(dtw_s1_s2$k_2, type = 'sc')
+```
+
+```{r}
+# export cluster predictions to the main data set
+clusters_s1_s2_dtw2_spread <- dct_spread_s1_s2
+clusters_s1_s2_dtw2_spread$cluster_dtw_2 <- dtw_s1_s2$k_2@cluster
+
+clusters_s1_s2_dtw2 <- merge(clusters_s1_s2_dtw2_spread[, c("cluster_dtw_2", 
+                                       "Show_Name")], 
+                       dct_s1_s2, by = "Show_Name")
+```
+
+```{r}
+clusters_s1_s2_dtw2_plot <- clusters_s1_s2_dtw2 %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_dtw_2) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(clusters_s1_s2_dtw2_plot) %>% 
+  layout(title = "Season 1-2 Shows with 2 DTW Clusters", 
+         margin = list(t = 150))
+```
+
+```{r}
+s1_s2_2clusters_dtw <- list(as.character(unique(clusters_s1_s2_dtw2[clusters_s1_s2_dtw2$cluster_dtw_2 == 1,]$Show_Name)), 
+                            as.character(unique(clusters_s1_s2_dtw2[clusters_s1_s2_dtw2$cluster_dtw_2 == 2,]$Show_Name)))
+s1_s2_2clusters_dtw
+```
+
+```{r}
+s1_s2_2clusters_d <- dist(clusters_s1_s2_dtw2_spread[, 5:205])
+(kshape_diag_s1_s2_2clusters <- cluster.stats(s1_s2_2clusters_d, as.numeric(clusters_s1_s2_dtw2_spread$cluster_dtw_2)))
+```
+
 
 # Season 1-2 (Continuous) Time Series Clustering
 
