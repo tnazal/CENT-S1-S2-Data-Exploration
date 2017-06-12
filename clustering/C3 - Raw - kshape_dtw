@@ -384,7 +384,7 @@ s1_s2_4clusters_kshape
 ```
 
 ```{r}
-s1_s2_4clusters_d <- dist(clusters_s1_s2_shape4_spread[, 4:104])
+s1_s2_4clusters_d <- dist(clusters_s1_s2_shape4_spread[, 5:205])
 (kshape_diag_s1_s2_4clusters <- cluster.stats(s1_s2_4clusters_d, as.numeric(clusters_s1_s2_shape4_spread$cluster_shape_4)))
 ```
 
@@ -449,8 +449,8 @@ s1_s2_5clusters_dtw
 ```
 
 ```{r}
-s1_s2_5clusters_d <- dist(clusters_s1_s2_dtw5_spread[, 4:104])
-(kshape_diag_s1_s2_5clusters <- cluster.stats(s1_S2_5clusters_d, as.numeric(clusters_s1_s2_dtw5_spread$cluster_dtw_5)))
+s1_s2_5clusters_d <- dist(clusters_s1_s2_dtw5_spread[, 5:205])
+(kshape_diag_s1_s2_5clusters <- cluster.stats(s1_s2_5clusters_d, as.numeric(clusters_s1_s2_dtw5_spread$cluster_dtw_5)))
 ```
 
 
