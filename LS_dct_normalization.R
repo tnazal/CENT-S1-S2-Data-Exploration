@@ -63,8 +63,9 @@ LS_dct_s1_s2 <- LS_df_curves %>%
 write.csv(LS_dct_s1_s2, "CENT_LS_dct_s1_s2.csv")
 
 # S1 & S2 continuous normalization
-LS_dct_cont <- df %>% 
+LS_dct_cont <- df %>%
   group_by(Network, Show_Name) %>% 
+  filter(Season_num == 1 | Season_num == 2) %>%  
   summarise(imps = list(LS_Imps)) %>%
   ungroup() %>% 
   mutate(dct_values = map(imps, dct)) %>% 
