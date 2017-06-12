@@ -25,7 +25,7 @@ library(ggplot2)
 
 ##Tadpole Clustering, 5 Clusters
 ```{r}
-dct_spread <- read.csv("CENT_growth_dct_spread.csv")
+dct_spread <- read.csv("CENT_dct_spread.csv")
 
 
 dtw_df_s1 <- dct_spread %>% 
@@ -226,8 +226,8 @@ tadpole_s2_3clusters
 
 ##Tadpole Clustering, 5 Clusters
 ```{r}
-dct_cont <- read.csv("CENT_dct_cont_growth.csv")
-dct_spread_cont <- read.csv("CENT_dct_spread_cont_growth.csv")
+dct_cont <- read.csv("CENT_dct_cont.csv")
+dct_spread_cont <- read.csv("CENT_dct_spread_cont.csv")
 dtw_df_cont <- dct_spread_cont %>%
   select(-X, -Network, -Show_Name)
 ```
