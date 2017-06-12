@@ -9,7 +9,7 @@ output:
 ##################################################################################
 #inputs: CENT_showlevel.csv
 #purpose: Exploratory plots for raw, growth and 1st episode rebase trends,
-#         non-normalized C3 impressions
+#         non-normalized LS impressions
 ##################################################################################
 ```
 
