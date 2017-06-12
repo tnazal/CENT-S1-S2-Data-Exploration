@@ -9,7 +9,7 @@ output:
 ##################################################################################
 #inputs: CENT_LS_dct.csv
 #purpose: Exploratory plots for raw, and growth,
-#         normalized C3 impressions
+#         normalized LS impressions
 ##################################################################################
 ```
 
