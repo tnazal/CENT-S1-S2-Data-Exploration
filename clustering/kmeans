@@ -4,12 +4,12 @@ output: html_notebook
 ---
 
 ```{r}
-##################################################################################
-#inputs: CENT_dct.csv, CENT_dct_cont_spread.csv, CENT_dct_spread.csv,
-#        s1_s2_cont_dct.csv, dct_s1_s2.csv  
+#####################################################################################
+#inputs: CENT_dct.csv, CENT_dct_spread.csv, CENT_dct_s1_s2.csv, 
+#        CENT_dct_cont.csv, CENT_dct_spread_cont.csv  
 #purpose: K-Means clustering (3 and 5 clusters for S1, S1 & S2 normalized separately,
 #          and S1 & S2 normalized together)
-##################################################################################
+#####################################################################################
 ```
 
 ```{r setup, include=FALSE}
