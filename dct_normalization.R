@@ -1,4 +1,4 @@
-```{r}
+
 library(dplyr)
 library(ggplot2)
 library(plotly)
@@ -6,50 +6,38 @@ library(scales)
 library(syuzhet)
 library(purrr)
 library(tidyr)
-```
 
-Read Data
-```{r}
+# read data
 df <- read.csv("CENT_showlevel.csv")
 df <- select(df, -X)
 
-#keep only shows that have both a first and second season in the data
+# keep only shows that have both a first and second season in the data
+# with 3 or more episodes
 df <- df %>% group_by(Network, Show_Name) %>%
   filter(all(c(1, 2) %in% Season_num)) %>% 
   ungroup() %>% 
   group_by(Network, Show_Name, Season_num) %>% 
   filter(max(Episode_num) >= 3) %>% 
   ungroup() %>% 
-  group_by(Network, Show_Name) %>%
-  filter(all(c(1, 2) %in% Season_num)) 
+  group_by(Network, Show_Name) %>% 
+  filter(all(c(1, 2) %in% Season_num))
 
-```
-
-```{r}
 df <- df[df$Show_Name != "RHOM", ]
-```
 
-```{r}
 df_curves <- df %>% 
   group_by(Network, Show_Name, Season_num) %>% 
   summarise(imps = list(C3_Imps))
 
-```
-
-```{r}
 dct <- function(x){
   get_dct_transform(
-      x, 
-      low_pass_size = 3, 
-      x_reverse_len = 100,
-      scale_vals = FALSE,
-      scale_range = TRUE
-      )
+    x, 
+    low_pass_size = 3, 
+    x_reverse_len = 100,
+    scale_vals = FALSE,
+    scale_range = TRUE
+  )
 }
 
-```
-
-```{r}
 df_with_dct <- df_curves %>% 
   mutate(dct_values = map(imps, dct)) %>% 
   select(-imps) %>% 
@@ -57,48 +45,38 @@ df_with_dct <- df_curves %>%
   group_by(Network, Show_Name, Season_num) %>% 
   mutate(period = row_number()) 
 
-```
-
-
-```{r}
 df_final <- df_with_dct %>% 
   spread(key = period, value = dct_values)
 
-```
-
-```{r}
 write.csv(df_with_dct, "CENT_dct.csv")
 write.csv(df_final, "CENT_dct_spread.csv")
-```
 
-```{r}
-#For matching with clusters on s1 & s2
+# for matching with clusters on S1 & S2
 dct_s1_s2 <- df_curves %>% 
   mutate(dct_values = map(imps, dct)) %>% 
   select(-imps) %>% 
   unnest(dct_values) %>% 
   filter(Season_num == 1 | Season_num == 2) %>% 
   group_by(Network, Show_Name) %>% 
-  mutate(period = row_number()) 
+  mutate(period = row_number())
 
 write.csv(dct_s1_s2, "CENT_dct_s1_s2.csv")
-```
 
-```{r}
-#S1 & S2 continuous normalization
-dct_cont <- df %>% 
+# S1 & S2 continuous normalization
+dct_cont <- df %>%
   group_by(Network, Show_Name) %>% 
+  filter(Season_num == 1 | Season_num == 2) %>% 
   summarise(imps = list(C3_Imps)) %>%
   ungroup() %>% 
   mutate(dct_values = map(imps, dct)) %>% 
   select(-imps) %>% 
   unnest(dct_values) %>% 
   group_by(Network, Show_Name) %>% 
-  mutate(period = row_number())  
+  mutate(period = row_number()) 
 
 dct_spread_cont <- dct_cont  %>% 
   spread(key = period, value = dct_values)
 
 write.csv(dct_cont, "CENT_dct_cont.csv")
 write.csv(dct_spread_cont, "CENT_dct_spread_cont.csv")
-```
+
