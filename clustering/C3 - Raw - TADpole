@@ -5,13 +5,13 @@ output: html_notebook
 
 ```{r}
 ##################################################################################
-# inputs:  CENT_dct_spread.csv, CENT_dct_spread_cont.csv, CENT_dct_cont.csv
+# inputs:  CENT_dct_spread.csv, CENT_dct_spread_cont.csv, CENT_dct_cont.csv, 
+#          CENT_dct.csv
 #
 # purpose: tadpole clustering (3 and 5 clusters for S1, S2,
 #          and S1 & S2 normalized separately and together)
 ##################################################################################
 ```
-
 
 ```{r}
 library(plyr)
