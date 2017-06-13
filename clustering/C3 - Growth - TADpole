@@ -110,7 +110,7 @@ s1_5clusters_tadpole_s2_trends_plot <- dct_s1_5clusters_tadpole_s2_trends %>%
         axis.title.y = element_blank())
 
 ggplotly(s1_5clusters_tadpole_s2_trends_plot) %>% 
-  layout(title = "Season 1 with 5 TADpole Clusters & Season 2 Trends", 
+  layout(title = "Season 1 with 5 TADpole Clusters & Season 2 Trends (C3 Growth)", 
          margin = list(t = 150))
 ```
 
@@ -177,7 +177,7 @@ s1_3clusters_tadpole_s2_trends_plot <- dct_s1_3clusters_tadpole_s2_trends %>%
         axis.title.y = element_blank())
 
 ggplotly(s1_3clusters_tadpole_s2_trends_plot) %>% 
-  layout(title = "Season 1 with 3 TADpole Clusters & Season 2 Trends", 
+  layout(title = "Season 1 with 3 TADpole Clusters & Season 2 Trends (C3 Growth)", 
          margin = list(t = 150))
 ```
 
