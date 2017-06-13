@@ -872,6 +872,6 @@ cont_5clusters
 ```
 
 ```{r}
-kmeans_cont_5cl_grwoth_d <- dist(clusters5_cont_spread[, 5:104])
-diagnostics_kmeans_cont_5cl <- cluster.stats(kmeans_cont_5cl_grwoth_d, as.numeric(clusters5_cont_spread$cluster_kmeans_5))
+kmeans_cont_5cl_growth_d <- dist(clusters5_cont_spread[, 5:104])
+diagnostics_kmeans_cont_5cl_growth <- cluster.stats(kmeans_cont_5cl_growth_d, as.numeric(clusters5_cont_spread$cluster_kmeans_5))
 ```
