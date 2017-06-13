@@ -1,12 +1,12 @@
 ---
-title: "rebase - tadpole"
+title: "S1-S2 TADpole Clustering on C3 Rebase"
 output: html_notebook
 ---
 
 ```{r}
 ##################################################################################
 # inputs:  CENT_rebase_dct_spread.csv, CENT_rebase_dct_cont.csv,
-#          CENT_rebase_dct_spread_cont.csv
+#          CENT_rebase_dct_spread_cont.csv, CENT_rebase_dct.csv
 #
 # purpose: tadpole clustering (3 and 5 clusters for S1, S2 (3 and 4 clusters),
 #          S1 & S2 normalized together, and S1-S2)
@@ -19,6 +19,8 @@ library(plyr)
 library(dplyr)
 library(dtwclust)
 library(ggplot2)
+library(tidyr)
+library(plotly)
 ```
 
 
@@ -27,7 +29,7 @@ library(ggplot2)
 ##Tadpole Clustering, 5 Clusters
 ```{r}
 dct_spread <- read.csv("CENT_rebase_dct_spread.csv")
-
+dct_df <- read.csv("CENT_rebase_dct.csv")
 
 dtw_df_s1 <- dct_spread %>% 
   filter(Season_num == 1) %>%
@@ -54,8 +56,6 @@ tadpole5_s1_long <- gather(tadpole_clust5_s1_df, key = period, value = dct_value
 tadpole5_s1_long$period <- as.numeric(sub("X", "", tadpole5_s1_long$period))
 tadpole5_s1_long$period <- as.numeric(tadpole5_s1_long$period)
 
-
-
 tadpole5_s1_plot <- tadpole5_s1_long %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
@@ -63,8 +63,6 @@ tadpole5_s1_plot <- tadpole5_s1_long %>%
 
 ggplotly(tadpole5_s1_plot)
 ```
-
-
 
 ###Shows in each cluster
 
@@ -78,7 +76,39 @@ tadpole_s1_5clusters <- list(as.character(unique(tadpole_clust5_s1_df[tadpole_cl
 tadpole_s1_5clusters
 ```
 
+```{r}
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
+s2_spread <- dct_spread %>% 
+  filter(Season_num == 2) %>%
+  ungroup() %>%
+  select(-X, -Network, -Season_num)
 
+s2_spread_newcols <- c(paste("X", 101:200, sep = ""))
+colnames(s2_spread)[2:ncol(s2_spread)] <- c(s2_spread_newcols)
+
+s1_5clusters_tadpole_s2_trends <- bind_cols(tadpole_clust5_s1_df, 
+                                    s2_spread[, 2:ncol(s2_spread)])
+
+s1_5clusters_tadpole_s2_trends <- merge(s1_5clusters_tadpole_s2_trends[, c("cluster", 
+                                                         "Show_Name")], 
+                               dct_df, by = "Show_Name")
+
+dct_s1_5clusters_tadpole_s2_trends <- s1_5clusters_tadpole_s2_trends %>% 
+  filter(Season_num == 1 | Season_num == 2) %>% 
+  group_by(Network, Show_Name) %>% 
+  mutate(period = row_number())
+
+s1_5clusters_tadpole_s2_trends_plot <- dct_s1_5clusters_tadpole_s2_trends %>%
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster, nrow = 5) + 
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(s1_5clusters_tadpole_s2_trends_plot) %>% 
+  layout(title = "Season 1 with 5 TADpole Clusters & Season 2 Trends (C3 Rebase)", 
+         margin = list(t = 150))
+```
 
 ##Tadpole Clustering, 3 Clusters
 
@@ -120,6 +150,33 @@ tadpole_s1_3clusters <- list(as.character(unique(tadpole_clust3_s1_df[tadpole_cl
 
 tadpole_s1_3clusters
 ```
+
+```{r}
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
+s1_3clusters_tadpole_s2_trends <- bind_cols(tadpole_clust3_s1_df, 
+                                    s2_spread[, 2:ncol(s2_spread)])
+
+s1_3clusters_tadpole_s2_trends <- merge(s1_3clusters_tadpole_s2_trends[, c("cluster", 
+                                                         "Show_Name")], 
+                               dct_df, by = "Show_Name")
+
+dct_s1_3clusters_tadpole_s2_trends <- s1_3clusters_tadpole_s2_trends %>% 
+  filter(Season_num == 1 | Season_num == 2) %>% 
+  group_by(Network, Show_Name) %>% 
+  mutate(period = row_number())
+
+s1_3clusters_tadpole_s2_trends_plot <- dct_s1_3clusters_tadpole_s2_trends %>%
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster, nrow = 3) + 
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(s1_3clusters_tadpole_s2_trends_plot) %>% 
+  layout(title = "Season 1 with 3 TADpole Clusters & Season 2 Trends (LS Growth)", 
+         margin = list(t = 150))
+```
+
 
 -----------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------
