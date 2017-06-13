@@ -44,7 +44,7 @@ pca_s1_df <- as.data.frame(pca_s1$x)
 pca_s1_df$Show_name <- dct_spread[dct_spread$Season_num == 1,]$Show_Name
 
 cluster_assign_s1<- pca_s1_df[, c(49, 1, 2, 3)]
-cluster_assign_s1$culster <- max.col(cluster_assign_s1[, c(2, 3, 4)], ties.method = "first")
+cluster_assign_s1$cluster <- max.col(cluster_assign_s1[, c(2, 3, 4)], ties.method = "first")
 
 df_pcaclusters_s1 <- dct_spread %>% filter(Season_num == 1) %>% 
   select(-X, -Season_num)
