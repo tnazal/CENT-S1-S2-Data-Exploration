@@ -280,12 +280,12 @@ clusters_s2_dtw3_plot <- clusters_s2_dtw3 %>%
   filter(Season_num == 2) %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
-  facet_wrap(~ cluster_dtw_3) +  
+  facet_wrap(~ cluster_dtw_3, nrow = 3) +  
   theme(axis.title.x = element_blank(), 
         axis.title.y = element_blank())
 
 ggplotly(clusters_s2_dtw3_plot) %>% 
-  layout(title = "Season 2 Shows with 3 DTW Clusters. C3 Growth", 
+  layout(title = "Season 2 Shows with 3 DTW Clusters (LS Growth)", 
          margin = list(t = 150))
 ```
 
