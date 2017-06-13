@@ -7,7 +7,7 @@ output: html_notebook
 ##################################################################################
 #inputs: CENT_growth_dct.csv, CENT_growth_dct_spread.csv,
 #         CENT_dct_spread_cont_growth.csv, CENT_dct_cont_growth.csv    
-#purpose: K-Means clustering (3 and 5 clusters for S1, S1 & S2 normalized separately,
+#purpose: K-Means clustering (for S1, S1 & S2 normalized separately,
 #          and S1 & S2 normalized together)
 ##################################################################################
 ```
