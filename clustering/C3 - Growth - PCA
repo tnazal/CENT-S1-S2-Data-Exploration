@@ -8,7 +8,7 @@ output: html_notebook
 # inputs:  CENT_growth_dct_spread.csv, CENT_dct_spread_cont_growth.csv
 #
 # purpose: PCA clustering (3 clusters (Cumulative proportion of variance = 1.0 at
-#          3 Principal components for all PCAs but s2 & s2, 5 for the latter)
+#          3 Principal components for all PCAs but s2 & s2, 4 for the latter)
 #          for S1, S2, s1 & s2, and S1 & S2 normalized together)
 #          
 ##################################################################################
@@ -190,11 +190,11 @@ ggplotly(pca_cont_plot)
 ###Shows in each cluster
 
 ```{r}
-pca_cont_clusters <- list(as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 1,]$Show_Name)),
+pca_cont_clusters_growth <- list(as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 1,]$Show_Name)),
       as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 2,]$Show_Name)),
       as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 3,]$Show_Name)))
 
-pca_cont_clusters 
+pca_cont_clusters_growth 
 
 ```
 
@@ -257,10 +257,11 @@ ggplotly(pca_s1_s2_plot)
 ###Shows in each cluster
 
 ```{r}
-pca_s1_s2_clusters <- list(as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 1,]$Show_Name)),
-      as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 2,]$Show_Name)),
-      as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 3,]$Show_Name)))
+pca_s1_s2_clusters_growth <- list(as.character(unique(df_pcaclusters_s1_s2[df_pcaclusters_s1_s2$cluster == 1,]$Show_Name)),
+      as.character(unique(df_pcaclusters_s1_s2[df_pcaclusters_s1_s2$cluster == 2,]$Show_Name)),
+      as.character(unique(df_pcaclusters_s1_s2[df_pcaclusters_s1_s2$cluster == 3,]$Show_Name)),
+      as.character(unique(df_pcaclusters_s1_s2[df_pcaclusters_s1_s2$cluster == 4,]$Show_Name)))
 
-pca_s1_s2_clusters 
+pca_s1_s2_clusters_growth 
 
 ```
