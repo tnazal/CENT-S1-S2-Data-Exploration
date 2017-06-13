@@ -145,7 +145,7 @@ tadpole_clust4_s2_df<- dct_spread %>%
   filter(Season_num == 2) %>% 
   select(-Season_num)
 
-tadpole_clust4_s2_df$cluster <- tadpole_clust5_s2$cl  
+tadpole_clust4_s2_df$cluster <- tadpole_clust4_s2$cl  
 ```
 
 
