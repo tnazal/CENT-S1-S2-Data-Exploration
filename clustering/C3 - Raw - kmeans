@@ -170,7 +170,7 @@ s1_3clusters_s2_trends_plot <- dct_s1_3clusters_s2_trends %>%
         axis.title.y = element_blank())
 
 ggplotly(s1_3clusters_s2_trends_plot) %>% 
-  layout(title = "Season 1 Shows with 3 Clusters & Season 2 Trends", 
+  layout(title = "Season 1 with 3 Clusters & Season 2 Trends", 
          margin = list(t = 150))
 ```
 
@@ -238,7 +238,7 @@ s1_4clusters_s2_trends_plot <- dct_s1_4clusters_s2_trends %>%
         axis.title.y = element_blank())
 
 ggplotly(s1_4clusters_s2_trends_plot) %>% 
-  layout(title = "Season 1 Shows with 4 Clusters & Season 2 Trends", 
+  layout(title = "Season 1 with 4 Clusters & Season 2 Trends", 
          margin = list(t = 150))
 ```
 
@@ -308,7 +308,7 @@ s1_5clusters_s2_trends_plot <- dct_s1_5clusters_s2_trends %>%
         axis.title.y = element_blank())
 
 ggplotly(s1_5clusters_s2_trends_plot) %>% 
-  layout(title = "Season 1 Shows with 5 Clusters & Season 2 Trends", 
+  layout(title = "Season 1 with 5 Clusters & Season 2 Trends", 
          margin = list(t = 150))
 ```
 
@@ -323,7 +323,7 @@ plot_ly(dct_s1_5clusters_s2_trends,
   add_lines() %>% 
   subplot(nrows = 5, shareX = TRUE) %>% 
   layout(showlegend = TRUE, 
-         title = "S1 with 5 Clusters & S2 Trends")
+         title = "Season 1 with 5 Clusters & Season 2 Trends")
 ```
 
 ```{r}
