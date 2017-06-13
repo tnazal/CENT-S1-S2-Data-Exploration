@@ -1,5 +1,5 @@
 ---
-title: "LS, Raw, PCA Clustering"
+title: "S1-S2 PCA Clustering on LS Impressions"
 output:
   html_notebook: default
   html_document: default
@@ -7,7 +7,7 @@ output:
 
 ```{r}
 ##################################################################################
-# inputs:  CENT_LS_dct_spread.csv, CENT_LS_dct_spread_cont.csv
+# inputs:  CENT_LS_dct_spread.csv, CENT_LS_dct_spread_cont.csv, CENT_LS_dct.csv
 #
 # purpose: PCA clustering (3 clusters (Cumulative proportion of variance = 1.0 at
 #          3 Principal components for all PCAs, but for non-contiuous s1 s2,
@@ -28,6 +28,7 @@ library(plotly)
 Read data, prepare data
 ```{r}
 dct_spread <- read.csv("CENT_LS_dct_spread.csv")
+dct_df <- read.csv("CENT_LS_dct.csv")
 
 pca_s1 <- dct_spread %>% 
   filter(Season_num == 1) %>%
@@ -82,6 +83,41 @@ pca_s1_clusters <- list(as.character(unique(df_pcaclusters_s1[df_pcaclusters_s1$
 pca_s1_clusters 
 
 ```
+
+```{r}
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
+s2_spread <- dct_spread %>% 
+  filter(Season_num == 2) %>%
+  ungroup() %>%
+  select(-X, -Network, -Season_num)
+
+s2_spread_newcols <- c(paste("X", 101:200, sep = ""))
+colnames(s2_spread)[2:ncol(s2_spread)] <- c(s2_spread_newcols)
+
+s1_pcaclusters_s2_trends <- bind_cols(df_pcaclusters_s1, 
+                                    s2_spread[, 2:ncol(s2_spread)])
+
+s1_pcaclusters_s2_trends <- merge(s1_pcaclusters_s2_trends[, c("cluster", 
+                                                         "Show_Name")], 
+                               dct_df, by = "Show_Name")
+
+dct_s1_pcaclusters_s2_trends <- s1_pcaclusters_s2_trends %>% 
+  filter(Season_num == 1 | Season_num == 2) %>% 
+  group_by(Network, Show_Name) %>% 
+  mutate(period = row_number())
+
+s1_pcaclusters_s2_trends_plot <- dct_s1_pcaclusters_s2_trends %>%
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster, nrow = 3) + 
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(s1_pcaclusters_s2_trends_plot) %>% 
+  layout(title = "Season 1 with 3 PCA Clusters & Season 2 Trends (LS)", 
+         margin = list(t = 150))
+```
+
 
 -------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------
