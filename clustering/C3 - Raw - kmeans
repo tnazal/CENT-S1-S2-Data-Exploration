@@ -1,13 +1,15 @@
 ---
 title: "CENT S1-S2 K-Means Clustering"
-output: html_notebook
+output:
+  html_notebook: default
+  html_document: default
 ---
 
 ```{r}
 ##################################################################################
 #inputs: CENT_dct.csv, CENT_dct_cont_spread.csv, CENT_dct_spread.csv,
 #        s1_s2_cont_dct.csv, dct_s1_s2.csv  
-#purpose: K-Means clustering (3 and 5 clusters for S1, S1 & S2 normalized separately,
+#purpose: K-Means clustering (for S1, S2, S1 & S2 normalized separately,
 #          and S1 & S2 normalized together)
 ##################################################################################
 ```
@@ -139,7 +141,7 @@ s1_3clusters
 ```
 
 ```{r}
-# TEST PLOT FOR S1 CLUSTERS & S2 TRENDS
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
 s2_spread <- dct_spread %>% 
   filter(Season_num == 2) %>%
   ungroup() %>%
@@ -215,7 +217,7 @@ s1_4clusters
 ```
 
 ```{r}
-# TEST PLOT FOR S1 CLUSTERS & S2 TRENDS
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
 s1_4clusters_s2_trends <- bind_cols(clusters4_s1_spread, 
                                     s2_spread[, 2:ncol(s2_spread)])
 
@@ -285,7 +287,7 @@ s1_5clusters
 ```
 
 ```{r}
-# TEST PLOT FOR S1 CLUSTERS & S2 TRENDS
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
 s1_5clusters_s2_trends <- bind_cols(clusters5_s1_spread, 
                                     s2_spread[, 2:ncol(s2_spread)])
 
