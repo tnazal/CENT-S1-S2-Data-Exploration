@@ -1,18 +1,17 @@
 ---
-title: "CENT S1-S2 Time Series Clustering"
+title: "CENT S1-S2 Time Series Clustering on C3 Growth"
 output: html_notebook
 ---
 
 ```{r}
 ##################################################################################
-# inputs:  CENT_growth_dct.csv, CENT_growth_dct_spread.csv, CENT_dct_spread_cont_growth.csv, 
-#          CENT_dct_cont_growth.csv, 
+# inputs:  CENT_growth_dct.csv, CENT_growth_dct_spread.csv, 
+#          CENT_dct_spread_cont_growth.csv, CENT_dct_cont_growth.csv, 
 #
 # purpose: K-Shape and Dynamic Time Warp clustering (clusters for S1, S2,
-#          and S1 & S2 normalized together)
+#          and S1 & S2 normalized separately and together)
 ##################################################################################
 ```
-
 
 ```{r}
 library(dplyr)
@@ -23,10 +22,7 @@ library(dtwclust)
 library(fpc)
 ```
 
-
-
 # Season 1 Time Series Clustering
-
 
 ```{r}
 dct_df <- read.csv("CENT_growth_dct.csv")
@@ -39,8 +35,6 @@ cluster_s1 <- dct_spread %>%
   ungroup() %>%
   select(-X, -Network, -Season_num, -Show_Name)
 ```
-
-
 
 ## K-Shape Clustering 
 
@@ -90,7 +84,7 @@ clusters_s1_shape5_plot <- clusters_s1_shape5 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters_s1_shape5_plot) %>% 
-  layout(title = "Season 1 Shows with 5 K-Shape Clusters. C3 Growth", 
+  layout(title = "Season 1 Shows with 5 K-Shape Clusters (C3 Growth)", 
          margin = list(t = 75))
 ```
 
@@ -103,7 +97,39 @@ s1_5clusters_kshape_growth <- list(as.character(unique(clusters_s1_shape5[cluste
 s1_5clusters_kshape_growth
 ```
 
+```{r}
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
+s2_spread <- dct_spread %>% 
+  filter(Season_num == 2) %>%
+  ungroup() %>%
+  select(-X, -Network, -Season_num)
 
+s2_spread_newcols <- c(paste("X", 101:200, sep = ""))
+colnames(s2_spread)[2:ncol(s2_spread)] <- c(s2_spread_newcols)
+
+s1_5clusters_kshape_s2_trends <- bind_cols(clusters_s1_shape5_spread, 
+                                    s2_spread[, 2:ncol(s2_spread)])
+
+s1_5clusters_kshape_s2_trends <- merge(s1_5clusters_kshape_s2_trends[, c("cluster_shape_5", 
+                                                         "Show_Name")], 
+                               dct_df, by = "Show_Name")
+
+dct_s1_5clusters_kshape_s2_trends <- s1_5clusters_kshape_s2_trends %>% 
+  filter(Season_num == 1 | Season_num == 2) %>% 
+  group_by(Network, Show_Name) %>% 
+  mutate(period = row_number())
+
+s1_5clusters_kshape_s2_trends_plot <- dct_s1_5clusters_kshape_s2_trends %>%
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_shape_5, nrow = 5) + 
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(s1_5clusters_kshape_s2_trends_plot) %>% 
+  layout(title = "Season 1 with 5 K-Shape Clusters & Season 2 Trends (C3 Growth)", 
+         margin = list(t = 150))
+```
 
 ## Dynamic Time Warp Clustering
 
@@ -153,7 +179,7 @@ clusters_s1_dtw3_plot <- clusters_s1_dtw3 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters_s1_dtw3_plot) %>% 
-  layout(title = "Season 1 Shows with 3 DTW Clusters. C3 Growth", 
+  layout(title = "Season 1 Shows with 3 DTW Clusters (C3 Growth)", 
          margin = list(t = 75))
 ```
 
@@ -164,6 +190,31 @@ s1_3clusters_dtw_growth <- list(as.character(unique(clusters_s1_dtw3[clusters_s1
 s1_3clusters_dtw_growth
 ```
 
+```{r}
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
+s1_3clusters_dtw_s2_trends <- bind_cols(clusters_s1_dtw3_spread, 
+                                    s2_spread[, 2:ncol(s2_spread)])
+
+s1_3clusters_dtw_s2_trends <- merge(s1_3clusters_dtw_s2_trends[, c("cluster_dtw_3", 
+                                                         "Show_Name")], 
+                               dct_df, by = "Show_Name")
+
+dct_s1_3clusters_dtw_s2_trends <- s1_3clusters_dtw_s2_trends %>% 
+  filter(Season_num == 1 | Season_num == 2) %>% 
+  group_by(Network, Show_Name) %>% 
+  mutate(period = row_number())
+
+s1_3clusters_dtw_s2_trends_plot <- dct_s1_3clusters_dtw_s2_trends %>%
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_dtw_3, nrow = 2) + 
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(s1_3clusters_dtw_s2_trends_plot) %>% 
+  layout(title = "Season 1 with 3 DTW Clusters & Season 2 Trends (C3 Growth)", 
+         margin = list(t = 150))
+```
 
 
 -----------------------------------------------------------------------------------------------------------
@@ -228,7 +279,7 @@ clusters_s2_shape2_plot <- clusters_s2_shape2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters_s2_shape2_plot) %>% 
-  layout(title = "Season 2 Shows with 2 K-Shape Clusters. C3 growth", 
+  layout(title = "Season 2 Shows with 2 K-Shape Clusters (C3 Growth)", 
          margin = list(t = 75))
 ```
 
@@ -287,7 +338,7 @@ clusters_s2_dtw3_plot <- clusters_s2_dtw3 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters_s2_dtw3_plot) %>% 
-  layout(title = "Season 2 Shows with 3 DTW Clusters. C3 Growth", 
+  layout(title = "Season 2 Shows with 3 DTW Clusters (C3 Growth)", 
          margin = list(t = 75))
 ```
 
@@ -359,7 +410,7 @@ clusters_cont_shape4_plot <- clusters_cont_shape4 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters_cont_shape4_plot) %>% 
-  layout(title = "Season 1-2 Shows with 4 K-Shape Clusters. C3 Growth", 
+  layout(title = "Season 1-2 Shows with 4 K-Shape Clusters (C3 Growth)", 
          margin = list(t = 75))
 ```
 
@@ -418,7 +469,7 @@ clusters_cont_dtw3_plot <- clusters_cont_dtw3 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters_cont_dtw3_plot) %>% 
-  layout(title = "Season 1-2 Shows with 3 DTW Clusters. C3 Growth", 
+  layout(title = "Season 1-2 Shows with 3 DTW Clusters (C3 Growth)", 
          margin = list(t = 150))
 ```
 
@@ -497,7 +548,7 @@ clusters_s1_s2_shape2_plot <- clusters_s1_s2_shape2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters_s1_s2_shape2_plot) %>% 
-  layout(title = "Season 1-2 Shows with 2 K-Shape Clusters. C3 Growth", 
+  layout(title = "Season 1-2 Shows with 2 K-Shape Clusters (C3 Growth)", 
          margin = list(t = 150))
 ```
 
@@ -555,7 +606,7 @@ clusters_s1_s2_dtw5_plot <- clusters_s1_s2_dtw5 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters_s1_s2_dtw5_plot) %>% 
-  layout(title = "Season 1-2 Shows with 5 DTW Clusters. C3 Growth", 
+  layout(title = "Season 1-2 Shows with 5 DTW Clusters (C3 Growth)", 
          margin = list(t = 150))
 ```
 
@@ -567,7 +618,3 @@ s1_s2_5clusters_dtw_growth <- list(as.character(unique(clusters_s1_s2_dtw5[clust
                             as.character(unique(clusters_s1_s2_dtw5[clusters_s1_s2_dtw5$cluster_dtw_5 == 5,]$Show_Name)))
 s1_s2_5clusters_dtw_growth
 ```
-
-
-
-
