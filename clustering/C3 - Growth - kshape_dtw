@@ -9,7 +9,7 @@ output: html_notebook
 #          CENT_dct_cont_growth.csv, 
 #
 # purpose: K-Shape and Dynamic Time Warp clustering (clusters for S1, S2,
-#          S1 & S2, and S1-S2 normalized together)
+#          and S1 & S2 normalized together)
 ##################################################################################
 ```
 
@@ -91,16 +91,16 @@ clusters_s1_shape5_plot <- clusters_s1_shape5 %>%
 
 ggplotly(clusters_s1_shape5_plot) %>% 
   layout(title = "Season 1 Shows with 5 K-Shape Clusters. C3 Growth", 
-         margin = list(t = 150))
+         margin = list(t = 75))
 ```
 
 ```{r}
-s1_5clusters_kshape <- list(as.character(unique(clusters_s1_shape5[clusters_s1_shape5$cluster_shape_5 == 1,]$Show_Name)), 
+s1_5clusters_kshape_growth <- list(as.character(unique(clusters_s1_shape5[clusters_s1_shape5$cluster_shape_5 == 1,]$Show_Name)), 
                             as.character(unique(clusters_s1_shape5[clusters_s1_shape5$cluster_shape_5 == 2,]$Show_Name)),
                             as.character(unique(clusters_s1_shape5[clusters_s1_shape5$cluster_shape_5 == 3,]$Show_Name)),
                             as.character(unique(clusters_s1_shape5[clusters_s1_shape5$cluster_shape_5 == 4,]$Show_Name)),
                             as.character(unique(clusters_s1_shape5[clusters_s1_shape5$cluster_shape_5 == 5,]$Show_Name)))
-s1_5clusters_kshape
+s1_5clusters_kshape_growth
 ```
 
 
@@ -154,14 +154,14 @@ clusters_s1_dtw3_plot <- clusters_s1_dtw3 %>%
 
 ggplotly(clusters_s1_dtw3_plot) %>% 
   layout(title = "Season 1 Shows with 3 DTW Clusters. C3 Growth", 
-         margin = list(t = 150))
+         margin = list(t = 75))
 ```
 
 ```{r}
-s1_3clusters_dtw <- list(as.character(unique(clusters_s1_dtw3[clusters_s1_dtw3$cluster_dtw_3 == 1,]$Show_Name)), 
+s1_3clusters_dtw_growth <- list(as.character(unique(clusters_s1_dtw3[clusters_s1_dtw3$cluster_dtw_3 == 1,]$Show_Name)), 
                          as.character(unique(clusters_s1_dtw3[clusters_s1_dtw3$cluster_dtw_3 == 2,]$Show_Name)), 
                          as.character(unique(clusters_s1_dtw3[clusters_s1_dtw3$cluster_dtw_3 == 3,]$Show_Name)))
-s1_3clusters_dtw
+s1_3clusters_dtw_growth
 ```
 
 
@@ -229,13 +229,13 @@ clusters_s2_shape2_plot <- clusters_s2_shape2 %>%
 
 ggplotly(clusters_s2_shape2_plot) %>% 
   layout(title = "Season 2 Shows with 2 K-Shape Clusters. C3 growth", 
-         margin = list(t = 150))
+         margin = list(t = 75))
 ```
 
 ```{r}
-s2_2clusters_kshape <- list(as.character(unique(clusters_s2_shape2[clusters_s2_shape2$cluster_shape_2 == 1,]$Show_Name)), 
+s2_2clusters_kshape_growth <- list(as.character(unique(clusters_s2_shape2[clusters_s2_shape2$cluster_shape_2 == 1,]$Show_Name)), 
                             as.character(unique(clusters_s2_shape2[clusters_s2_shape2$cluster_shape_2 == 2,]$Show_Name)))
-s2_2clusters_kshape
+s2_2clusters_kshape_growth
 ```
 
 
@@ -288,14 +288,14 @@ clusters_s2_dtw3_plot <- clusters_s2_dtw3 %>%
 
 ggplotly(clusters_s2_dtw3_plot) %>% 
   layout(title = "Season 2 Shows with 3 DTW Clusters. C3 Growth", 
-         margin = list(t = 150))
+         margin = list(t = 75))
 ```
 
 ```{r}
-s2_3clusters_dtw <- list(as.character(unique(clusters_s2_dtw3[clusters_s2_dtw3$cluster_dtw_3 == 1,]$Show_Name)), 
+s2_3clusters_dtw_growth <- list(as.character(unique(clusters_s2_dtw3[clusters_s2_dtw3$cluster_dtw_3 == 1,]$Show_Name)), 
                          as.character(unique(clusters_s2_dtw3[clusters_s2_dtw3$cluster_dtw_3 == 2,]$Show_Name)),
                          as.character(unique(clusters_s2_dtw3[clusters_s2_dtw3$cluster_dtw_3 == 3,]$Show_Name)))
-s2_3clusters_dtw
+s2_3clusters_dtw_growth
 ```
 
 
@@ -359,16 +359,16 @@ clusters_cont_shape4_plot <- clusters_cont_shape4 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters_cont_shape4_plot) %>% 
-  layout(title = "Season 1-2 Shows with 4 K-Shape Clusters", 
-         margin = list(t = 150))
+  layout(title = "Season 1-2 Shows with 4 K-Shape Clusters. C3 Growth", 
+         margin = list(t = 75))
 ```
 
 ```{r}
-cont_4clusters_kshape <- list(as.character(unique(clusters_cont_shape4[clusters_cont_shape4$cluster_shape_4 == 1,]$Show_Name)), 
+cont_4clusters_kshape_growth <- list(as.character(unique(clusters_cont_shape4[clusters_cont_shape4$cluster_shape_4 == 1,]$Show_Name)), 
                               as.character(unique(clusters_cont_shape4[clusters_cont_shape4$cluster_shape_4 == 2,]$Show_Name)), 
                               as.character(unique(clusters_cont_shape4[clusters_cont_shape4$cluster_shape_4 == 3,]$Show_Name)), 
                               as.character(unique(clusters_cont_shape4[clusters_cont_shape4$cluster_shape_4 == 4,]$Show_Name)))
-cont_4clusters_kshape
+cont_4clusters_kshape_growth
 ```
 
 ## Dynamic Time Warp Clustering
@@ -423,10 +423,10 @@ ggplotly(clusters_cont_dtw3_plot) %>%
 ```
 
 ```{r}
-cont_3clusters_dtw <- list(as.character(unique(clusters_cont_dtw3[clusters_cont_dtw3$cluster_dtw_3 == 1,]$Show_Name)), 
+cont_3clusters_dtw_growth <- list(as.character(unique(clusters_cont_dtw3[clusters_cont_dtw3$cluster_dtw_3 == 1,]$Show_Name)), 
                            as.character(unique(clusters_cont_dtw3[clusters_cont_dtw3$cluster_dtw_3 == 2,]$Show_Name)), 
                            as.character(unique(clusters_cont_dtw3[clusters_cont_dtw3$cluster_dtw_3 == 3,]$Show_Name)))
-cont_3clusters_dtw
+cont_3clusters_dtw_growth
 ```
 
 
@@ -502,9 +502,9 @@ ggplotly(clusters_s1_s2_shape2_plot) %>%
 ```
 
 ```{r}
-s1_s2_2clusters_kshape <- list(as.character(unique(clusters_s1_s2_shape2[clusters_s1_s2_shape2$cluster_shape_2 == 1,]$Show_Name)), 
+s1_s2_2clusters_kshape_growth <- list(as.character(unique(clusters_s1_s2_shape2[clusters_s1_s2_shape2$cluster_shape_2 == 1,]$Show_Name)), 
                                as.character(unique(clusters_s1_s2_shape2[clusters_s1_s2_shape2$cluster_shape_2 == 2,]$Show_Name)))
-s1_s2_2clusters_kshape
+s1_s2_2clusters_kshape_growth
 ```
 
 
@@ -555,17 +555,17 @@ clusters_s1_s2_dtw5_plot <- clusters_s1_s2_dtw5 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters_s1_s2_dtw5_plot) %>% 
-  layout(title = "Season 1-2 Shows with 5 DTW Clusters", 
+  layout(title = "Season 1-2 Shows with 5 DTW Clusters. C3 Growth", 
          margin = list(t = 150))
 ```
 
 ```{r}
-s1_s2_5clusters_dtw <- list(as.character(unique(clusters_s1_s2_dtw5[clusters_s1_s2_dtw5$cluster_dtw_5 == 1,]$Show_Name)), 
+s1_s2_5clusters_dtw_growth <- list(as.character(unique(clusters_s1_s2_dtw5[clusters_s1_s2_dtw5$cluster_dtw_5 == 1,]$Show_Name)), 
                             as.character(unique(clusters_s1_s2_dtw5[clusters_s1_s2_dtw5$cluster_dtw_5 == 2,]$Show_Name)), 
                             as.character(unique(clusters_s1_s2_dtw5[clusters_s1_s2_dtw5$cluster_dtw_5 == 3,]$Show_Name)), 
                             as.character(unique(clusters_s1_s2_dtw5[clusters_s1_s2_dtw5$cluster_dtw_5 == 4,]$Show_Name)), 
                             as.character(unique(clusters_s1_s2_dtw5[clusters_s1_s2_dtw5$cluster_dtw_5 == 5,]$Show_Name)))
-s1_s2_5clusters_dtw
+s1_s2_5clusters_dtw_growth
 ```
 
 
