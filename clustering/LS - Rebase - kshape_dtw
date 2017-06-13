@@ -10,10 +10,9 @@ output: html_notebook
 #        CENT_LS_rebase_dct_s1_s2.csv
 #
 # purpose: K-Shape and Dynamic Time Warp clustering (clusters for S1, S2,
-#          and S1 & S2 normalized together)
+#          and S1 & S2 normalized separately and together)
 ##################################################################################
 ```
-
 
 ```{r}
 library(dplyr)
@@ -24,9 +23,7 @@ library(dtwclust)
 library(fpc)
 ```
 
-
 # Season 1 Time Series Clustering
-
 
 ```{r}
 dct_df <- read.csv("CENT_LS_rebase_dct.csv")
@@ -39,7 +36,6 @@ cluster_s1 <- dct_spread %>%
   ungroup() %>%
   select(-X, -Network, -Season_num, -Show_Name)
 ```
-
 
 ## K-Shape Clustering 
 
@@ -101,7 +97,39 @@ s1_4clusters_kshape <- list(as.character(unique(clusters_s1_shape4[clusters_s1_s
 s1_4clusters_kshape
 ```
 
+```{r}
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
+s2_spread <- dct_spread %>% 
+  filter(Season_num == 2) %>%
+  ungroup() %>%
+  select(-X, -Network, -Season_num)
 
+s2_spread_newcols <- c(paste("X", 101:200, sep = ""))
+colnames(s2_spread)[2:ncol(s2_spread)] <- c(s2_spread_newcols)
+
+s1_4clusters_kshape_s2_trends <- bind_cols(clusters_s1_shape4_spread, 
+                                    s2_spread[, 2:ncol(s2_spread)])
+
+s1_4clusters_kshape_s2_trends <- merge(s1_4clusters_kshape_s2_trends[, c("cluster_shape_4", 
+                                                         "Show_Name")], 
+                               dct_df, by = "Show_Name")
+
+dct_s1_4clusters_kshape_s2_trends <- s1_4clusters_kshape_s2_trends %>% 
+  filter(Season_num == 1 | Season_num == 2) %>% 
+  group_by(Network, Show_Name) %>% 
+  mutate(period = row_number())
+
+s1_4clusters_kshape_s2_trends_plot <- dct_s1_4clusters_kshape_s2_trends %>%
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_shape_4, nrow = 4) + 
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(s1_4clusters_kshape_s2_trends_plot) %>% 
+  layout(title = "Season 1 with 4 K-Shape Clusters & Season 2 Trends (LS Rebase)", 
+         margin = list(t = 150))
+```
 
 ## Dynamic Time Warp Clustering
 
@@ -163,6 +191,31 @@ s1_4clusters_dtw <- list(as.character(unique(clusters_s1_dtw4[clusters_s1_dtw4$c
 s1_4clusters_dtw
 ```
 
+```{r}
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
+s1_4clusters_dtw_s2_trends <- bind_cols(clusters_s1_dtw4_spread, 
+                                    s2_spread[, 2:ncol(s2_spread)])
+
+s1_4clusters_dtw_s2_trends <- merge(s1_4clusters_dtw_s2_trends[, c("cluster_dtw_4", 
+                                                         "Show_Name")], 
+                               dct_df, by = "Show_Name")
+
+dct_s1_4clusters_dtw_s2_trends <- s1_4clusters_dtw_s2_trends %>% 
+  filter(Season_num == 1 | Season_num == 2) %>% 
+  group_by(Network, Show_Name) %>% 
+  mutate(period = row_number())
+
+s1_4clusters_dtw_s2_trends_plot <- dct_s1_4clusters_dtw_s2_trends %>%
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_dtw_4, nrow = 4) + 
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(s1_4clusters_dtw_s2_trends_plot) %>% 
+  layout(title = "Season 1 with 4 DTW Clusters & Season 2 Trends (LS Rebase)", 
+         margin = list(t = 150))
+```
 
 
 -----------------------------------------------------------------------------------------------------------
