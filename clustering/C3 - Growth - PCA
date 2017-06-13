@@ -48,7 +48,7 @@ cluster_assign_s1$cluster <- max.col(cluster_assign_s1[, c(2, 3, 4)], ties.metho
 
 df_pcaclusters_s1 <- dct_spread %>% filter(Season_num == 1) %>% 
   select(-X, -Season_num)
-df_pcaclusters_s1$cluster <- cluster_assign_s1$culster
+df_pcaclusters_s1$cluster <- cluster_assign_s1$cluster
 df_pcaclusters_s1 <- df_pcaclusters_s1[,c(1, 2, 103, 3:102)]
 ```
 
