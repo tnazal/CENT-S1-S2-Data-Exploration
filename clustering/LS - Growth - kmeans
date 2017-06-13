@@ -5,9 +5,9 @@ output: html_notebook
 
 ```{r}
 ##################################################################################
-#inputs: CENT_LS_growth_dct.csv, CENT_LS_growth_dct_spread.csv,
+#inputs: CENT_lS_growth_dct.csv, CENT_LS_growth_dct_spread.csv,
 #         CENT_dct_spread_cont_LS_growth.csv, CENT_dct_cont_LS_growth.csv    
-#purpose: K-Means clustering (for S1, S1 & S2 normalized separately,
+#purpose: K-Means clustering (for S1, S2, S1 & S2 normalized separately,
 #          and S1 & S2 normalized together)
 ##################################################################################
 ```
@@ -137,7 +137,7 @@ s1_4clusters
 ```
 
 ```{r}
-# TEST PLOT FOR S1 CLUSTERS & S2 TRENDS
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
 s2_spread <- dct_spread %>% 
   filter(Season_num == 2) %>%
   ungroup() %>%
@@ -166,7 +166,7 @@ s1_4clusters_s2_trends_plot <- dct_s1_4clusters_s2_trends %>%
         axis.title.y = element_blank())
 
 ggplotly(s1_4clusters_s2_trends_plot) %>% 
-  layout(title = "Season 1 Shows with 4 Clusters & Season 2 Trends (LS Growth)", 
+  layout(title = "Season 1 with 4 Clusters & Season 2 Trends (LS Growth)", 
          margin = list(t = 150))
 ```
 
@@ -215,7 +215,7 @@ s1_5clusters
 ```
 
 ```{r}
-# TEST PLOT FOR S1 CLUSTERS & S2 TRENDS
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
 s1_5clusters_s2_trends <- bind_cols(clusters5_s1_spread, 
                                     s2_spread[, 2:ncol(s2_spread)])
 
@@ -236,7 +236,7 @@ s1_5clusters_s2_trends_plot <- dct_s1_5clusters_s2_trends %>%
         axis.title.y = element_blank())
 
 ggplotly(s1_5clusters_s2_trends_plot) %>% 
-  layout(title = "Season 1 Shows with 5 Clusters & Season 2 Trends (LS Growth)", 
+  layout(title = "Season 1 with 5 Clusters & Season 2 Trends (LS Growth)", 
          margin = list(t = 150))
 ```
 
