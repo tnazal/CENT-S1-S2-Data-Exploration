@@ -9,7 +9,7 @@ output: html_notebook
 #          CENT_dct_cont_growth.csv, 
 #
 # purpose: K-Shape and Dynamic Time Warp clustering (clusters for S1, S2,
-#          and S1 & S2 normalized together)
+#          S1 & S2, and S1-S2 normalized together)
 ##################################################################################
 ```
 
