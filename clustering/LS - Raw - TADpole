@@ -21,6 +21,8 @@ library(plyr)
 library(dplyr)
 library(dtwclust)
 library(ggplot2)
+library(tidyr)
+library(plotly)
 ```
 
 
@@ -141,7 +143,7 @@ dtw_df_s2 <- dct_spread %>%
 
 ```{r}
 set.seed(12)
-tadpole_clust5_s2 <- TADPole(dtw_df_s2, k = 5L, window.size = 30, dc = 100)
+tadpole_clust5_s2 <- TADPole(dtw_df_s2, k = 5L, window.size = 50, dc = 5)
 
 tadpole_clust5_s2_df<- dct_spread %>% 
   filter(Season_num == 2) %>% 
@@ -184,7 +186,7 @@ tadpole_s2_5clusters
 
 ```{r}
 set.seed(12)
-tadpole_clust3_s2 <- TADPole(dtw_df_s2, k = 3L, window.size = 25, dc = 2)
+tadpole_clust3_s2 <- TADPole(dtw_df_s2, k = 3L, window.size = 2, dc = 2)
 
 tadpole_clust3_s2_df<- dct_spread %>% 
   filter(Season_num == 2) %>% 
@@ -238,7 +240,7 @@ dtw_df_cont <- dct_spread_cont %>%
 
 ```{r}
 set.seed(12)
-tadpole_clust5_cont <- TADPole(dtw_df_cont, k = 5L, window.size = 3, dc = 10)
+tadpole_clust5_cont <- TADPole(dtw_df_cont, k = 5L, window.size = 5, dc = 5)
 
 tadpole_clust5_cont_df<- dct_spread_cont
 
@@ -251,8 +253,6 @@ tadpole5_cont_long <- gather(tadpole_clust5_cont_df, key = period, value = dct_v
   select(-X)
 tadpole5_cont_long$period <- as.numeric(sub("X", "", tadpole5_cont_long$period ))
 tadpole5_cont_long$period <- as.numeric(tadpole5_cont_long$period)
-
-
 
 tadpole5_cont_plot <- tadpole5_cont_long %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
@@ -278,7 +278,7 @@ tadpole_cont_5clusters
 
 ```{r}
 set.seed(12)
-tadpole_clust3_cont <- TADPole(dtw_df_cont, k = 3L, window.size = 3, dc = 10)
+tadpole_clust3_cont <- TADPole(dtw_df_cont, k = 3L, window.size = 2, dc = 2)
 
 tadpole_clust3_cont_df<- dct_spread_cont
 
@@ -336,7 +336,7 @@ tadpole_s1_s2 <- tadpole_spread_s1_s2 %>%
 
 ```{r}
 set.seed(12)
-tadpole_clust5_s1_s2 <- TADPole(tadpole_s1_s2, k = 5L, window.size = 2, dc = 10)
+tadpole_clust5_s1_s2 <- TADPole(tadpole_s1_s2, k = 5L, window.size = 2, dc = 5)
 
 tadpole_clust5_s1_s2_df<- tadpole_spread_s1_s2
 
@@ -355,7 +355,7 @@ tadpole5_s1_s2_long$period <- as.numeric(tadpole5_s1_s2_long$period)
 tadpole5_s1_s2_plot <- tadpole5_s1_s2_long %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
-  facet_wrap(~ cluster)
+  facet_wrap(~ cluster, nrow = 3)
 
 ggplotly(tadpole5_s1_s2_plot)
 ```
