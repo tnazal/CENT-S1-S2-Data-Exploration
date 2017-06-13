@@ -1,5 +1,5 @@
 ---
-title: "rebase - CENT S1-S2 K-Means Clustering"
+title: "CENT S1-S2 K-Means Clustering on C3 Rebase"
 output: html_notebook
 ---
 
@@ -7,7 +7,7 @@ output: html_notebook
 ##################################################################################
 #inputs: CENT_rebase_dct.csv, CENT_rebase_dct_spread.csv,
 #         CENT_rebase_dct_spread_cont.csv, CENT_rebase_dct_cont.csv    
-#purpose: K-Means clustering (3 and 5 clusters for S1, S1 & S2 normalized separately,
+#purpose: K-Means clustering (for S1, S2, S1 & S2 normalized separately,
 #          and S1 & S2 normalized together)
 ##################################################################################
 ```
@@ -122,7 +122,7 @@ clusters3_s1_plot <- clusters3_s1 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters3_s1_plot) %>% 
-  layout(title = "Season 1 Shows with 3 Clusters. C3 rebase", 
+  layout(title = "Season 1 Shows with 3 Clusters (C3 Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -136,7 +136,7 @@ s1_3clusters
 ```
 
 ```{r}
-# TEST PLOT FOR S1 CLUSTERS & S2 TRENDS
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
 s2_spread <- dct_spread %>% 
   filter(Season_num == 2) %>%
   ungroup() %>%
@@ -165,7 +165,7 @@ s1_3clusters_s2_trends_plot <- dct_s1_3clusters_s2_trends %>%
         axis.title.y = element_blank())
 
 ggplotly(s1_3clusters_s2_trends_plot) %>% 
-  layout(title = "Season 1 Shows with 3 Clusters & Season 2 Trends. C3 rebase", 
+  layout(title = "Season 1 with 3 Clusters & Season 2 Trends (C3 Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -197,7 +197,7 @@ clusters4_s1_plot <- clusters4_s1 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters4_s1_plot) %>% 
-  layout(title = "Season 1 Shows with 4 Clusters, C3, rebase", 
+  layout(title = "Season 1 Shows with 4 Clusters (C3 Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -212,7 +212,7 @@ s1_4clusters
 ```
 
 ```{r}
-# TEST PLOT FOR S1 CLUSTERS & S2 TRENDS
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
 s1_4clusters_s2_trends <- bind_cols(clusters4_s1_spread, 
                                     s2_spread[, 2:ncol(s2_spread)])
 
@@ -233,7 +233,7 @@ s1_4clusters_s2_trends_plot <- dct_s1_4clusters_s2_trends %>%
         axis.title.y = element_blank())
 
 ggplotly(s1_4clusters_s2_trends_plot) %>% 
-  layout(title = "Season 1 Shows with 4 Clusters & Season 2 Trends. C3, rebase", 
+  layout(title = "Season 1 with 4 Clusters & Season 2 Trends (C3 Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -266,7 +266,7 @@ clusters5_s1_plot <- clusters5_s1 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters5_s1_plot) %>% 
-  layout(title = "Season 1 Shows with 5 Clusters. C3 rebase", 
+  layout(title = "Season 1 Shows with 5 Clusters (C3 Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -282,7 +282,7 @@ s1_5clusters
 ```
 
 ```{r}
-# TEST PLOT FOR S1 CLUSTERS & S2 TRENDS
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
 s1_5clusters_s2_trends <- bind_cols(clusters5_s1_spread, 
                                     s2_spread[, 2:ncol(s2_spread)])
 
@@ -303,7 +303,7 @@ s1_5clusters_s2_trends_plot <- dct_s1_5clusters_s2_trends %>%
         axis.title.y = element_blank())
 
 ggplotly(s1_5clusters_s2_trends_plot) %>% 
-  layout(title = "Season 1 Shows with 5 Clusters & Season 2 Trends. C3 rebase", 
+  layout(title = "Season 1 with 5 Clusters & Season 2 Trends (C3 Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -410,7 +410,7 @@ clusters4_s2_plot <- clusters4_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters4_s2_plot) %>% 
-  layout(title = "Season 2 Shows with 4 Clusters. C3 rebase", 
+  layout(title = "Season 2 Shows with 4 Clusters (C3 Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -452,7 +452,7 @@ clusters2_s2_plot <- clusters2_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters2_s2_plot) %>% 
-  layout(title = "Season 2 Shows with 2 Clusters. C3 rebase", 
+  layout(title = "Season 2 Shows with 2 Clusters (C3 Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -493,7 +493,7 @@ clusters5_s2_plot <- clusters5_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters5_s2_plot) %>% 
-  layout(title = "Season 2 Shows with 5 Clusters. C3 rebase", 
+  layout(title = "Season 2 Shows with 5 Clusters (C3 Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -619,7 +619,7 @@ clusters2_s1_s2_plot <- clusters2_s1_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters2_s1_s2_plot) %>% 
-  layout(title = "Season 1 and Season 2 Shows with 2 Clusters. C3 rebase", 
+  layout(title = "Season 1 and Season 2 Shows with 2 Clusters (C3 Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -660,7 +660,7 @@ clusters3_s1_s2_plot <- clusters3_s1_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters3_s1_s2_plot) %>% 
-  layout(title = "Season 1 and Season 2 Shows with 3 Clusters. C3 rebase", 
+  layout(title = "Season 1 and Season 2 Shows with 3 Clusters (C3 Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -702,7 +702,7 @@ clusters5_s1_s2_plot <- clusters5_s1_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters5_s1_s2_plot) %>% 
-  layout(title = "Season 1 and Season 2 Shows with 5 Clusters. C3 Rebase", 
+  layout(title = "Season 1 and Season 2 Shows with 5 Clusters (C3 Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -817,7 +817,7 @@ clusters3_cont_plot <- clusters3_cont %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters3_cont_plot) %>% 
-  layout(title = "Season 1-2 (Continuous) with 3 Clusters. C3 rebase", 
+  layout(title = "Season 1-2 (Continuous) with 3 Clusters (C3 Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -857,7 +857,7 @@ clusters2_cont_plot <- clusters2_cont %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters2_cont_plot) %>% 
-  layout(title = "Season 1-2 continuous Shows with 2 Clusters. C3 rebase", 
+  layout(title = "Season 1-2 continuous Shows with 2 Clusters (C3 Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -898,7 +898,7 @@ clusters5_cont_plot <- clusters5_cont %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters5_cont_plot) %>% 
-  layout(title = "Season 1-2 (Continuous) with 5 Clusters. C3 rebase", 
+  layout(title = "Season 1-2 (Continuous) with 5 Clusters (C3 Rebase)", 
          margin = list(t = 150))
 ```
 
