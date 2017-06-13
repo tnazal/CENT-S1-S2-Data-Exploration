@@ -105,11 +105,11 @@ pca_s2_df <- as.data.frame(pca_s2$x)
 pca_s2_df$Show_name <- dct_spread[dct_spread$Season_num == 2,]$Show_Name
 
 cluster_assign_s2<- pca_s2_df[, c(49, 1, 2, 3)]
-cluster_assign_s2$culster <- max.col(cluster_assign_s2[, c(2, 3, 4)], ties.method = "first")
+cluster_assign_s2$cluster <- max.col(cluster_assign_s2[, c(2, 3, 4)], ties.method = "first")
 
 df_pcaclusters_s2 <- dct_spread %>% filter(Season_num == 2) %>% 
   select(-X, -Season_num)
-df_pcaclusters_s2$cluster <- cluster_assign_s2$culster
+df_pcaclusters_s2$cluster <- cluster_assign_s2$cluster
 df_pcaclusters_s2 <- df_pcaclusters_s2[,c(1, 2, 103, 3:102)]
 ```
 
@@ -165,10 +165,10 @@ pca_cont_df <- as.data.frame(pca_cont$x)
 pca_cont_df$Show_name <- dct_spread_cont$Show_Name
 
 cluster_assign_cont<- pca_cont_df[,c(49, 1, 2, 3)]
-cluster_assign_cont$culster <- max.col(cluster_assign_cont[, c(2, 3, 4)], ties.method = "first")
+cluster_assign_cont$cluster <- max.col(cluster_assign_cont[, c(2, 3, 4)], ties.method = "first")
 
 df_pcaclusters_cont <- dct_spread_cont %>% select(-X)
-df_pcaclusters_cont$cluster <- cluster_assign_cont$culster
+df_pcaclusters_cont$cluster <- cluster_assign_cont$cluster
 df_pcaclusters_cont <- df_pcaclusters_cont[,c(1, 2, 103, 3:102)]
 ```
 
@@ -231,10 +231,10 @@ pca_s1_s2_df <- as.data.frame(pca_s1_s2$x)
 pca_s1_s2_df$Show_name <- dct_spread[dct_spread$Season_num == 1, ]$Show_Name
 
 cluster_assign_s1_s2<- pca_s1_s2_df[,c(49, 1, 2, 3, 4)]
-cluster_assign_s1_s2$culster <- max.col(cluster_assign_s1_s2[, c(2, 3, 4, 5)], ties.method = "first")
+cluster_assign_s1_s2$cluster <- max.col(cluster_assign_s1_s2[, c(2, 3, 4, 5)], ties.method = "first")
 
 df_pcaclusters_s1_s2 <- dct_spread_s1_s2 %>% select(-X)
-df_pcaclusters_s1_s2$cluster <- cluster_assign_s1_s2$culster
+df_pcaclusters_s1_s2$cluster <- cluster_assign_s1_s2$cluster
 df_pcaclusters_s1_s2 <- select(df_pcaclusters_s1_s2, -Season_num)
 df_pcaclusters_s1_s2 <- df_pcaclusters_s1_s2[,c(1, 2, 203, 3:202)]
 ```
