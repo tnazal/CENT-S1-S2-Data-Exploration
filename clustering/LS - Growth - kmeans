@@ -138,6 +138,14 @@ s1_4clusters
 
 ```{r}
 # TEST PLOT FOR S1 CLUSTERS & S2 TRENDS
+s2_spread <- dct_spread %>% 
+  filter(Season_num == 2) %>%
+  ungroup() %>%
+  select(-X, -Network, -Season_num)
+
+s2_spread_newcols <- c(paste("X", 101:200, sep = ""))
+colnames(s2_spread)[2:ncol(s2_spread)] <- c(s2_spread_newcols)
+
 s1_4clusters_s2_trends <- bind_cols(clusters4_s1_spread, 
                                     s2_spread[, 2:ncol(s2_spread)])
 
