@@ -11,7 +11,7 @@ output:
 #
 # purpose: PCA clustering (3 clusters (Cumulative proportion of variance = 1.0 at
 #          3 Principal components for all PCAs, but for non-contiuous s1-s2,
-#          4 clusters for the latter) for S1, S2, and S1 & S2 normalized together)       
+#          4 clusters for the latter) for S1, S2, and S1 & S2 normalized together)
 ##################################################################################
 ```
 
@@ -296,11 +296,10 @@ ggplotly(pca_s1_s2_plot) %>%
 ### Shows in Each Cluster
 
 ```{r}
-pca_s1_s2_clusters <- list(as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 1,]$Show_Name)),
-                           as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 2,]$Show_Name)),
-                           as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 3,]$Show_Name)),
-                           as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 4,]$Show_Name)))
+pca_s1_s2_clusters <- list(as.character(unique(df_pcaclusters_s1_s2[df_pcaclusters_s1_s2$cluster == 1,]$Show_Name)),
+                           as.character(unique(df_pcaclusters_s1_s2[df_pcaclusters_s1_s2$cluster == 2,]$Show_Name)),
+                           as.character(unique(df_pcaclusters_s1_s2[df_pcaclusters_s1_s2$cluster == 3,]$Show_Name)),
+                           as.character(unique(df_pcaclusters_s1_s2[df_pcaclusters_s1_s2$cluster == 4,]$Show_Name)))
 
 pca_s1_s2_clusters 
-
 ```
