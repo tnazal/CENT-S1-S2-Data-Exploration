@@ -1,6 +1,8 @@
 ---
-title: "S1-S2 PCA Clustering on LS Rebase"
-output: html_notebook
+title: "CENT S1-S2 PCA Clustering on LS Rebase"
+output:
+  html_notebook: default
+  html_document: default
 ---
 
 ```{r}
@@ -9,10 +11,13 @@ output: html_notebook
 #          CENT_LS_rebase_dct.csv
 #
 # purpose: PCA clustering (3 clusters (Cumulative proportion of variance = 1.0 at
-#          3 Principal components for all PCAs but s2 & s2, 5 for the latter)
+#          3 Principal components for all PCAs but s2 & s2, 4 for the latter)
 #          for S1, S2, s1 & s2, and S1 & S2 normalized together)
-#          
 ##################################################################################
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 ```
 
 ```{r}
@@ -22,7 +27,7 @@ library(ggplot2)
 library(plotly)
 ```
 
-#PCA S1
+# PCA S1
 
 Read data, prepare data
 ```{r}
@@ -42,7 +47,7 @@ pca_s1 <- prcomp(pca_s1)
 summary(pca_s1)
 ```
 
-Assing Clusters based on PCA contribution
+Assign clusters based on PCA contribution
 ```{r}
 pca_s1_df <- as.data.frame(pca_s1$x)
 pca_s1_df$Show_name <- dct_spread[dct_spread$Season_num == 1,]$Show_Name
@@ -56,23 +61,22 @@ df_pcaclusters_s1$cluster <- cluster_assign_s1$cluster
 df_pcaclusters_s1 <- df_pcaclusters_s1[,c(1, 2, 103, 3:102)]
 ```
 
-
 Long form data, plot
 ```{r}
 pca_s1_long <- gather(df_pcaclusters_s1, key = period, value = dct_values ,X1:X100)
 pca_s1_long$period <- as.numeric(sub("X", "", pca_s1_long$period))
-
 
 pca_s1_plot <- pca_s1_long %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
   facet_wrap(~ cluster, nrow = 3)
 
-ggplotly(pca_s1_plot)
+ggplotly(pca_s1_plot) %>% 
+  layout(title = "Season 1 with 3 PCA Clusters (LS Rebase)", 
+         margin = list(t = 150))
 ```
 
-
-###Shows in each cluster
+### Shows in Each Cluster
 
 ```{r}
 pca_s1_clusters_growth <- list(as.character(unique(df_pcaclusters_s1[df_pcaclusters_s1$cluster == 1,]$Show_Name)),
@@ -80,7 +84,6 @@ pca_s1_clusters_growth <- list(as.character(unique(df_pcaclusters_s1[df_pcaclust
                                as.character(unique(df_pcaclusters_s1[df_pcaclusters_s1$cluster == 3,]$Show_Name)))
 
 pca_s1_clusters_growth 
-
 ```
 
 ```{r}
@@ -122,7 +125,7 @@ ggplotly(s1_pcaclusters_s2_trends_plot) %>%
 -------------------------------------------------------------------------------------------------------------------------------------
 
 
-PCA S2
+# PCA S2
 
 ```{r}
 pca_s2 <- dct_spread %>% 
@@ -138,7 +141,7 @@ pca_s2 <- prcomp(pca_s2)
 summary(pca_s2)
 ```
 
-Assign Clusters based on PCA contribution
+Assign clusters based on PCA contribution
 ```{r}
 pca_s2_df <- as.data.frame(pca_s2$x)
 pca_s2_df$Show_name <- dct_spread[dct_spread$Season_num == 2,]$Show_Name
@@ -152,22 +155,22 @@ df_pcaclusters_s2$cluster <- cluster_assign_s2$cluster
 df_pcaclusters_s2 <- df_pcaclusters_s2[,c(1, 2, 103, 3:102)]
 ```
 
-
 Long form data, plot
 ```{r}
 pca_s2_long <- gather(df_pcaclusters_s2, key = period, value = dct_values ,X1:X100)
 pca_s2_long$period <- as.numeric(sub("X", "", pca_s2_long$period))
-
 
 pca_s2_plot <- pca_s2_long %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
   facet_wrap(~ cluster, nrow = 3)
 
-ggplotly(pca_s2_plot)
+ggplotly(pca_s2_plot) %>% 
+  layout(title = "Season 2 with 3 PCA Clusters (LS Rebase)", 
+         margin = list(t = 150))
 ```
 
-###Shows in each cluster
+###Shows in Each Cluster
 
 ```{r}
 pca_s2_clusters_growth <- list(as.character(unique(df_pcaclusters_s2[df_pcaclusters_s2$cluster == 1,]$Show_Name)),
@@ -175,7 +178,6 @@ pca_s2_clusters_growth <- list(as.character(unique(df_pcaclusters_s2[df_pcaclust
                                as.character(unique(df_pcaclusters_s2[df_pcaclusters_s2$cluster == 3,]$Show_Name)))
 
 pca_s2_clusters_growth 
-
 ```
 
 
@@ -183,7 +185,7 @@ pca_s2_clusters_growth
 -------------------------------------------------------------------------------------------------------------------------------------
 
 
-PCA S1-S2 Continuous
+# PCA S1-S2 Continuous
 
 ```{r}
 dct_spread_cont <- read.csv("CENT_LS_rebase_dct_spread_cont.csv")
@@ -198,7 +200,7 @@ pca_cont <- prcomp(pca_cont)
 summary(pca_cont)
 ```
 
-Assing Clusters based on PCA contribution
+Assign clusters based on PCA contribution
 ```{r}
 pca_cont_df <- as.data.frame(pca_cont$x)
 pca_cont_df$Show_name <- dct_spread_cont$Show_Name
@@ -211,22 +213,22 @@ df_pcaclusters_cont$cluster <- cluster_assign_cont$cluster
 df_pcaclusters_cont <- df_pcaclusters_cont[,c(1, 2, 103, 3:102)]
 ```
 
-
 Long form data, plot
 ```{r}
 pca_cont_long <- gather(df_pcaclusters_cont, key = period, value = dct_values ,X1:X100)
 pca_cont_long$period <- as.numeric(sub("X", "", pca_cont_long$period))
-
 
 pca_cont_plot <- pca_cont_long %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
   facet_wrap(~ cluster, nrow = 3)
 
-ggplotly(pca_cont_plot)
+ggplotly(pca_cont_plot) %>% 
+  layout(title = "S1-S2 (Continuous) with 3 PCA Clusters (LS Rebase)", 
+         margin = list(t = 150))
 ```
 
-###Shows in each cluster
+### Shows in Each Cluster
 
 ```{r}
 pca_cont_clusters <- list(as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 1,]$Show_Name)),
@@ -234,7 +236,6 @@ pca_cont_clusters <- list(as.character(unique(df_pcaclusters_cont[df_pcaclusters
                           as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 3,]$Show_Name)))
 
 pca_cont_clusters 
-
 ```
 
 
@@ -242,7 +243,7 @@ pca_cont_clusters
 -------------------------------------------------------------------------------------------------------------------------------------
 
 
-PCA S1-S2 non-continuous
+# PCA S1-S2 Non-Continuous
 
 ```{r}
 temp1 <- filter(dct_spread, Season_num == 1)
@@ -264,7 +265,7 @@ pca_s1_s2 <- prcomp(pca_s1_s2)
 summary(pca_s1_s2)
 ```
 
-Assing Clusters based on PCA contribution
+Assign clusters based on PCA contribution
 ```{r}
 pca_s1_s2_df <- as.data.frame(pca_s1_s2$x)
 pca_s1_s2_df$Show_name <- dct_spread[dct_spread$Season_num == 1, ]$Show_Name
@@ -278,28 +279,28 @@ df_pcaclusters_s1_s2 <- select(df_pcaclusters_s1_s2, -Season_num)
 df_pcaclusters_s1_s2 <- df_pcaclusters_s1_s2[,c(1, 2, 203, 3:202)]
 ```
 
-
 Long form data, plot
 ```{r}
 pca_s1_s2_long <- gather(df_pcaclusters_s1_s2, key = period, value = dct_values ,X1:X200)
 pca_s1_s2_long$period <- as.numeric(sub("X", "", pca_s1_s2_long$period))
-
 
 pca_s1_s2_plot <- pca_s1_s2_long %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
   facet_wrap(~ cluster)
 
-ggplotly(pca_s1_s2_plot)
+ggplotly(pca_s1_s2_plot) %>% 
+  layout(title = "S1-S2 (Non-Continuous) with 4 PCA Clusters (LS Rebase)", 
+         margin = list(t = 150))
 ```
 
-###Shows in each cluster
+### Shows in Each Cluster
 
 ```{r}
-pca_s1_s2_clusters <- list(as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 1,]$Show_Name)),
-                           as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 2,]$Show_Name)),
-                           as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 3,]$Show_Name)))
+pca_s1_s2_clusters <- list(as.character(unique(df_pcaclusters_s1_s2[df_pcaclusters_s1_s2$cluster == 1,]$Show_Name)),
+                           as.character(unique(df_pcaclusters_s1_s2[df_pcaclusters_s1_s2$cluster == 2,]$Show_Name)),
+                           as.character(unique(df_pcaclusters_s1_s2[df_pcaclusters_s1_s2$cluster == 3,]$Show_Name)),
+                           as.character(unique(df_pcaclusters_s1_s2[df_pcaclusters_s1_s2$cluster == 4,]$Show_Name)))
 
 pca_s1_s2_clusters 
-
 ```
