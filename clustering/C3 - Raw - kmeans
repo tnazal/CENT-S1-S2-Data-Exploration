@@ -174,11 +174,6 @@ ggplotly(s1_3clusters_s2_trends_plot) %>%
          margin = list(t = 150))
 ```
 
-```{r}
-s1_3clusters_d <- dist(clusters3_s1_spread[, 6:105])
-(kmeans_diag_s1_3clusters <- cluster.stats(s1_3clusters_d, as.numeric(clusters3_s1_spread$cluster_kmeans_3)))
-```
-
 ### 4 Clusters (K-Means)
 
 ```{r}
@@ -240,11 +235,6 @@ s1_4clusters_s2_trends_plot <- dct_s1_4clusters_s2_trends %>%
 ggplotly(s1_4clusters_s2_trends_plot) %>% 
   layout(title = "Season 1 with 4 Clusters & Season 2 Trends", 
          margin = list(t = 150))
-```
-
-```{r}
-s1_4clusters_d <- dist(clusters4_s1_spread[, 6:105])
-(kmeans_diag_s1_4clusters <- cluster.stats(s1_4clusters_d, as.numeric(clusters4_s1_spread$cluster_kmeans_4)))
 ```
 
 ### 5 Clusters (K-Means)
@@ -326,10 +316,6 @@ plot_ly(dct_s1_5clusters_s2_trends,
          title = "Season 1 with 5 Clusters & Season 2 Trends")
 ```
 
-```{r}
-s1_5clusters_d <- dist(clusters5_s1_spread[, 6:105])
-(kmeans_diag_s1_5clusters <- cluster.stats(s1_5clusters_d, as.numeric(clusters5_s1_spread$cluster_kmeans_5)))
-```
 
 
 ----------------------------------------------------------------------------------------------------------
@@ -441,11 +427,6 @@ s2_3clusters <- list(as.character(unique(clusters3_s2[clusters3_s2$cluster_kmean
 s2_3clusters
 ```
 
-```{r}
-s2_3clusters_d <- dist(clusters3_s2_spread[, 6:105])
-(kmeans_diag_s2_3clusters <- cluster.stats(s2_3clusters_d, as.numeric(clusters3_s2_spread$cluster_kmeans_3)))
-```
-
 ### 4 Clusters (K-Means)
 
 ```{r}
@@ -481,11 +462,6 @@ s2_4clusters <- list(as.character(unique(clusters4_s2[clusters4_s2$cluster_kmean
                      as.character(unique(clusters4_s2[clusters4_s2$cluster_kmeans_4 == 3,]$Show_Name)), 
                      as.character(unique(clusters4_s2[clusters4_s2$cluster_kmeans_4 == 4,]$Show_Name)))
 s2_4clusters
-```
-
-```{r}
-s2_4clusters_d <- dist(clusters4_s2_spread[, 6:105])
-(kmeans_diag_s2_4clusters <- cluster.stats(s2_4clusters_d, as.numeric(clusters4_s2_spread$cluster_kmeans_4)))
 ```
 
 ### 5 Clusters (K-Means)
@@ -525,11 +501,6 @@ s2_5clusters <- list(as.character(unique(clusters5_s2[clusters5_s2$cluster_kmean
                      as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 4,]$Show_Name)),
                      as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 5,]$Show_Name)))
 s2_5clusters
-```
-
-```{r}
-s2_5clusters_d <- dist(clusters5_s2_spread[, 6:105])
-(kmeans_diag_s2_5clusters <- cluster.stats(s2_5clusters_d, as.numeric(clusters5_s2_spread$cluster_kmeans_5)))
 ```
 
 
@@ -651,11 +622,6 @@ s1_s2_3clusters <- list(as.character(unique(clusters3_s1_s2[clusters3_s1_s2$clus
 s1_s2_3clusters
 ```
 
-```{r}
-s1_s2_3clusters_d <- dist(clusters3_s1_s2_spread[, 6:205])
-(kmeans_diag_s1_s2_3clusters <- cluster.stats(s1_s2_3clusters_d, as.numeric(clusters3_s1_s2_spread$cluster_kmeans_3)))
-```
-
 ### 5 Clusters (K-Means)
 
 ```{r}
@@ -690,11 +656,6 @@ s1_s2_5clusters <- list(as.character(unique(clusters5_s1_s2[clusters5_s1_s2$clus
                         as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 4,]$Show_Name)),
                         as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 5,]$Show_Name)))
 s1_s2_5clusters
-```
-
-```{r}
-s1_s2_5clusters_d <- dist(clusters5_s1_s2_spread[, 6:205])
-(kmeans_diag_s1_s2_5clusters <- cluster.stats(s1_s2_5clusters_d, as.numeric(clusters5_s1_s2_spread$cluster_kmeans_5)))
 ```
 
 
@@ -807,11 +768,6 @@ cont_3clusters <- list(as.character(unique(clusters3_cont [clusters3_cont $clust
 cont_3clusters
 ```
 
-```{r}
-cont_3clusters_d <- dist(clusters3_cont_spread[, 5:104])
-(kmeans_diag_cont_3clusters <- cluster.stats(cont_3clusters_d, as.numeric(clusters3_cont_spread$cluster_kmeans_3)))
-```
-
 ### 5 Clusters (K-Means)
 
 ```{r}
@@ -848,9 +804,4 @@ cont_5clusters <- list(as.character(unique(clusters5_cont[clusters5_cont$cluster
                        as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 4,]$Show_Name)),
                        as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 5,]$Show_Name)))
 cont_5clusters
-```
-
-```{r}
-cont_5clusters_d <- dist(clusters5_cont_spread[, 5:104])
-(kmeans_diag_cont_5clusters <- cluster.stats(cont_5clusters_d, as.numeric(clusters5_cont_spread$cluster_kmeans_5)))
 ```
