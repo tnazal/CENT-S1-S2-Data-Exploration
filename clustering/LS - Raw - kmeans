@@ -128,7 +128,7 @@ clusters3_s1_plot <- clusters3_s1 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters3_s1_plot) %>% 
-  layout(title = "Season 1 Shows with 3 Clusters (LS)", 
+  layout(title = "Season 1 with 3 K-Means Clusters (LS)", 
          margin = list(t = 150))
 ```
 
@@ -171,7 +171,7 @@ s1_3clusters_s2_trends_plot <- dct_s1_3clusters_s2_trends %>%
         axis.title.y = element_blank())
 
 ggplotly(s1_3clusters_s2_trends_plot) %>% 
-  layout(title = "Season 1 with 3 Clusters & Season 2 Trends (LS)", 
+  layout(title = "Season 1 with 3 K-Means Clusters & Season 2 Trends (LS)", 
          margin = list(t = 150))
 ```
 
@@ -198,7 +198,7 @@ clusters4_s1_plot <- clusters4_s1 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters4_s1_plot) %>% 
-  layout(title = "Season 1 Shows with 4 Clusters (LS)", 
+  layout(title = "Season 1 with 4 K-Means Clusters (LS)", 
          margin = list(t = 150))
 ```
 
@@ -234,7 +234,7 @@ s1_4clusters_s2_trends_plot <- dct_s1_4clusters_s2_trends %>%
         axis.title.y = element_blank())
 
 ggplotly(s1_4clusters_s2_trends_plot) %>% 
-  layout(title = "Season 1 with 4 Clusters & Season 2 Trends (LS)", 
+  layout(title = "Season 1 with 4 K-Means Clusters & Season 2 Trends (LS)", 
          margin = list(t = 150))
 ```
 
@@ -262,7 +262,7 @@ clusters5_s1_plot <- clusters5_s1 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters5_s1_plot) %>% 
-  layout(title = "Season 1 Shows with 5 Clusters (LS)", 
+  layout(title = "Season 1 with 5 K-Means Clusters (LS)", 
          margin = list(t = 150))
 ```
 
@@ -299,7 +299,7 @@ s1_5clusters_s2_trends_plot <- dct_s1_5clusters_s2_trends %>%
         axis.title.y = element_blank())
 
 ggplotly(s1_5clusters_s2_trends_plot) %>% 
-  layout(title = "Season 1 with 5 Clusters & Season 2 Trends (LS)", 
+  layout(title = "Season 1 with 5 K-Means Clusters & Season 2 Trends (LS)", 
          margin = list(t = 150))
 ```
 
@@ -312,9 +312,9 @@ plot_ly(dct_s1_5clusters_s2_trends,
         yaxis = ~paste0('y', cluster_kmeans_5), 
         legendgroup = ~Network) %>% 
   add_lines() %>% 
-  subplot(nrows = 5, shareX = TRUE) %>% 
+  subplot(nrows = 3, shareX = TRUE) %>% 
   layout(showlegend = TRUE, 
-         title = "Season 1 with 5 Clusters & Season 2 Trends (LS)")
+         title = "Season 1 with 5 K-Means Clusters & Season 2 Trends (LS)")
 ```
 
 
@@ -414,7 +414,7 @@ clusters3_s2_plot <- clusters3_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters3_s2_plot) %>% 
-  layout(title = "Season 2 Shows with 3 Clusters", 
+  layout(title = "Season 2 with 3 K-Means Clusters (LS)", 
          margin = list(t = 150))
 ```
 
@@ -450,7 +450,7 @@ clusters4_s2_plot <- clusters4_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters4_s2_plot) %>% 
-  layout(title = "Season 2 Shows with 4 Clusters", 
+  layout(title = "Season 2 Shows with 4 Clusters(LS)", 
          margin = list(t = 150))
 ```
 
@@ -488,7 +488,7 @@ clusters5_s2_plot <- clusters5_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters5_s2_plot) %>% 
-  layout(title = "Season 2 Shows with 5 Clusters", 
+  layout(title = "Season 2 with 5 K-Means Clusters (LS)", 
          margin = list(t = 150))
 ```
 
@@ -508,7 +508,7 @@ s2_5clusters
 ----------------------------------------------------------------------------------------------------------
 
 
-# Season 1 and 2 Curve Clustering
+# S1-S2 Non-Continuous Curve Clustering
 
 ```{r}
 temp1 <- filter(dct_spread, Season_num == 1)
@@ -609,7 +609,7 @@ clusters3_s1_s2_plot <- clusters3_s1_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters3_s1_s2_plot) %>% 
-  layout(title = "Season 1 and Season 2 Shows with 3 Clusters", 
+  layout(title = "S1-S2 (Non-Continuous) with 3 K-Means Clusters (LS)", 
          margin = list(t = 150))
 ```
 
@@ -645,7 +645,7 @@ clusters4_s1_s2_plot <- clusters4_s1_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters4_s1_s2_plot) %>% 
-  layout(title = "Season 1 and Season 2 Shows with 4 Clusters", 
+  layout(title = "S1-S2 (Non-Continuous) with 4 K-Means Clusters (LS)", 
          margin = list(t = 150))
 ```
 
@@ -682,7 +682,7 @@ clusters5_s1_s2_plot <- clusters5_s1_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters5_s1_s2_plot) %>% 
-  layout(title = "Season 1 and Season 2 Shows with 5 Clusters", 
+  layout(title = "S1-S2 (Non-Continuous) with 5 K-Means Clusters (LS)", 
          margin = list(t = 150))
 ```
 
@@ -700,7 +700,7 @@ s1_s2_5clusters
 ----------------------------------------------------------------------------------------------------------
 
 
-#Season 1 and 2 Continuous Curve Clustering
+#S1-S2 Continuous Curve Clustering
 
 ```{r}
 dct_cont <- read.csv("CENT_LS_dct_cont.csv")
@@ -792,7 +792,7 @@ clusters3_cont_plot <- clusters3_cont %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters3_cont_plot) %>% 
-  layout(title = "Season 1-2 (Continuous) with 3 Clusters", 
+  layout(title = "S1-S2 (Continuous) with 3 K-Means Clusters (LS)", 
          margin = list(t = 150))
 ```
 
@@ -828,7 +828,7 @@ clusters5_cont_plot <- clusters5_cont %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters5_cont_plot) %>% 
-  layout(title = "Season 1-2 (Continuous) with 5 Clusters", 
+  layout(title = "S1-S2 (Continuous) with 5 K-Means Clusters (LS)", 
          margin = list(t = 150))
 ```
 
