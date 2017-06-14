@@ -1,6 +1,8 @@
 ---
-title: "CENT S1-S2 Time Series Clustering on LS Rebase"
-output: html_notebook
+title: "CENT S1-S2 K-Shape and DTW Clustering on LS Rebase"
+output:
+  html_notebook: default
+  html_document: default
 ---
 
 ```{r}
@@ -12,6 +14,10 @@ output: html_notebook
 # purpose: K-Shape and Dynamic Time Warp clustering (clusters for S1, S2,
 #          and S1 & S2 normalized separately and together)
 ##################################################################################
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 ```
 
 ```{r}
@@ -85,7 +91,7 @@ clusters_s1_shape4_plot <- clusters_s1_shape4 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters_s1_shape4_plot) %>% 
-  layout(title = "Season 1 Shows with 4 K-Shape Clusters (LS Rebase)", 
+  layout(title = "Season 1 with 4 K-Shape Clusters (LS Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -179,7 +185,7 @@ clusters_s1_dtw4_plot <- clusters_s1_dtw4 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters_s1_dtw4_plot) %>% 
-  layout(title = "Season 1 Shows with 4 DTW Clusters (LS Rebase)", 
+  layout(title = "Season 1 with 4 DTW Clusters (LS Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -219,6 +225,7 @@ ggplotly(s1_4clusters_dtw_s2_trends_plot) %>%
 
 
 -----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 
 
 # Season 2 Time Series Clustering
@@ -229,8 +236,6 @@ cluster_s2 <- dct_spread %>%
   ungroup() %>%
   select(-X, -Network, -Season_num, -Show_Name)
 ```
-
-
 
 ## K-Shape Clustering 
 
@@ -280,7 +285,7 @@ clusters_s2_shape4_plot <- clusters_s2_shape4 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters_s2_shape4_plot) %>% 
-  layout(title = "Season 2 Shows with 4 K-Shape Clusters (LS Rebase)", 
+  layout(title = "Season 2 with 4 K-Shape Clusters (LS Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -341,7 +346,7 @@ clusters_s2_dtw5_plot <- clusters_s2_dtw5 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters_s2_dtw5_plot) %>% 
-  layout(title = "Season 2 Shows with 5 DTW Clusters (LS Rebase)", 
+  layout(title = "Season 2 with 5 DTW Clusters (LS Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -355,11 +360,11 @@ s2_5clusters_dtw
 ```
 
 
-
+-----------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------
 
 
-# Season 1-2 (Continuous) Time Series Clustering
+# S1-S2 Continuous Time Series Clustering
 
 ```{r}
 dct_cont <- read.csv("CENT_LS_rebase_dct_cont.csv")
@@ -415,7 +420,7 @@ clusters_cont_shape4_plot <- clusters_cont_shape4 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters_cont_shape4_plot) %>% 
-  layout(title = "Season 1-2 Shows with 4 K-Shape Clusters (LS Rebase)", 
+  layout(title = "S1-S2 (Continuous) with 4 K-Shape Clusters (LS Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -469,12 +474,12 @@ clusters_cont_dtw2 <- merge(clusters_cont_dtw2_spread[, c("cluster_dtw_2",
 clusters_cont_dtw2_plot <- clusters_cont_dtw2 %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
-  facet_wrap(~ cluster_dtw_2) +  
+  facet_wrap(~ cluster_dtw_2, nrow = 2) +  
   theme(axis.title.x = element_blank(), 
         axis.title.y = element_blank())
 
 ggplotly(clusters_cont_dtw2_plot) %>% 
-  layout(title = "Season 1-2 Shows with 2 DTW Clusters (LS Rebase)", 
+  layout(title = "S1-S2 (Continuous) with 2 DTW Clusters (LS Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -486,11 +491,10 @@ cont_2clusters_dtw
 
 
 -----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
 
 
-# Season 1-2 (non-Continuous) Time Series Clustering
-
-
+# S1-S2 Non-Continuous Time Series Clustering
 
 ```{r}
 temp1 <- filter(dct_spread, Season_num == 1)
@@ -552,7 +556,7 @@ clusters_s1_s2_shape5_plot <- clusters_s1_s2_shape5 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters_s1_s2_shape5_plot) %>% 
-  layout(title = "Season 1-2 Shows with 5 K-Shape Clusters (LS Rebase)", 
+  layout(title = "S1-S2 (Non-Continuous) with 5 K-Shape Clusters (LS Rebase)", 
          margin = list(t = 150))
 ```
 
@@ -608,12 +612,12 @@ clusters_s1_s2_dtw2 <- merge(clusters_s1_s2_dtw2_spread[, c("cluster_dtw_2",
 clusters_s1_s2_dtw2_plot <- clusters_s1_s2_dtw2 %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
-  facet_wrap(~ cluster_dtw_2) +  
+  facet_wrap(~ cluster_dtw_2, nrow = 2) +  
   theme(axis.title.x = element_blank(), 
         axis.title.y = element_blank())
 
 ggplotly(clusters_s1_s2_dtw2_plot) %>% 
-  layout(title = "Season 1-2 Shows with 2 DTW Clusters (LS Rebase)", 
+  layout(title = "S1-S2 (Non-Continuous) with 2 DTW Clusters (LS Rebase)", 
          margin = list(t = 150))
 ```
 
