@@ -8,12 +8,17 @@ output:
 ```{r}
 ##################################################################################
 #inputs: CENT_growth_dct.csv, CENT_growth_dct_spread.csv,
-#         CENT_dct_spread_cont_growth.csv, CENT_dct_cont_growth.csv    
+#        CENT_dct_spread_cont_growth.csv, CENT_dct_cont_growth.csv, 
+#        CENT_growth_dct_s1_s2.csv  
+#
 #purpose: K-Means clustering (for S1, S2, S1 & S2 normalized separately,
 #          and S1 & S2 normalized together)
 ##################################################################################
 ```
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
 
 ```{r}
 library(dplyr)
@@ -124,7 +129,7 @@ clusters3_s1_plot <- clusters3_s1 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters3_s1_plot) %>% 
-  layout(title = "Season 1 Shows with 3 Clusters (C3 Growth)", 
+  layout(title = "Season 1 with 3 Clusters (C3 Growth)", 
          margin = list(t = 150))
 ```
 
@@ -194,7 +199,7 @@ clusters4_s1_plot <- clusters4_s1 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters4_s1_plot) %>% 
-  layout(title = "Season 1 Shows with 4 Clusters (C3 Growth)", 
+  layout(title = "Season 1 with 4 Clusters (C3 Growth)", 
          margin = list(t = 150))
 ```
 
@@ -258,7 +263,7 @@ clusters5_s1_plot <- clusters5_s1 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters5_s1_plot) %>% 
-  layout(title = "Season 1 Shows with 5 Clusters (C3 Growth)", 
+  layout(title = "Season 1 with 5 Clusters (C3 Growth)", 
          margin = list(t = 150))
 ```
 
@@ -396,7 +401,7 @@ clusters3_s2_plot <- clusters3_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters3_s2_plot) %>% 
-  layout(title = "Season 2 Shows with 3 Clusters (C3 Growth)", 
+  layout(title = "Season 2 with 3 Clusters (C3 Growth)", 
          margin = list(t = 150))
 ```
 
@@ -432,7 +437,7 @@ clusters2_s2_plot <- clusters2_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters2_s2_plot) %>% 
-  layout(title = "Season 2 Shows with 2 Clusters (C3 Growth)", 
+  layout(title = "Season 2 with 2 Clusters (C3 Growth)", 
          margin = list(t = 150))
 ```
 
@@ -468,7 +473,7 @@ clusters5_s2_plot <- clusters5_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters5_s2_plot) %>% 
-  layout(title = "Season 2 Shows with 5 Clusters (C3 Growth)", 
+  layout(title = "Season 2 with 5 Clusters (C3 Growth)", 
          margin = list(t = 150))
 ```
 
@@ -488,7 +493,7 @@ s2_5clusters
 ----------------------------------------------------------------------------------------------------------
 
 
-# Season 1 and 2 Curve Clustering
+# Season 1-2 Non-Continuous Curve Clustering
 
 ```{r}
 temp1 <- filter(dct_spread, Season_num == 1)
@@ -589,7 +594,7 @@ clusters4_s1_s2_plot <- clusters4_s1_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters4_s1_s2_plot) %>% 
-  layout(title = "Season 1 and Season 2 Shows with 4 Clusters (C3 Growth)", 
+  layout(title = "S1-S2 (Non-Continuous) with 4 Clusters (C3 Growth)", 
          margin = list(t = 150))
 ```
 
@@ -626,7 +631,7 @@ clusters5_s1_s2_plot <- clusters5_s1_s2 %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters5_s1_s2_plot) %>% 
-  layout(title = "Season 1 and Season 2 Shows with 5 Clusters (C3 Growth)", 
+  layout(title = "S1-S2 (Non-Continuous) with 5 Clusters (C3 Growth)", 
          margin = list(t = 150))
 ```
 
@@ -644,7 +649,7 @@ s1_s2_5clusters
 ----------------------------------------------------------------------------------------------------------
 
 
-#Season 1 and 2 Continuous Curve Clustering
+#Season 1-2 Continuous Curve Clustering
 
 ```{r}
 dct_cont <- read.csv("CENT_dct_cont_growth.csv")
@@ -736,7 +741,7 @@ clusters3_cont_plot <- clusters3_cont %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters3_cont_plot) %>% 
-  layout(title = "Season 1-2 (Continuous) with 3 Clusters (C3 Growth)", 
+  layout(title = "S1-S2 (Continuous) with 3 Clusters (C3 Growth)", 
          margin = list(t = 150))
 ```
 
@@ -771,7 +776,7 @@ clusters2_cont_plot <- clusters2_cont %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters2_cont_plot) %>% 
-  layout(title = "Season 1-2 continuous Shows with 2 Clusters (C3 Growth)", 
+  layout(title = "S1-S2 (Continuous) with 2 Clusters (C3 Growth)", 
          margin = list(t = 150))
 ```
 
@@ -779,7 +784,7 @@ ggplotly(clusters2_cont_plot) %>%
 
 ```{r}
 cont_2clusters <- list(as.character(unique(clusters2_cont[clusters2_cont$cluster_kmeans_2 == 1,]$Show_Name)),
-                     as.character(unique(clusters2_cont[clusters2_cont$cluster_kmeans_2 == 2,]$Show_Name)))
+                       as.character(unique(clusters2_cont[clusters2_cont$cluster_kmeans_2 == 2,]$Show_Name)))
 cont_2clusters
 ```
 
@@ -806,7 +811,7 @@ clusters5_cont_plot <- clusters5_cont %>%
         axis.title.y = element_blank())
 
 ggplotly(clusters5_cont_plot) %>% 
-  layout(title = "Season 1-2 (Continuous) with 5 Clusters (C3 Growth)", 
+  layout(title = "S1-S2 (Continuous) with 5 Clusters (C3 Growth)", 
          margin = list(t = 150))
 ```
 
