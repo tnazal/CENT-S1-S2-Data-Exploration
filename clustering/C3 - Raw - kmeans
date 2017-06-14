@@ -805,3 +805,85 @@ cont_5clusters <- list(as.character(unique(clusters5_cont[clusters5_cont$cluster
                        as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 5,]$Show_Name)))
 cont_5clusters
 ```
+
+
+
+#Diagnostics
+Group diagnostics / write table 
+```{r}
+
+#Create Distance Matrices for clusters
+kmeans_s1_3cl_d <- dist(clusters3_s1_spread[, 6:105])
+kmeans_s1_4cl_d <- dist(clusters4_s1_spread[, 6:105])
+kmeans_s1_5cl_d <- dist(clusters5_s1_spread[, 6:105])
+kmeans_s2_3cl_d <- dist(clusters3_s2_spread[, 6:105])
+kmeans_s2_4cl_d <- dist(clusters4_s2_spread[, 6:105])
+kmeans_s2_5cl_d <- dist(clusters5_s2_spread[, 6:105])
+kmeans_s1_s2_3cl_d <- dist(clusters3_s1_s2_spread[, 6:205])
+kmeans_s1_s2_5cl_d <- dist(clusters5_s1_s2_spread[, 6:205])
+kmeans_cont_3cl_d <- dist(clusters3_cont_spread[, 5:104])
+kmeans_cont_5cl_d <- dist(clusters5_cont_spread[, 5:104])
+
+
+#Diagnostics
+diagnostics_C3_raw_kmeans_s1_3cl <- cluster.stats(kmeans_s1_3cl_d, as.numeric(clusters3_s1_spread$cluster_kmeans_3))
+diagnostics_C3_raw_kmeans_s1_4cl <- cluster.stats(kmeans_s1_4cl_d, as.numeric(clusters4_s1_spread$cluster_kmeans_4))
+diagnostics_C3_raw_kmeans_s1_5cl <- cluster.stats(kmeans_s1_5cl_d, as.numeric(clusters5_s1_spread$cluster_kmeans_5))
+diagnostics_C3_raw_kmeans_s2_3cl <- cluster.stats(kmeans_s2_3cl_d, as.numeric(clusters3_s2_spread$cluster_kmeans_3))
+diagnostics_C3_raw_kmeans_s2_4cl <- cluster.stats(kmeans_s2_4cl_d, as.numeric(clusters4_s2_spread$cluster_kmeans_4))
+diagnostics_C3_raw_kmeans_s2_5cl <- cluster.stats(kmeans_s2_5cl_d, as.numeric(clusters5_s2_spread$cluster_kmeans_5))
+diagnostics_C3_raw_kmeans_sep_3cl <- cluster.stats(kmeans_s1_s2_3cl_d, as.numeric(clusters3_s1_s2_spread$cluster_kmeans_3))
+diagnostics_C3_raw_kmeans_sep_5cl <- cluster.stats(kmeans_s1_s2_5cl_d, as.numeric(clusters5_s1_s2_spread$cluster_kmeans_5))
+diagnostics_C3_raw_kmeans_cont_3cl <- cluster.stats(kmeans_cont_3cl_d, as.numeric(clusters3_cont_spread$cluster_kmeans_3))
+diagnostics_C3_raw_kmeans_cont_5cl <- cluster.stats(kmeans_cont_5cl_d, as.numeric(clusters5_cont_spread$cluster_kmeans_5))
+
+
+#gather diagnostic names, list all diagnostics objects
+d_names <- ls()[grep("diagnostics", ls())]
+d_list <- mget(ls()[grep("diagnostics", ls())])
+
+
+#generate df with statsitics of interest for comparation
+diagnostic_df <- as.data.frame(NA)
+
+for (n in 1:length(d_names)){
+  diagnostic_df[n, 1] <- paste(d_names[n])
+  diagnostic_df[n, 2] <- d_list[[n]]["average.between"]
+  diagnostic_df[n, 3] <- d_list[[n]]["average.within"]
+  diagnostic_df[n, 4] <- d_list[[n]]["wb.ratio"]
+  diagnostic_df[n, 5] <- d_list[[n]]["widestgap"]
+  diagnostic_df[n, 6] <- d_list[[n]]["dunn2"]
+  diagnostic_df[n, 7] <- d_list[[n]]["entropy"]
+  diagnostic_df[n, 8] <- d_list[[n]]["within.cluster.ss"]
+  diagnostic_df[n, 9] <- d_list[[n]]["cluster.number"]
+}
+
+
+#add information for decision making
+colnames(diagnostic_df)[1] <- "name"
+
+diagnostic_df$name <- sub("diagnostics_", "", diagnostic_df$name)
+
+diagnostic_df$algorithm <- ifelse(grepl("kmeans", diagnostic_df$name) == 1, "kmeans",
+                                 ifelse(grepl("kshape", diagnostic_df$name) == 1, "kshape",
+                                 ifelse(grepl("PCA", diagnostic_df$name) == 1, "PCA",
+                                 ifelse(grepl("tadpole", diagnostic_df$name) == 1, "tadpole",
+                                 ifelse(grepl("dtw", diagnostic_df$name) == 1, "DTW", 0)))))
+
+diagnostic_df$season <- ifelse(grepl("s1", diagnostic_df$name) == 1, "s1",
+                                 ifelse(grepl("s2", diagnostic_df$name) == 1, "s2",
+                                 ifelse(grepl("sep", diagnostic_df$name) == 1, "sep",
+                                 ifelse(grepl("cont", diagnostic_df$name) == 1, "cont", 0))))
+
+diagnostic_df$stream <- ifelse(grepl("C3", diagnostic_df$name) == 1, "C3",
+                               ifelse(grepl("LS", diagnostic_df$name) == 1, "LS", 0))
+
+diagnostic_df$data <- ifelse(grepl("raw", diagnostic_df$name) == 1, "raw",
+                               ifelse(grepl("growth", diagnostic_df$name) == 1, "growth",
+                               ifelse(grepl("rebase", diagnostic_df$name) == 1, "rebase",0)))
+
+View(diagnostic_df)
+#write table
+
+write.csv(diagnostic_df, "diagnostics_C3_raw_kmeans.csv")
+```
