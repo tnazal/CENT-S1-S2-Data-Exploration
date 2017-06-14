@@ -1,6 +1,8 @@
 ---
-title: "S1-S2 TADpole Clustering on C3 Rebase"
-output: html_notebook
+title: "CENT S1-S2 TADpole Clustering on C3 Rebase"
+output:
+  html_notebook: default
+  html_document: default
 ---
 
 ```{r}
@@ -13,6 +15,9 @@ output: html_notebook
 ##################################################################################
 ```
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
 
 ```{r}
 library(plyr)
@@ -23,10 +28,10 @@ library(tidyr)
 library(plotly)
 ```
 
+# Season 1 Clustering
 
-#Season 1 clustering
+## TADpole Clustering, 5 Clusters
 
-##Tadpole Clustering, 5 Clusters
 ```{r}
 dct_spread <- read.csv("CENT_rebase_dct_spread.csv")
 dct_df <- read.csv("CENT_rebase_dct.csv")
@@ -34,9 +39,7 @@ dct_df <- read.csv("CENT_rebase_dct.csv")
 dtw_df_s1 <- dct_spread %>% 
   filter(Season_num == 1) %>%
   select(-X, -Network, -Season_num, -Show_Name)
-
 ```
-
 
 ```{r}
 set.seed(12)
@@ -49,7 +52,6 @@ tadpole_clust5_s1_df<- dct_spread %>%
 tadpole_clust5_s1_df$cluster <- tadpole_clust5_s1$cl  
 ```
 
-
 ```{r}
 tadpole5_s1_long <- gather(tadpole_clust5_s1_df, key = period, value = dct_values ,X1:X100) %>% 
   select(-X)
@@ -61,17 +63,19 @@ tadpole5_s1_plot <- tadpole5_s1_long %>%
   geom_line() + 
   facet_wrap(~ cluster, nrow = 2)
 
-ggplotly(tadpole5_s1_plot)
+ggplotly(tadpole5_s1_plot) %>% 
+  layout(title = "Season 1 with 5 TADpole Clusters (C3 Rebase)", 
+         margin = list(t = 150))
 ```
 
-###Shows in each cluster
+### Shows in Each Cluster
 
 ```{r}
 tadpole_s1_5clusters <- list(as.character(unique(tadpole_clust5_s1_df[tadpole_clust5_s1_df$cluster == 1,]$Show_Name)),
-      as.character(unique(tadpole_clust5_s1_df[tadpole_clust5_s1_df$cluster == 2,]$Show_Name)),
-      as.character(unique(tadpole_clust5_s1_df[tadpole_clust5_s1_df$cluster == 3,]$Show_Name)),
-      as.character(unique(tadpole_clust5_s1_df[tadpole_clust5_s1_df$cluster == 4,]$Show_Name)),
-      as.character(unique(tadpole_clust5_s1_df[tadpole_clust5_s1_df$cluster == 5,]$Show_Name)))
+                             as.character(unique(tadpole_clust5_s1_df[tadpole_clust5_s1_df$cluster == 2,]$Show_Name)),
+                             as.character(unique(tadpole_clust5_s1_df[tadpole_clust5_s1_df$cluster == 3,]$Show_Name)),
+                             as.character(unique(tadpole_clust5_s1_df[tadpole_clust5_s1_df$cluster == 4,]$Show_Name)),
+                             as.character(unique(tadpole_clust5_s1_df[tadpole_clust5_s1_df$cluster == 5,]$Show_Name)))
 
 tadpole_s1_5clusters
 ```
@@ -110,7 +114,7 @@ ggplotly(s1_5clusters_tadpole_s2_trends_plot) %>%
          margin = list(t = 150))
 ```
 
-##Tadpole Clustering, 3 Clusters
+## TADpole Clustering, 3 Clusters
 
 ```{r}
 set.seed(12)
@@ -123,30 +127,28 @@ tadpole_clust3_s1_df<- dct_spread %>%
 tadpole_clust3_s1_df$cluster <- tadpole_clust3_s1$cl  
 ```
 
-
 ```{r}
 tadpole3_s1_long <- gather(tadpole_clust3_s1_df, key = period, value = dct_values ,X1:X100) %>% 
   select(-X)
 tadpole3_s1_long$period <- as.numeric(sub("X", "", tadpole3_s1_long$period))
 tadpole3_s1_long$period <- as.numeric(tadpole3_s1_long$period)
 
-
-
 tadpole3_s1_plot <- tadpole3_s1_long %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
   facet_wrap(~ cluster, nrow = 3)
 
-ggplotly(tadpole3_s1_plot)
+ggplotly(tadpole3_s1_plot) %>% 
+  layout(title = "Season 1 with 3 TADpole Clusters (C3 Rebase)", 
+         margin = list(t = 150))
 ```
 
-
-###Shows in each cluster
+### Shows in Each Cluster
 
 ```{r}
 tadpole_s1_3clusters <- list(as.character(unique(tadpole_clust3_s1_df[tadpole_clust3_s1_df$cluster == 1,]$Show_Name)),
-      as.character(unique(tadpole_clust3_s1_df[tadpole_clust3_s1_df$cluster == 2,]$Show_Name)),
-      as.character(unique(tadpole_clust3_s1_df[tadpole_clust3_s1_df$cluster == 3,]$Show_Name)))
+                             as.character(unique(tadpole_clust3_s1_df[tadpole_clust3_s1_df$cluster == 2,]$Show_Name)),
+                             as.character(unique(tadpole_clust3_s1_df[tadpole_clust3_s1_df$cluster == 3,]$Show_Name)))
 
 tadpole_s1_3clusters
 ```
@@ -182,17 +184,15 @@ ggplotly(s1_3clusters_tadpole_s2_trends_plot) %>%
 -----------------------------------------------------------------------------------------------------------
 
 
-#Season 2 clustering
+# Season 2 Clustering
 
-##Tadpole Clustering, 4 Clusters
+##TADpole Clustering, 4 Clusters
+
 ```{r}
-
 dtw_df_s2 <- dct_spread %>% 
   filter(Season_num == 2) %>%
   select(-X, -Network, -Season_num, -Show_Name)
-
 ```
-
 
 ```{r}
 set.seed(12)
@@ -205,37 +205,34 @@ tadpole_clust4_s2_df<- dct_spread %>%
 tadpole_clust4_s2_df$cluster <- tadpole_clust4_s2$cl  
 ```
 
-
 ```{r}
 tadpole4_s2_long <- gather(tadpole_clust4_s2_df, key = period, value = dct_values ,X1:X100) %>% 
   select(-X)
 tadpole4_s2_long$period <- as.numeric(sub("X", "", tadpole4_s2_long$period ))
 tadpole4_s2_long$period <- as.numeric(tadpole4_s2_long$period)
 
-
-
 tadpole4_s2_plot <- tadpole4_s2_long %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
   facet_wrap(~ cluster)
 
-ggplotly(tadpole4_s2_plot)
+ggplotly(tadpole4_s2_plot) %>% 
+  layout(title = "Season 2 with 4 TADpole Clusters (C3 Rebase)", 
+         margin = list(t = 150))
 ```
 
-
-###Shows in each cluster
+### Shows in Each Cluster
 
 ```{r}
-tadpole_s2_5clusters <- list(as.character(unique(tadpole_clust5_s2_df[tadpole_clust5_s2_df$cluster == 1,]$Show_Name)),
-      as.character(unique(tadpole_clust5_s2_df[tadpole_clust5_s2_df$cluster == 2,]$Show_Name)),
-      as.character(unique(tadpole_clust5_s2_df[tadpole_clust5_s2_df$cluster == 3,]$Show_Name)),
-      as.character(unique(tadpole_clust5_s2_df[tadpole_clust5_s2_df$cluster == 4,]$Show_Name)),
-      as.character(unique(tadpole_clust5_s2_df[tadpole_clust5_s2_df$cluster == 5,]$Show_Name)))
+tadpole_s2_4clusters <- list(as.character(unique(tadpole_clust4_s2_df[tadpole_clust4_s2_df$cluster == 1,]$Show_Name)),
+                             as.character(unique(tadpole_clust4_s2_df[tadpole_clust4_s2_df$cluster == 2,]$Show_Name)),
+                             as.character(unique(tadpole_clust4_s2_df[tadpole_clust4_s2_df$cluster == 3,]$Show_Name)),
+                             as.character(unique(tadpole_clust4_s2_df[tadpole_clust4_s2_df$cluster == 4,]$Show_Name)))
 
-tadpole_s2_5clusters
+tadpole_s2_4clusters
 ```
 
-##Tadpole Clustering, 3 Clusters
+## TADpole Clustering, 3 Clusters
 
 ```{r}
 set.seed(12)
@@ -248,48 +245,47 @@ tadpole_clust3_s2_df<- dct_spread %>%
 tadpole_clust3_s2_df$cluster <- tadpole_clust3_s2 $cl  
 ```
 
-
 ```{r}
 tadpole3_s2_long <- gather(tadpole_clust3_s2_df, key = period, value = dct_values ,X1:X100) %>% 
   select(-X)
 tadpole3_s2_long$period <- as.numeric(sub("X", "", tadpole3_s2_long$period ))
 tadpole3_s2_long$period <- as.numeric(tadpole3_s2_long$period)
 
-
-
 tadpole3_s2_plot <- tadpole3_s2_long %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
   facet_wrap(~ cluster, nrow = 3)
 
-ggplotly(tadpole3_s2_plot)
+ggplotly(tadpole3_s2_plot) %>% 
+  layout(title = "Season 2 with 3 TADpole Clusters (C3 Rebase)", 
+         margin = list(t = 150))
 ```
 
-###Shows in each cluster
+### Shows in Each Cluster
 
 ```{r}
 tadpole_s2_3clusters <- list(as.character(unique(tadpole_clust3_s2_df[tadpole_clust3_s2_df$cluster == 1,]$Show_Name)),
-      as.character(unique(tadpole_clust3_s2_df[tadpole_clust3_s2_df$cluster == 2,]$Show_Name)),
-      as.character(unique(tadpole_clust3_s2_df[tadpole_clust3_s2_df$cluster == 3,]$Show_Name)))
+                             as.character(unique(tadpole_clust3_s2_df[tadpole_clust3_s2_df$cluster == 2,]$Show_Name)),
+                             as.character(unique(tadpole_clust3_s2_df[tadpole_clust3_s2_df$cluster == 3,]$Show_Name)))
 
 tadpole_s2_3clusters
 ```
 
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------
 
 
-#continuous S01-S02 clustering
+# S1-S2 Continuous Clustering
 
-##Tadpole Clustering, 5 Clusters
+## TADpole Clustering, 5 Clusters
+
 ```{r}
 dct_cont <- read.csv("CENT_rebase_dct_cont.csv")
 dct_spread_cont <- read.csv("CENT_rebase_dct_spread_cont.csv")
 dtw_df_cont <- dct_spread_cont %>%
   select(-X, -Network, -Show_Name)
 ```
-
 
 ```{r}
 set.seed(12)
@@ -300,36 +296,35 @@ tadpole_clust5_cont_df<- dct_spread_cont
 tadpole_clust5_cont_df$cluster <- tadpole_clust5_cont$cl  
 ```
 
-
 ```{r}
 tadpole5_cont_long <- gather(tadpole_clust5_cont_df, key = period, value = dct_values ,X1:X100) %>% 
   select(-X)
 tadpole5_cont_long$period <- as.numeric(sub("X", "", tadpole5_cont_long$period ))
 tadpole5_cont_long$period <- as.numeric(tadpole5_cont_long$period)
 
-
-
 tadpole5_cont_plot <- tadpole5_cont_long %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
   facet_wrap(~ cluster)
 
-ggplotly(tadpole5_cont_plot)
+ggplotly(tadpole5_cont_plot) %>% 
+  layout(title = "S1-S2 (Continuous) with 5 TADpole Clusters (C3 Rebase)", 
+         margin = list(t = 150))
 ```
 
-###Shows in each cluster
+### Shows in Each Cluster
 
 ```{r}
 tadpole_cont_5clusters <- list(as.character(unique(tadpole_clust5_cont_df[tadpole_clust5_cont_df$cluster == 1,]$Show_Name)),
-      as.character(unique(tadpole_clust5_cont_df[tadpole_clust5_cont_df$cluster == 2,]$Show_Name)),
-      as.character(unique(tadpole_clust5_cont_df[tadpole_clust5_cont_df$cluster == 3,]$Show_Name)),
-      as.character(unique(tadpole_clust5_cont_df[tadpole_clust5_cont_df$cluster == 4,]$Show_Name)),
-      as.character(unique(tadpole_clust5_cont_df[tadpole_clust5_cont_df$cluster == 5,]$Show_Name)))
+                               as.character(unique(tadpole_clust5_cont_df[tadpole_clust5_cont_df$cluster == 2,]$Show_Name)),
+                               as.character(unique(tadpole_clust5_cont_df[tadpole_clust5_cont_df$cluster == 3,]$Show_Name)),
+                               as.character(unique(tadpole_clust5_cont_df[tadpole_clust5_cont_df$cluster == 4,]$Show_Name)),
+                               as.character(unique(tadpole_clust5_cont_df[tadpole_clust5_cont_df$cluster == 5,]$Show_Name)))
 
 tadpole_cont_5clusters
 ```
 
-##Tadpole Clustering, 3 Clusters
+## TADpole Clustering, 3 Clusters
 
 ```{r}
 set.seed(12)
@@ -340,41 +335,40 @@ tadpole_clust3_cont_df<- dct_spread_cont
 tadpole_clust3_cont_df$cluster <- tadpole_clust3_cont$cl  
 ```
 
-
 ```{r}
 tadpole3_cont_long <- gather(tadpole_clust3_cont_df, key = period, value = dct_values ,X1:X100) %>% 
   select(-X)
 tadpole3_cont_long$period <- as.numeric(sub("X", "", tadpole3_cont_long$period ))
 tadpole3_cont_long$period <- as.numeric(tadpole3_cont_long$period)
 
-
-
 tadpole3_cont_plot <- tadpole3_cont_long %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
   facet_wrap(~ cluster, nrow = 3)
 
-ggplotly(tadpole3_cont_plot)
+ggplotly(tadpole3_cont_plot) %>% 
+  layout(title = "S1-S2 (Continuous) with 3 TADpole Clusters (C3 Rebase)", 
+         margin = list(t = 150))
 ```
 
-###Shows in each cluster
+### Shows in Each Cluster
 
 ```{r}
 tadpole_cont_3clusters <- list(as.character(unique(tadpole_clust3_cont_df[tadpole_clust3_cont_df$cluster == 1,]$Show_Name)),
-      as.character(unique(tadpole_clust3_cont_df[tadpole_clust3_cont_df$cluster == 2,]$Show_Name)),
-      as.character(unique(tadpole_clust3_cont_df[tadpole_clust3_cont_df$cluster == 3,]$Show_Name)))
+                               as.character(unique(tadpole_clust3_cont_df[tadpole_clust3_cont_df$cluster == 2,]$Show_Name)),
+                               as.character(unique(tadpole_clust3_cont_df[tadpole_clust3_cont_df$cluster == 3,]$Show_Name)))
 
 tadpole_cont_3clusters
-
 ```
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------
 
 
-#non-continuous S01-S02 clustering
+# S1-S2 Non-Continuous Clustering
 
-##Tadpole Clustering, 5 Clusters
+## TADpole Clustering, 5 Clusters
+
 ```{r}
 temp1 <- filter(dct_spread, Season_num == 1)
 temp2 <- filter(dct_spread, Season_num == 2)
@@ -388,7 +382,6 @@ tadpole_s1_s2 <- tadpole_spread_s1_s2 %>%
   select(-X, -Network, -Season_num, -Show_Name)
 ```
 
-
 ```{r}
 set.seed(12)
 tadpole_clust5_s1_s2 <- TADPole(tadpole_s1_s2, k = 5L, window.size = 2, dc = 2)
@@ -398,36 +391,35 @@ tadpole_clust5_s1_s2_df<- tadpole_spread_s1_s2
 tadpole_clust5_s1_s2_df$cluster <- tadpole_clust5_s1_s2$cl  
 ```
 
-
 ```{r}
 tadpole5_s1_s2_long <- gather(tadpole_clust5_s1_s2_df, key = period, value = dct_values ,X1:X200) %>% 
   select(-X)
 tadpole5_s1_s2_long$period <- as.numeric(sub("X", "", tadpole5_s1_s2_long$period ))
 tadpole5_s1_s2_long$period <- as.numeric(tadpole5_s1_s2_long$period)
 
-
-
 tadpole5_s1_s2_plot <- tadpole5_s1_s2_long %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
-  facet_wrap(~ cluster)
+  facet_wrap(~ cluster, nrow = 3)
 
-ggplotly(tadpole5_s1_s2_plot)
+ggplotly(tadpole5_s1_s2_plot) %>% 
+  layout(title = "S1-S2 (Non-Continuous) with 5 TADpole Clusters (C3 Rebase)", 
+         margin = list(t = 150))
 ```
 
 ###Shows in each cluster
 
 ```{r}
 tadpole_s1_s2_5clusters <- list(as.character(unique(tadpole_clust5_s1_s2_df[tadpole_clust5_s1_s2_df$cluster == 1,]$Show_Name)),
-      as.character(unique(tadpole_clust5_s1_s2_df[tadpole_clust5_s1_s2_df$cluster == 2,]$Show_Name)),
-      as.character(unique(tadpole_clust5_s1_s2_df[tadpole_clust5_s1_s2_df$cluster == 3,]$Show_Name)),
-      as.character(unique(tadpole_clust5_s1_s2_df[tadpole_clust5_s1_s2_df$cluster == 4,]$Show_Name)),
-      as.character(unique(tadpole_clust5_s1_s2_df[tadpole_clust5_s1_s2_df$cluster == 5,]$Show_Name)))
+                                as.character(unique(tadpole_clust5_s1_s2_df[tadpole_clust5_s1_s2_df$cluster == 2,]$Show_Name)),
+                                as.character(unique(tadpole_clust5_s1_s2_df[tadpole_clust5_s1_s2_df$cluster == 3,]$Show_Name)),
+                                as.character(unique(tadpole_clust5_s1_s2_df[tadpole_clust5_s1_s2_df$cluster == 4,]$Show_Name)),
+                                as.character(unique(tadpole_clust5_s1_s2_df[tadpole_clust5_s1_s2_df$cluster == 5,]$Show_Name)))
 
 tadpole_s1_s2_5clusters
 ```
 
-##Tadpole Clustering, 3 Clusters
+## TADpole Clustering, 3 Clusters
 
 ```{r}
 set.seed(12)
@@ -438,34 +430,31 @@ tadpole_clust3_s1_s2_df<- tadpole_spread_s1_s2
 tadpole_clust3_s1_s2_df$cluster <- tadpole_clust3_s1_s2$cl  
 ```
 
-
 ```{r}
 tadpole3_s1_s2_long <- gather(tadpole_clust3_s1_s2_df, key = period, value = dct_values ,X1:X200) %>% 
   select(-X)
 tadpole3_s1_s2_long$period <- as.numeric(sub("X", "", tadpole3_s1_s2_long$period ))
 tadpole3_s1_s2_long$period <- as.numeric(tadpole3_s1_s2_long$period)
 
-
-
 tadpole3_s1_s2_plot <- tadpole3_s1_s2_long %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
   facet_wrap(~ cluster, nrow = 3)
 
-ggplotly(tadpole3_s1_s2_plot)
+ggplotly(tadpole3_s1_s2_plot) %>% 
+  layout(title = "S1-S2 (Continuous) with 3 TADpole Clusters (C3 Rebase)", 
+         margin = list(t = 150))
 ```
 
 ###Shows in each cluster
 
 ```{r}
 tadpole_cont_3clusters <- list(as.character(unique(tadpole_clust3_cont_df[tadpole_clust3_cont_df$cluster == 1,]$Show_Name)),
-      as.character(unique(tadpole_clust3_cont_df[tadpole_clust3_cont_df$cluster == 2,]$Show_Name)),
-      as.character(unique(tadpole_clust3_cont_df[tadpole_clust3_cont_df$cluster == 3,]$Show_Name)))
+                               as.character(unique(tadpole_clust3_cont_df[tadpole_clust3_cont_df$cluster == 2,]$Show_Name)),
+                               as.character(unique(tadpole_clust3_cont_df[tadpole_clust3_cont_df$cluster == 3,]$Show_Name)))
 
 tadpole_cont_3clusters
-
 ```
-
 
 
 #Diagnostics
