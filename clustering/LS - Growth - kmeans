@@ -1,12 +1,15 @@
 ---
 title: "CENT S1-S2 K-Means Clustering on LS Growth"
-output: html_notebook
+output:
+  html_notebook: default
+  html_document: default
 ---
 
 ```{r}
 ##################################################################################
 #inputs: CENT_lS_growth_dct.csv, CENT_LS_growth_dct_spread.csv,
-#         CENT_dct_spread_cont_LS_growth.csv, CENT_dct_cont_LS_growth.csv    
+#         CENT_dct_spread_cont_LS_growth.csv, CENT_dct_cont_LS_growth.csv
+#
 #purpose: K-Means clustering (for S1, S2, S1 & S2 normalized separately,
 #          and S1 & S2 normalized together)
 ##################################################################################
@@ -170,11 +173,6 @@ ggplotly(s1_4clusters_s2_trends_plot) %>%
          margin = list(t = 150))
 ```
 
-```{r}
-kmeans_s1_4cl_LS_growth_d <- dist(clusters4_s1_spread[, 6:105])
-diagnostics_kmeans_s1_4cl_LS_growth <- cluster.stats(kmeans_s1_4cl_LS_growth_d, as.numeric(clusters4_s1_spread$cluster_kmeans_4))
-```
-
 ### 5 Clusters (K-Means)
 
 ```{r}
@@ -238,12 +236,6 @@ s1_5clusters_s2_trends_plot <- dct_s1_5clusters_s2_trends %>%
 ggplotly(s1_5clusters_s2_trends_plot) %>% 
   layout(title = "Season 1 with 5 Clusters & Season 2 Trends (LS Growth)", 
          margin = list(t = 150))
-```
-
-
-```{r}
-kmeans_s1_5cl_LS_growth_d <- dist(clusters5_s1_spread[, 6:105])
-diagnostics_kmeans_s1_5cl_LS_growth <- cluster.stats(kmeans_s1_5cl_LS_growth_d, as.numeric(clusters5_s1_spread$cluster_kmeans_5))
 ```
 
 
@@ -356,11 +348,6 @@ s2_3clusters <- list(as.character(unique(clusters3_s2[clusters3_s2$cluster_kmean
 s2_3clusters
 ```
 
-```{r}
-kmeans_s2_3cl_LS_growth_d <- dist(clusters3_s2_spread[, 6:105])
-diagnostics_kmeans_s2_3cl_LS_growth <- cluster.stats(kmeans_s2_3cl_LS_growth_d, as.numeric(clusters3_s2_spread$cluster_kmeans_3))
-```
-
 ### 5 Clusters (K-Means)
 
 ```{r}
@@ -398,11 +385,6 @@ s2_5clusters <- list(as.character(unique(clusters5_s2[clusters5_s2$cluster_kmean
                      as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 4,]$Show_Name)),
                      as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 5,]$Show_Name)))
 s2_5clusters
-```
-
-```{r}
-kmeans_s2_5cl_LS_growth_d <- dist(clusters5_s2_spread[, 6:105])
-diagnostics_kmeans_s2_5cl_LS_growth <- cluster.stats(kmeans_s2_5cl_LS_growth_d, as.numeric(clusters5_s2_spread$cluster_kmeans_5))
 ```
 
 
@@ -524,11 +506,6 @@ s1_s2_5clusters <- list(as.character(unique(clusters5_s1_s2[clusters5_s1_s2$clus
 s1_s2_5clusters
 ```
 
-```{r}
-kmeans_s1_s2_5cl_LS_growth_d <- dist(clusters5_s1_s2_spread[, 6:205])
-kmeans_diag_s1_s2_5cl_LS_growth <- cluster.stats(kmeans_s1_s2_5cl_LS_growth_d, as.numeric(clusters5_s1_s2_spread$cluster_kmeans_5))
-```
-
 
 ----------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------
@@ -637,12 +614,6 @@ cont_2clusters <- list(as.character(unique(clusters2_cont[clusters2_cont$cluster
 cont_2clusters
 ```
 
-```{r}
-kmeans_cont_2cl_LS_growth_d <- dist(clusters2_s2_spread[, 6:105])
-diagnostics_kmeans_cont_2cl_LS_growth <- cluster.stats(kmeans_cont_2cl_LS_growth_d, as.numeric(clusters2_cont_spread$cluster_kmeans_2))
-```
-
-
 ### 4 Clusters (K-Means)
 
 ```{r}
@@ -678,9 +649,4 @@ cont_4clusters <- list(as.character(unique(clusters4_cont[clusters4_cont$cluster
                        as.character(unique(clusters4_cont[clusters4_cont$cluster_kmeans_4 == 3,]$Show_Name)),
                        as.character(unique(clusters4_cont[clusters4_cont$cluster_kmeans_4 == 4,]$Show_Name)))
 cont_4clusters
-```
-
-```{r}
-kmeans_cont_4cl_LS_growth_d <- dist(clusters4_cont_spread[, 5:104])
-diagnostics_kmeans_cont_4cl_LS_growth <- cluster.stats(kmeans_cont_4cl_LS_growth_d, as.numeric(clusters4_cont_spread$cluster_kmeans_4))
 ```
