@@ -11,7 +11,7 @@ output:
 #          CENT_LS_growth_dct.csv
 #
 # purpose: PCA clustering (3 clusters (Cumulative proportion of variance = 1.0 at
-#          3 Principal components for all PCAs but s2 & s2, 5 for the latter)
+#          3 Principal components for all PCAs but s2 & s2, 4 for the latter)
 #          for S1, S2, s1 & s2, and S1 & S2 normalized together)
 ##################################################################################
 ```
