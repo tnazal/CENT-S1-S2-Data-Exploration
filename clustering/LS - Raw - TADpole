@@ -114,7 +114,7 @@ ggplotly(s1_5clusters_tadpole_s2_trends_plot) %>%
          margin = list(t = 150))
 ```
 
-## Tadpole Clustering, 3 Clusters
+## TADpole Clustering, 3 Clusters
 
 ```{r}
 set.seed(12)
@@ -186,7 +186,7 @@ ggplotly(s1_3clusters_tadpole_s2_trends_plot) %>%
 
 # Season 2 Clustering
 
-## Tadpole Clustering, 5 Clusters
+## TADpole Clustering, 5 Clusters
 
 ```{r}
 dtw_df_s2 <- dct_spread %>% 
@@ -233,7 +233,7 @@ tadpole_s2_5clusters <- list(as.character(unique(tadpole_clust5_s2_df[tadpole_cl
 tadpole_s2_5clusters
 ```
 
-## Tadpole Clustering, 3 Clusters
+## TADpole Clustering, 3 Clusters
 
 ```{r}
 set.seed(12)
@@ -279,7 +279,7 @@ tadpole_s2_3clusters
 
 # S1-S2 Continuous Clustering
 
-## Tadpole Clustering, 5 Clusters
+## TADpole Clustering, 5 Clusters
 
 ```{r}
 dct_cont <- read.csv("CENT_LS_dct_cont.csv")
@@ -325,7 +325,7 @@ tadpole_cont_5clusters <- list(as.character(unique(tadpole_clust5_cont_df[tadpol
 tadpole_cont_5clusters
 ```
 
-## Tadpole Clustering, 3 Clusters
+## TADpole Clustering, 3 Clusters
 
 ```{r}
 set.seed(12)
@@ -369,7 +369,7 @@ tadpole_cont_3clusters
 
 # S1-S2 Non-Continuous Clustering
 
-## Tadpole Clustering, 5 Clusters
+## TADpole Clustering, 5 Clusters
 
 ```{r}
 temp1 <- filter(dct_spread, Season_num == 1)
@@ -421,7 +421,7 @@ tadpole_s1_s2_5clusters <- list(as.character(unique(tadpole_clust5_s1_s2_df[tadp
 tadpole_s1_s2_5clusters
 ```
 
-## Tadpole Clustering, 3 Clusters
+## TADpole Clustering, 3 Clusters
 
 ```{r}
 set.seed(12)
