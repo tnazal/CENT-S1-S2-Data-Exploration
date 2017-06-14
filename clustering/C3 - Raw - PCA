@@ -287,7 +287,7 @@ pca_s1_s2_long$period <- as.numeric(sub("X", "", pca_s1_s2_long$period))
 pca_s1_s2_plot <- pca_s1_s2_long %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
-  facet_wrap(~ cluster, nrow = 4)
+  facet_wrap(~ cluster)
 
 ggplotly(pca_s1_s2_plot) %>% 
   layout(title = "S1-S2 (Non-Continuous) with 4 PCA Clusters (C3)", 
@@ -297,10 +297,10 @@ ggplotly(pca_s1_s2_plot) %>%
 ### Shows in Each Cluster
 
 ```{r}
-pca_s1_s2_clusters <- list(as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 1,]$Show_Name)),
-                           as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 2,]$Show_Name)),
-                           as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 3,]$Show_Name)),
-                           as.character(unique(df_pcaclusters_cont[df_pcaclusters_cont$cluster == 4,]$Show_Name)))
+pca_s1_s2_clusters <- list(as.character(unique(df_pcaclusters_s1_s2[df_pcaclusters_s1_s2$cluster == 1,]$Show_Name)),
+                           as.character(unique(df_pcaclusters_s1_s2[df_pcaclusters_s1_s2$cluster == 2,]$Show_Name)),
+                           as.character(unique(df_pcaclusters_s1_s2[df_pcaclusters_s1_s2$cluster == 3,]$Show_Name)),
+                           as.character(unique(df_pcaclusters_s1_s2[df_pcaclusters_s1_s2$cluster == 4,]$Show_Name)))
 
 pca_s1_s2_clusters 
 ```
