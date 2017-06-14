@@ -312,7 +312,7 @@ plot_ly(dct_s1_5clusters_s2_trends,
         yaxis = ~paste0('y', cluster_kmeans_5), 
         legendgroup = ~Network) %>% 
   add_lines() %>% 
-  subplot(nrows = 5, shareX = TRUE) %>% 
+  subplot(nrows = 3, shareX = TRUE) %>% 
   layout(showlegend = TRUE, 
          title = "Season 1 with 5 K-Means Clusters & Season 2 Trends (C3)")
 ```
