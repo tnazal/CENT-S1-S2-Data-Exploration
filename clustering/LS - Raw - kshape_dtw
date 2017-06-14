@@ -1,5 +1,5 @@
 ---
-title: "CENT S1-S2 Time Series Clustering for LS Impressions"
+title: "CENT S1-S2 K-Shape and DTW Clustering on LS Impressions"
 output:
   html_notebook: default
   html_document: default
@@ -138,11 +138,6 @@ s1_4clusters_kshape <- list(as.character(unique(clusters_s1_shape4[clusters_s1_s
 s1_4clusters_kshape
 ```
 
-```{r}
-s1_4clusters_d <- dist(clusters_s1_shape4_spread[, 5:105])
-(kshape_diag_s1_4clusters <- cluster.stats(s1_4clusters_d, as.numeric(clusters_s1_shape4_spread$cluster_shape_4)))
-```
-
 ## Dynamic Time Warp Clustering
 
 ```{r}
@@ -229,11 +224,6 @@ ggplotly(s1_4clusters_dtw_s2_trends_plot) %>%
          margin = list(t = 150))
 ```
 
-```{r}
-s1_4clusters_d <- dist(clusters_s1_dtw4_spread[, 5:105])
-(kshape_diag_s1_4clusters <- cluster.stats(s1_4clusters_d, as.numeric(clusters_s1_dtw4_spread$cluster_dtw_4)))
-```
-
 # Season 2 Time Series Clustering
 
 ```{r}
@@ -303,11 +293,6 @@ s2_4clusters_kshape <- list(as.character(unique(clusters_s2_shape4[clusters_s2_s
 s2_4clusters_kshape
 ```
 
-```{r}
-s2_4clusters_d <- dist(clusters_s2_shape4_spread[, 5:105])
-(kshape_diag_s2_4clusters <- cluster.stats(s2_4clusters_d, as.numeric(clusters_s2_shape4_spread$cluster_shape_4)))
-```
-
 ## Dynamic Time Warp Clustering
 
 ```{r}
@@ -368,12 +353,6 @@ s2_5clusters_dtw <- list(as.character(unique(clusters_s2_dtw5[clusters_s2_dtw5$c
                          as.character(unique(clusters_s2_dtw5[clusters_s2_dtw5$cluster_dtw_5 == 5,]$Show_Name)))
 s2_5clusters_dtw
 ```
-
-```{r}
-s2_5clusters_d <- dist(clusters_s2_dtw5_spread[, 5:105])
-(kshape_diag_s2_5clusters <- cluster.stats(s2_5clusters_d, as.numeric(clusters_s2_dtw5_spread$cluster_dtw_5)))
-```
-
 
 # Season 1 and 2 Time Series Clustering
 
@@ -450,11 +429,6 @@ s1_s2_5clusters_kshape <- list(as.character(unique(clusters_s1_s2_shape5[cluster
 s1_s2_5clusters_kshape
 ```
 
-```{r}
-s1_s2_5clusters_d <- dist(clusters_s1_s2_shape5_spread[, 5:205])
-(kshape_diag_s1_s2_5clusters <- cluster.stats(s1_s2_5clusters_d, as.numeric(clusters_s1_s2_shape5_spread$cluster_shape_5)))
-```
-
 ## Dynamic Time Warp Clustering
 
 ```{r}
@@ -511,12 +485,6 @@ s1_s2_2clusters_dtw <- list(as.character(unique(clusters_s1_s2_dtw2[clusters_s1_
                             as.character(unique(clusters_s1_s2_dtw2[clusters_s1_s2_dtw2$cluster_dtw_2 == 2,]$Show_Name)))
 s1_s2_2clusters_dtw
 ```
-
-```{r}
-s1_s2_2clusters_d <- dist(clusters_s1_s2_dtw2_spread[, 5:205])
-(kshape_diag_s1_s2_2clusters <- cluster.stats(s1_s2_2clusters_d, as.numeric(clusters_s1_s2_dtw2_spread$cluster_dtw_2)))
-```
-
 
 # Season 1-2 (Continuous) Time Series Clustering
 
@@ -587,11 +555,6 @@ cont_5clusters_kshape <- list(as.character(unique(clusters_cont_shape5[clusters_
 cont_5clusters_kshape
 ```
 
-```{r}
-cont_5clusters_d <- dist(clusters_cont_shape5_spread[, 4:104])
-(kshape_diag_cont_5clusters <- cluster.stats(cont_5clusters_d, as.numeric(clusters_cont_shape5_spread$cluster_shape_5)))
-```
-
 ## Dynamic Time Warp Clustering
 
 ```{r}
@@ -648,9 +611,3 @@ cont_2clusters_dtw <- list(as.character(unique(clusters_cont_dtw2[clusters_cont_
                            as.character(unique(clusters_cont_dtw2[clusters_cont_dtw2$cluster_dtw_2 == 2,]$Show_Name)))
 cont_2clusters_dtw
 ```
-
-```{r}
-cont_2clusters_d <- dist(clusters_cont_dtw2_spread[, 4:104])
-(kshape_diag_cont_2clusters <- cluster.stats(cont_2clusters_d, as.numeric(clusters_cont_dtw2_spread$cluster_dtw_2)))
-```
-
