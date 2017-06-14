@@ -11,8 +11,7 @@ output:
 #
 # purpose: PCA clustering (3 clusters (Cumulative proportion of variance = 1.0 at
 #          3 Principal components for all PCAs, but for non-contiuous s1-s2,
-#          4 clusters for the latter) for S1, S2, and S1 & S2 normalized together)
-#          
+#          4 clusters for the latter) for S1, S2, and S1 & S2 normalized together)       
 ##################################################################################
 ```
 
