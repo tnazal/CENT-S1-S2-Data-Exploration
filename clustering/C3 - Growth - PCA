@@ -336,7 +336,7 @@ for (n in 1:length(d_names)){
   diagnostic_df[n, 4] <- d_list[[n]]["wb.ratio"]
   diagnostic_df[n, 5] <- d_list[[n]]["widestgap"]
   diagnostic_df[n, 6] <- d_list[[n]]["dunn2"]
-  diagnostic_df[n, 7] <- d_list[[n]]["entropy"]
+  diagnostic_df[n, 7] <- d_list[[n]]["avg.silwidth"]
   diagnostic_df[n, 8] <- d_list[[n]]["within.cluster.ss"]
   diagnostic_df[n, 9] <- d_list[[n]]["cluster.number"]
 }
