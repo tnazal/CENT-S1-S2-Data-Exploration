@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "C3 Growth Normalization"
 output: html_notebook
 ---
 
@@ -27,7 +27,6 @@ df <- df %>% group_by(Network, Show_Name) %>%
   ungroup() %>% 
   group_by(Network, Show_Name) %>%
   filter(all(c(1, 2) %in% Season_num)) 
-
 ```
 
 ```{r}
@@ -36,10 +35,9 @@ df <- df[df$Show_Name != "RHOM", ]
 
 ```{r}
 df_growth_curves <- df %>%
-  filter(is.na(growth) == F) %>% 
+  filter(is.na(C3_Growth) == F) %>% 
   group_by(Network, Show_Name, Season_num) %>% 
-  summarise(growth = list(growth))
-
+  summarise(growth = list(C3_Growth))
 ```
 
 ```{r}
@@ -52,7 +50,6 @@ dct <- function(x){
       scale_range = TRUE
       )
 }
-
 ```
 
 ```{r}
@@ -62,14 +59,12 @@ df_growth_with_dct <- df_growth_curves %>%
   unnest(dct_values) %>% 
   group_by(Network, Show_Name, Season_num) %>% 
   mutate(period = row_number()) 
-
 ```
 
 
 ```{r}
 df_growth_final <- df_growth_with_dct %>% 
   spread(key = period, value = dct_values)
-
 ```
 
 ```{r}
@@ -110,8 +105,3 @@ dct_spread_cont <- dct_cont  %>%
 write.csv(dct_cont, "CENT_dct_cont_growth.csv")
 write.csv(dct_spread_cont, "CENT_dct_spread_cont_growth.csv")
 ```
-
-
-
-
-
