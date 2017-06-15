@@ -1,14 +1,11 @@
 ---
 title: "R Notebook"
-output:
-  html_document: default
-  html_notebook: default
+output: html_notebook
 ---
-
 ```{r}
 ##################################################################################
-#inputs: CENT_dct.csv
-#purpose: Exploratory plots for raw, and growth,
+#inputs: CENT_dct.csv, Cent_growth_dct.csv, CENT_rebase_dct
+#purpose: Exploratory plots for raw, rebase and growth,
 #         normalized C3 impressions
 ##################################################################################
 ```
@@ -23,6 +20,8 @@ library(purrr)
 library(tidyr)
 ```
 
+
+#RAW
 
 read data
 ```{r, echo = F, message = F, error = F, warning = F}
@@ -43,14 +42,11 @@ my_theme <-  theme(panel.background = element_blank(),
         strip.background = element_blank())
 ```
 
-#Plots
-
-
 
 ##DCT values trends
 
 ```{r, echo = F, message = F, error = F, warning = F}
-ggplotly(ggplot(df %>% filter (Season_num < 3)) +
+raw_all <- ggplotly(ggplot(df %>% filter(Season_num < 3)) +
            
   geom_line(aes(x = period, y = dct_values, color = Show_Name), alpha = 0.6) +
     scale_colour_hue(h = c(180, 270)) +
@@ -78,11 +74,12 @@ ggplotly(ggplot(df %>% filter (Season_num < 3)) +
   width = 1200,
   height = 750)
   
+raw_all
 ```
 
 
 ```{r, echo = F, message = F, error = F, warning = F}
-ggplotly(ggplot(df %>% filter (Season_num < 3)) +
+raw_linear <- ggplotly(ggplot(df %>% filter (Season_num < 3)) +
   stat_smooth(aes(x = period, y = dct_values, color = Show_Name), geom = "line", se = F,
                        method = "lm", alpha = 0.6) +
   scale_colour_hue(h = c(180, 270)) +
@@ -113,207 +110,174 @@ ggplotly(ggplot(df %>% filter (Season_num < 3)) +
   
 ```
 
-```{r, echo = F, message = F, error = F, warning = F}
-ggplotly(ggplot(df %>% filter (Season_num < 3)) +
-  stat_smooth(aes(x = period, y = dct_values, color = Show_Name), geom = "line", se = F,
-                       alpha = 0.6) +
-  scale_colour_hue(h = c(180, 270)) +
-    
-  
-  stat_smooth(data = filter(df, Network == "BRVO", Season_num < 3), 
-              aes(x = period, y = dct_values, linetype = Network), geom = "line", se = F,
-                       methos = "gam", color = "#7a0177", size = 1.3) +
-  stat_smooth(data = filter(df, Network == "ENT", Season_num < 3), 
-              aes(x = period, y = dct_values, linetype = Network), geom = "line", se = F,
-                       color = "#ae017e", size = 1.3) +
-  stat_smooth(data = filter(df, Network == "SYFY", Season_num < 3), 
-              aes(x = period, y = dct_values, linetype = Network), geom = "line", se = F,
-                       color = "#dd3497", size = 1.3) +
-  stat_smooth(data = filter(df, Network == "USA", Season_num < 3), 
-              aes(x = period, y = dct_values, linetype = Network), geom = "line", se = F,
-                       color = "#f768a1", size = 1.3) +
 
-    
-  stat_smooth(aes(x = period, y = dct_values), geom = "line", se = F,
-                       color = "black",
-                       linetype = "dashed", size = 1.4) +
-  facet_grid(~Season_num) +
-  ggtitle("All Shows and Networks, DCT smooth trends") +
-  my_theme,
-  width = 1600,
-  height = 750)
+#Growth
+
+read data
+```{r, echo = F, message = F, error = F, warning = F}
+df_growth <- read.csv("CENT_growth_dct.csv")
 
 ```
 
+##DCT values trends
 
-
-##DCT growth  trends
 ```{r, echo = F, message = F, error = F, warning = F}
-ggplotly(ggplot(df %>% filter (Season_num < 3)) +
+growth_all <- ggplotly(ggplot(df_growth  %>% filter(Season_num < 3)) +
            
-  geom_line(aes(x = period, y = growth, color = Show_Name), alpha = 0.6) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name), alpha = 0.6) +
     scale_colour_hue(h = c(180, 270)) +
   
   geom_line(data = df %>% filter (Season_num < 3, Network == "BRVO") %>% group_by(Network, Season_num, period) %>% 
-          summarise(avg = mean(growth)),
+          summarise(avg = mean(dct_values)),
    aes(x = period, y = avg, linetype = Network), size = 1.2, color = "#7a0177") +
   geom_line(data = df %>% filter (Season_num < 3, Network == "ENT") %>% group_by(Network, Season_num, period) %>% 
-          summarise(avg = mean(growth)),
+          summarise(avg = mean(dct_values)),
    aes(x = period, y = avg, linetype = Network), size = 1.2, color = "#ae017e") +
   geom_line(data = df %>% filter (Season_num < 3, Network == "SYFY") %>% group_by(Network, Season_num, period) %>% 
-          summarise(avg = mean(growth)),
+          summarise(avg = mean(dct_values)),
    aes(x = period, y = avg, linetype = Network), size = 1.2, color = "#dd3497") +
   geom_line(data = df %>% filter (Season_num < 3, Network == "USA") %>% group_by(Network, Season_num, period) %>% 
-          summarise(avg = mean(growth)),
+          summarise(avg = mean(dct_values)),
    aes(x = period, y = avg, linetype = Network), size = 1.2, color = "#f768a1") +
     
   geom_line(data = df %>% filter (Season_num < 3) %>% group_by(Season_num, period) %>% 
-              summarise(avg = mean(growth)),
+              summarise(avg = mean(dct_values)),
     aes(x = period, y = avg, color = Show_Name), color = "black", linetype = "dashed",
     size = 1.3) +
-  coord_cartesian(ylim = c(-4, 4)) +
   facet_grid(~Season_num) +
-  ggtitle("All Shows and Networks, DCT growth trends. ZOOM") +
+  ggtitle("Growth DCT value trends. All Shows and Networks") +
   my_theme,
   width = 1200,
   height = 750)
   
+growth_all 
 ```
 
 
 ```{r, echo = F, message = F, error = F, warning = F}
-ggplotly(ggplot(df %>% filter (Season_num < 3)) +
-  stat_smooth(aes(x = period, y = growth, color = Show_Name), geom = "line", se = F,
+growth_linear <- ggplotly(ggplot(df_growth  %>% filter (Season_num < 3)) +
+  stat_smooth(aes(x = period, y = dct_values, color = Show_Name), geom = "line", se = F,
                        method = "lm", alpha = 0.6) +
   scale_colour_hue(h = c(180, 270)) +
     
   
   stat_smooth(data = filter(df, Network == "BRVO", Season_num < 3), 
-              aes(x = period, y = growth, linetype = Network), geom = "line", se = F,
+              aes(x = period, y = dct_values, linetype = Network), geom = "line", se = F,
                        method = "lm", color = "#7a0177", size = 1.3) +
   stat_smooth(data = filter(df, Network == "ENT", Season_num < 3), 
-              aes(x = period, y = growth, linetype = Network), geom = "line", se = F,
+              aes(x = period, y = dct_values, linetype = Network), geom = "line", se = F,
                        method = "lm", color = "#ae017e", size = 1.3) +
   stat_smooth(data = filter(df, Network == "SYFY", Season_num < 3), 
-              aes(x = period, y = growth, linetype = Network), geom = "line", se = F,
+              aes(x = period, y = dct_values, linetype = Network), geom = "line", se = F,
                        method = "lm", color = "#dd3497", size = 1.3) +
   stat_smooth(data = filter(df, Network == "USA", Season_num < 3), 
-              aes(x = period, y = growth, linetype = Network), geom = "line", se = F,
+              aes(x = period, y = dct_values, linetype = Network), geom = "line", se = F,
                        method = "lm", color = "#f768a1", size = 1.3) +
 
     
-  stat_smooth(aes(x = period, y = growth), geom = "line", se = F,
+  stat_smooth(aes(x = period, y = dct_values), geom = "line", se = F,
                        method = "lm", color = "black",
                        linetype = "dashed", size = 1.4) +
-    
-  coord_cartesian(ylim = c(-2, 5)) +  
   facet_grid(~Season_num) +
-  ggtitle("All Shows and Networks, DCT growth linear trends. ZOOM") +
+  ggtitle("Growth DCT linear trends. All Shows and Networks.") +
   my_theme,
   width = 1600,
   height = 750)
-  
+
+growth_linear
+ 
 ```
+
+
+
+#Rebase
+
+#RAW
+
+read data
 ```{r, echo = F, message = F, error = F, warning = F}
-ggplotly(ggplot(df %>% filter (Season_num < 3)) +
-  stat_smooth(aes(x = period, y = growth, color = Show_Name), geom = "line", se = F,
-                       alpha = 0.6) +
+df_rebase <- read.csv("CENT_rebase_dct.csv")
+
+```
+
+Define ggplot theme
+```{r, echo = F, message = F, error = F, warning = F}
+my_theme <-  theme(panel.background = element_blank(),
+        panel.grid.major = element_line(color = "#d8d8d8", linetype = "dotted"),
+        panel.grid.major.x = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        axis.line.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.line.x = element_line(color = "#d8d8d8", linetype = "dashed"),
+        strip.background = element_blank())
+```
+
+
+##DCT values trends
+
+```{r, echo = F, message = F, error = F, warning = F}
+rebase_all <- ggplotly(ggplot(df_rebase %>% filter(Season_num < 3)) +
+           
+  geom_line(aes(x = period, y = dct_values, color = Show_Name), alpha = 0.6) +
+    scale_colour_hue(h = c(180, 270)) +
+  
+  geom_line(data = df %>% filter (Season_num < 3, Network == "BRVO") %>% group_by(Network, Season_num, period) %>% 
+          summarise(avg = mean(dct_values)),
+   aes(x = period, y = avg, linetype = Network), size = 1.2, color = "#7a0177") +
+  geom_line(data = df %>% filter (Season_num < 3, Network == "ENT") %>% group_by(Network, Season_num, period) %>% 
+          summarise(avg = mean(dct_values)),
+   aes(x = period, y = avg, linetype = Network), size = 1.2, color = "#ae017e") +
+  geom_line(data = df %>% filter (Season_num < 3, Network == "SYFY") %>% group_by(Network, Season_num, period) %>% 
+          summarise(avg = mean(dct_values)),
+   aes(x = period, y = avg, linetype = Network), size = 1.2, color = "#dd3497") +
+  geom_line(data = df %>% filter (Season_num < 3, Network == "USA") %>% group_by(Network, Season_num, period) %>% 
+          summarise(avg = mean(dct_values)),
+   aes(x = period, y = avg, linetype = Network), size = 1.2, color = "#f768a1") +
+    
+  geom_line(data = df %>% filter (Season_num < 3) %>% group_by(Season_num, period) %>% 
+              summarise(avg = mean(dct_values)),
+    aes(x = period, y = avg, color = Show_Name), color = "black", linetype = "dashed",
+    size = 1.3) +
+  facet_grid(~Season_num) +
+  ggtitle("Rebase DCT value trends. All Shows and Networks.") +
+  my_theme,
+  width = 1200,
+  height = 750)
+  
+rebase_all
+```
+
+
+```{r, echo = F, message = F, error = F, warning = F}
+rebase_linear <- ggplotly(ggplot(df_rebase %>% filter (Season_num < 3)) +
+  stat_smooth(aes(x = period, y = dct_values, color = Show_Name), geom = "line", se = F,
+                       method = "lm", alpha = 0.6) +
   scale_colour_hue(h = c(180, 270)) +
     
   
   stat_smooth(data = filter(df, Network == "BRVO", Season_num < 3), 
-              aes(x = period, y = growth, linetype = Network), geom = "line", se = F,
-                       methos = "gam", color = "#7a0177", size = 1.3) +
+              aes(x = period, y = dct_values, linetype = Network), geom = "line", se = F,
+                       method = "lm", color = "#7a0177", size = 1.3) +
   stat_smooth(data = filter(df, Network == "ENT", Season_num < 3), 
-              aes(x = period, y = growth, linetype = Network), geom = "line", se = F,
-                       color = "#ae017e", size = 1.3) +
+              aes(x = period, y = dct_values, linetype = Network), geom = "line", se = F,
+                       method = "lm", color = "#ae017e", size = 1.3) +
   stat_smooth(data = filter(df, Network == "SYFY", Season_num < 3), 
-              aes(x = period, y = growth, linetype = Network), geom = "line", se = F,
-                       color = "#dd3497", size = 1.3) +
+              aes(x = period, y = dct_values, linetype = Network), geom = "line", se = F,
+                       method = "lm", color = "#dd3497", size = 1.3) +
   stat_smooth(data = filter(df, Network == "USA", Season_num < 3), 
-              aes(x = period, y = growth, linetype = Network), geom = "line", se = F,
-                       color = "#f768a1", size = 1.3) +
+              aes(x = period, y = dct_values, linetype = Network), geom = "line", se = F,
+                       method = "lm", color = "#f768a1", size = 1.3) +
 
     
-  stat_smooth(aes(x = period, y = growth), geom = "line", se = F,
-                       color = "black",
+  stat_smooth(aes(x = period, y = dct_values), geom = "line", se = F,
+                       method = "lm", color = "black",
                        linetype = "dashed", size = 1.4) +
-    
-      
   facet_grid(~Season_num) +
-  ggtitle("All Shows and Networks, DCT growth smooth trends") +
+  ggtitle("Rebase DCT linear trends. All Shows and Networks, ") +
   my_theme,
   width = 1600,
   height = 750)
 
+rebase_linear 
 ```
 
-
-
-```{r, echo = F, message = F, error = F, warning = F}
-ggplotly(ggplot(df %>% filter (Season_num < 3)) +
-  stat_smooth(aes(x = period, y = growth, color = Show_Name), geom = "line", se = F,
-                       alpha = 0.6) +
-  scale_colour_hue(h = c(180, 270)) +
-    
-  
-  stat_smooth(data = filter(df, Network == "BRVO", Season_num < 3), 
-              aes(x = period, y = growth, linetype = Network), geom = "line", se = F,
-                       methos = "gam", color = "#7a0177", size = 1.3) +
-  stat_smooth(data = filter(df, Network == "ENT", Season_num < 3), 
-              aes(x = period, y = growth, linetype = Network), geom = "line", se = F,
-                       color = "#ae017e", size = 1.3) +
-  stat_smooth(data = filter(df, Network == "SYFY", Season_num < 3), 
-              aes(x = period, y = growth, linetype = Network), geom = "line", se = F,
-                       color = "#dd3497", size = 1.3) +
-  stat_smooth(data = filter(df, Network == "USA", Season_num < 3), 
-              aes(x = period, y = growth, linetype = Network), geom = "line", se = F,
-                       color = "#f768a1", size = 1.3) +
-
-    
-  stat_smooth(aes(x = period, y = growth), geom = "line", se = F,
-                       color = "black",
-                       linetype = "dashed", size = 1.4) +
-    
-  coord_cartesian(ylim = c(-4, 6.5)) +    
-  facet_grid(~Season_num) +
-  ggtitle("All Shows and Networks, DCT growth smooth trends. ZOOM 1") +
-  my_theme,
-  width = 1600,
-  height = 750)
-
-```
-
-```{r, echo = F, message = F, error = F, warning = F}
-ggplotly(ggplot(df %>% filter (Season_num < 3)) +
-  stat_smooth(aes(x = period, y = growth, color = Show_Name), geom = "line", se = F,
-                       alpha = 0.6) +
-  scale_colour_hue(h = c(180, 270)) +
-    
-  
-  stat_smooth(data = filter(df, Network == "BRVO", Season_num < 3), 
-              aes(x = period, y = growth, linetype = Network), geom = "line", se = F,
-                       methos = "gam", color = "#7a0177", size = 1.3) +
-  stat_smooth(data = filter(df, Network == "ENT", Season_num < 3), 
-              aes(x = period, y = growth, linetype = Network), geom = "line", se = F,
-                       color = "#ae017e", size = 1.3) +
-  stat_smooth(data = filter(df, Network == "SYFY", Season_num < 3), 
-              aes(x = period, y = growth, linetype = Network), geom = "line", se = F,
-                       color = "#dd3497", size = 1.3) +
-  stat_smooth(data = filter(df, Network == "USA", Season_num < 3), 
-              aes(x = period, y = growth, linetype = Network), geom = "line", se = F,
-                       color = "#f768a1", size = 1.3) +
-
-    
-  stat_smooth(aes(x = period, y = growth), geom = "line", se = F,
-                       color = "black",
-                       linetype = "dashed", size = 1.4) +
-    
-  coord_cartesian(ylim = c(0, 2.3)) +    
-  facet_grid(~Season_num) +
-  ggtitle("All Shows and Networks, DCT growth smooth trends. ZOOM 2") +
-  my_theme,
-  width = 1600,
-  height = 750)
-
-```
