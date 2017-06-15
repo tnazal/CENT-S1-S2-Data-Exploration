@@ -89,7 +89,7 @@ write.csv(dct_s1_s2, "CENT_growth_dct_s1_s2.csv")
 #S1 & S2 continuous normalization
 dct_cont <- df %>%
   filter(Season_num == 1 | Season_num == 2) %>%
-  filter(is.na(growth) == F) %>% 
+  filter(is.na(C3_Growth) == F) %>% 
   group_by(Network, Show_Name) %>% 
   summarise(growth = list(C3_Growth)) %>%
   ungroup() %>% 
