@@ -26,7 +26,7 @@ df <- df[df$Show_Name != "RHOM", ]
 
 df_curves <- df %>% 
   group_by(Network, Show_Name, Season_num) %>% 
-  summarise(imps = list(C3_Imps))
+  summarise(imps = list(C3_Impressions))
 
 dct <- function(x){
   get_dct_transform(
@@ -66,7 +66,7 @@ write.csv(dct_s1_s2, "CENT_dct_s1_s2.csv")
 dct_cont <- df %>%
   group_by(Network, Show_Name) %>% 
   filter(Season_num == 1 | Season_num == 2) %>% 
-  summarise(imps = list(C3_Imps)) %>%
+  summarise(imps = list(C3_Impressions)) %>%
   ungroup() %>% 
   mutate(dct_values = map(imps, dct)) %>% 
   select(-imps) %>% 
