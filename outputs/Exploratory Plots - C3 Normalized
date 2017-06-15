@@ -1,10 +1,14 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "Exploratory Plots for Normalized C3 Impressions"
+output:
+  html_notebook: default
+  html_document: default
 ---
+
 ```{r}
 ##################################################################################
 #inputs: CENT_dct.csv, Cent_growth_dct.csv, CENT_rebase_dct
+#
 #purpose: Exploratory plots for raw, rebase and growth,
 #         normalized C3 impressions
 ##################################################################################
