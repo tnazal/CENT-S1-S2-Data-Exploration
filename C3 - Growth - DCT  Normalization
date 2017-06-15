@@ -91,7 +91,7 @@ dct_cont <- df %>%
   filter(Season_num == 1 | Season_num == 2) %>%
   filter(is.na(growth) == F) %>% 
   group_by(Network, Show_Name) %>% 
-  summarise(growth = list(growth)) %>%
+  summarise(growth = list(C3_Growth)) %>%
   ungroup() %>% 
   mutate(dct_values = map(growth, dct)) %>% 
   select(-growth) %>% 
