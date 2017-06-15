@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "C3 Rebase Normalization"
 output: html_notebook
 ---
 
@@ -37,7 +37,7 @@ df <- df[df$Show_Name != "RHOM", ]
 ```{r}
 df_rebase_curves <- df %>%
   group_by(Network, Show_Name, Season_num) %>% 
-  summarise(rebase = list(rebase))
+  summarise(rebase = list(C3_Rebase))
 
 ```
 
@@ -94,7 +94,7 @@ write.csv(dct_s1_s2, "CENT_rebase_dct_s1_s2.csv")
 dct_cont <- df %>%
   filter(Season_num == 1 | Season_num == 2) %>% 
   group_by(Network, Show_Name) %>% 
-  summarise(rebase = list(rebase)) %>%
+  summarise(rebase = list(C3_Rebase)) %>%
   ungroup() %>% 
   mutate(dct_values = map(rebase, dct)) %>% 
   select(-rebase) %>% 
@@ -108,8 +108,3 @@ dct_spread_cont <- dct_cont  %>%
 write.csv(dct_cont, "CENT_rebase_dct_cont.csv")
 write.csv(dct_spread_cont, "CENT_rebase_dct_spread_cont.csv")
 ```
-
-
-
-
-
