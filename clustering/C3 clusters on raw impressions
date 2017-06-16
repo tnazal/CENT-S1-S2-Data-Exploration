@@ -1,0 +1,159 @@
+---
+title: "Exploratory. Clusters"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+```{r}
+##################################################################################
+#inputs: CENT_showlevel.csv, lookup_s1_clusters.csv 
+#purpose: Exploratory plots for raw, growth and 1st episode rebase trends,
+#         non-normalized C3 impressions, clusters from nomralized data
+##################################################################################
+```
+
+```{r, message=FALSE, error=FALSE, warning=FALSE}
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(scales)
+```
+
+
+```{r, message=FALSE, error=FALSE, warning=FALSE, echo=FALSE}
+df <- read.csv("CENT_showlevel.csv")
+df <- select(df, -X)
+lookup <- read.csv("lookup_s1_clusters.csv")
+df$clusters_raw <- lookup$s1_clusters_raw[match(df$Show_Name, lookup$Show_Name)]
+df$clusters_rebase <- lookup$s1_clusters_rebase[match(df$Show_Name, lookup$Show_Name)]
+df$clusters_growth<- lookup$s1_clusters_growth[match(df$Show_Name, lookup$Show_Name)]
+```
+
+
+```{r, message=FALSE, error=FALSE, warning=FALSE, echo=FALSE}
+my_theme <-  theme(panel.background = element_blank(),
+        panel.grid.major = element_line(color = "#d8d8d8", linetype = "dotted"),
+        panel.grid.major.x = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        axis.line.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.line.x = element_line(color = "#d8d8d8", linetype = "dashed"),
+        strip.background = element_blank())
+```
+
+
+#Impressions
+
+
+```{r, message=FALSE, error=FALSE, warning=FALSE, echo=FALSE}
+
+ggplotly(ggplot(df %>% filter(Episode_num < 15 & Season_num > 0 & Season_num <3 & is.na(clusters_raw) == F)) +
+  geom_line(aes(x = Episode_num, y = C3_Imps, color = Show_Name), se = F, method = "lm",
+              alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Imps), color = "black", se = F, method = lm,
+              linetype = "dashed") +
+  facet_grid(clusters_raw ~ Season_num ) +
+  my_theme +
+  theme(legend.position = "none") +
+  ggtitle("S01 - S02 trend all shows. C3 Impressions. By cluster"),
+  width = 750,
+  height = 1000)
+
+```
+
+```{r, message=FALSE, error=FALSE, warning=FALSE, echo=FALSE}
+
+ggplotly(ggplot(df %>% filter(Episode_num < 15 & Season_num > 0 & Season_num <3 & is.na(clusters_raw) == F)) +
+  stat_smooth(aes(x = Episode_num, y = C3_Imps, color = Show_Name), geom = "line", se = F, method = "lm",
+              alpha = 1) +
+  stat_smooth(aes(x = Episode_num, y = C3_Imps), geom = "line", color = "black", se = F, method = "lm",
+              linetype = "dashed", alpha = 0.7) +
+  facet_grid(clusters_raw ~ Season_num ) +
+  my_theme +
+  theme(legend.position = "none") +
+  ggtitle("S01 - S02 linear trend all shows. C3 Impressions. By cluster"),
+  width = 750,
+  height = 1000)
+
+```
+
+
+#Growth
+
+
+
+```{r, message=FALSE, error=FALSE, warning=FALSE, echo=FALSE}
+
+ggplotly(ggplot(df %>% filter(Episode_num < 15 & Season_num > 0 & Season_num <3 & is.na(clusters_growth) == F)) +
+  geom_line(aes(x = Episode_num, y = growth, color = Show_Name), se = F,
+              alpha = 1) +
+  stat_smooth(aes(x = Episode_num, y = growth), geom = "line", color = "black", se = F, method = "lm",
+              linetype = "dashed", alpha = 1) +
+  facet_grid(clusters_growth ~ Season_num ) +
+  coord_cartesian(ylim = c(0, 2.5)) +
+  my_theme +
+  theme(legend.position = "none") +
+  ggtitle("S01 - S02 trend all shows. Growth. By cluster"),
+  width = 750,
+  height = 1000)
+```
+
+
+```{r, message=FALSE, error=FALSE, warning=FALSE, echo=FALSE}
+ggplotly(ggplot(df %>% filter(Episode_num < 15 & Season_num > 0 & Season_num <3 & is.na(clusters_growth) == F)) +
+  stat_smooth(aes(x = Episode_num, y = growth, color = Show_Name), geom = "line", se = F, method = "lm",
+              alpha = 1) +
+  stat_smooth(aes(x = Episode_num, y = growth), geom = "line", color = "black", se = F, method = "lm",
+              linetype = "dashed", alpha = 1) +
+  facet_grid(clusters_growth ~ Season_num ) +
+    coord_cartesian(ylim = c(0.5, 1.5)) +
+  my_theme +
+  theme(legend.position = "none") +
+  ggtitle("S01 - S02 linear trend all shows. Growth. By cluster"),
+  width = 750,
+  height = 1000)
+
+```
+
+
+
+#Rebase
+
+
+
+```{r, message=FALSE, error=FALSE, warning=FALSE, echo=FALSE}
+
+ggplotly(ggplot(df %>% filter(Episode_num < 15 & Season_num > 0 & Season_num <3 & is.na(clusters_rebase) == F)) +
+  geom_line(aes(x = Episode_num, y = rebase, color = Show_Name), se = F,
+              alpha = 1) +
+  stat_smooth(aes(x = Episode_num, y = rebase), geom = "line", color = "black", se = F, method = "lm",
+              linetype = "dashed", alpha = 1) +
+  facet_grid(clusters_rebase ~ Season_num ) +
+  my_theme +
+  theme(legend.position = "none") +
+  ggtitle("S01 - S02 trend all shows. Rebase. By cluster"),
+  width = 750,
+  height = 1000)
+```
+
+```{r, message=FALSE, error=FALSE, warning=FALSE, echo=FALSE}
+ggplotly(ggplot(df %>% filter(Episode_num < 15 & Season_num > 0 & Season_num <3 & is.na(clusters_rebase) == F)) +
+  stat_smooth(aes(x = Episode_num, y = rebase, color = Show_Name), geom = "line", se = F, method = "lm",
+              alpha = 1) +
+  stat_smooth(aes(x = Episode_num, y = rebase), geom = "line", color = "black", se = F, method = "lm",
+              linetype = "dashed", alpha = 1) +
+  facet_grid(clusters_rebase ~ Season_num ) +
+    coord_cartesian(ylim = c(-1000000, 500000)) +
+  my_theme +
+  theme(legend.position = "none") +
+  ggtitle("S01 - S02 linear trend all shows. Rebase. by cluster"),
+  width = 750,
+  height = 1000)
+```
+
+
+
+
+
+
