@@ -40,6 +40,8 @@ my_theme <-  theme(panel.background = element_blank(),
         panel.grid.major = element_line(color = "#d8d8d8", linetype = "dotted"),
         panel.grid.major.x = element_blank(),
         plot.title = element_text(hjust = 0.5),
+        axis.title.x = element_blank(), 
+        axis.title.y = element_blank(),
         axis.line.y = element_blank(),
         axis.ticks.y = element_blank(),
         axis.line.x = element_line(color = "#d8d8d8", linetype = "dashed"),
@@ -50,7 +52,7 @@ my_theme <-  theme(panel.background = element_blank(),
 ##DCT values trends
 
 ```{r, echo = F, message = F, error = F, warning = F}
-raw_all <- ggplotly(ggplot(df %>% filter(Season_num < 3)) +
+DCT_trends <- ggplotly(ggplot(df %>% filter(Season_num < 3)) +
            
   geom_line(aes(x = period, y = dct_values, color = Show_Name), alpha = 0.6) +
     scale_colour_hue(h = c(180, 270)) +
@@ -72,18 +74,21 @@ raw_all <- ggplotly(ggplot(df %>% filter(Season_num < 3)) +
               summarise(avg = mean(dct_values)),
     aes(x = period, y = avg, color = Show_Name), color = "black", linetype = "dashed",
     size = 1.3) +
-  facet_grid(~Season_num) +
-  ggtitle("All Shows and Networks, DCT value trends") +
-  my_theme,
-  width = 1200,
-  height = 750)
-  
-raw_all
+  facet_wrap(~Season_num) +
+  my_theme) %>% 
+  layout(title = "DCT Value Trends for All Shows and Networks", 
+         autosize = FALSE, width = 1200, height = 500, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+
+htmlwidgets::saveWidget(DCT_trends, "DCT_trends.html", selfcontained = TRUE)
 ```
 
 
 ```{r, echo = F, message = F, error = F, warning = F}
-raw_linear <- ggplotly(ggplot(df %>% filter (Season_num < 3)) +
+DCT_linear <- ggplotly(ggplot(df %>% filter (Season_num < 3)) +
   stat_smooth(aes(x = period, y = dct_values, color = Show_Name), geom = "line", se = F,
                        method = "lm", alpha = 0.6) +
   scale_colour_hue(h = c(180, 270)) +
@@ -106,12 +111,16 @@ raw_linear <- ggplotly(ggplot(df %>% filter (Season_num < 3)) +
   stat_smooth(aes(x = period, y = dct_values), geom = "line", se = F,
                        method = "lm", color = "black",
                        linetype = "dashed", size = 1.4) +
-  facet_grid(~Season_num) +
-  ggtitle("All Shows and Networks, DCT linear trends") +
-  my_theme,
-  width = 1600,
-  height = 750)
-  
+  facet_wrap(~Season_num) +
+  my_theme) %>% 
+  layout(title = "DCT Linear Trends for All Shows and Networks", 
+         autosize = FALSE, width = 1200, height = 500, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+
+htmlwidgets::saveWidget(DCT_linear, "DCT_linear.html", selfcontained = TRUE)
 ```
 
 
@@ -126,7 +135,7 @@ df_growth <- read.csv("CENT_growth_dct.csv")
 ##DCT values trends
 
 ```{r, echo = F, message = F, error = F, warning = F}
-growth_all <- ggplotly(ggplot(df_growth  %>% filter(Season_num < 3)) +
+DCT_growth_trends <- ggplotly(ggplot(df_growth  %>% filter(Season_num < 3)) +
            
   geom_line(aes(x = period, y = dct_values, color = Show_Name), alpha = 0.6) +
     scale_colour_hue(h = c(180, 270)) +
@@ -148,18 +157,21 @@ growth_all <- ggplotly(ggplot(df_growth  %>% filter(Season_num < 3)) +
               summarise(avg = mean(dct_values)),
     aes(x = period, y = avg, color = Show_Name), color = "black", linetype = "dashed",
     size = 1.3) +
-  facet_grid(~Season_num) +
-  ggtitle("Growth DCT value trends. All Shows and Networks") +
-  my_theme,
-  width = 1200,
-  height = 750)
-  
-growth_all 
+  facet_wrap(~Season_num) +
+  my_theme) %>% 
+  layout(title = "DCT Growth Trends for All Shows and Networks", 
+         autosize = FALSE, width = 1200, height = 500, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+
+htmlwidgets::saveWidget(DCT_growth_trends, "DCT_growth_trends.html", selfcontained = TRUE) 
 ```
 
 
 ```{r, echo = F, message = F, error = F, warning = F}
-growth_linear <- ggplotly(ggplot(df_growth  %>% filter (Season_num < 3)) +
+DCT_growth_linear <- ggplotly(ggplot(df_growth  %>% filter (Season_num < 3)) +
   stat_smooth(aes(x = period, y = dct_values, color = Show_Name), geom = "line", se = F,
                        method = "lm", alpha = 0.6) +
   scale_colour_hue(h = c(180, 270)) +
@@ -182,14 +194,16 @@ growth_linear <- ggplotly(ggplot(df_growth  %>% filter (Season_num < 3)) +
   stat_smooth(aes(x = period, y = dct_values), geom = "line", se = F,
                        method = "lm", color = "black",
                        linetype = "dashed", size = 1.4) +
-  facet_grid(~Season_num) +
-  ggtitle("Growth DCT linear trends. All Shows and Networks.") +
-  my_theme,
-  width = 1600,
-  height = 750)
+  facet_wrap(~Season_num) +
+  my_theme) %>% 
+  layout(title = "DCT Growth Linear Trends for All Shows and Networks", 
+         autosize = FALSE, width = 1200, height = 500, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
 
-growth_linear
- 
+htmlwidgets::saveWidget(DCT_growth_linear, "DCT_growth_linear.html", selfcontained = TRUE)
 ```
 
 
@@ -201,26 +215,13 @@ growth_linear
 read data
 ```{r, echo = F, message = F, error = F, warning = F}
 df_rebase <- read.csv("CENT_rebase_dct.csv")
-
-```
-
-Define ggplot theme
-```{r, echo = F, message = F, error = F, warning = F}
-my_theme <-  theme(panel.background = element_blank(),
-        panel.grid.major = element_line(color = "#d8d8d8", linetype = "dotted"),
-        panel.grid.major.x = element_blank(),
-        plot.title = element_text(hjust = 0.5),
-        axis.line.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.line.x = element_line(color = "#d8d8d8", linetype = "dashed"),
-        strip.background = element_blank())
 ```
 
 
 ##DCT values trends
 
 ```{r, echo = F, message = F, error = F, warning = F}
-rebase_all <- ggplotly(ggplot(df_rebase %>% filter(Season_num < 3)) +
+DCT_rebase <- ggplotly(ggplot(df_rebase %>% filter(Season_num < 3)) +
            
   geom_line(aes(x = period, y = dct_values, color = Show_Name), alpha = 0.6) +
     scale_colour_hue(h = c(180, 270)) +
@@ -242,18 +243,21 @@ rebase_all <- ggplotly(ggplot(df_rebase %>% filter(Season_num < 3)) +
               summarise(avg = mean(dct_values)),
     aes(x = period, y = avg, color = Show_Name), color = "black", linetype = "dashed",
     size = 1.3) +
-  facet_grid(~Season_num) +
-  ggtitle("Rebase DCT value trends. All Shows and Networks.") +
-  my_theme,
-  width = 1200,
-  height = 750)
-  
-rebase_all
+  facet_wrap(~Season_num) +
+  my_theme) %>% 
+  layout(title = "DCT Rebase Trends for All Shows and Networks", 
+         autosize = FALSE, width = 1200, height = 500, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+
+htmlwidgets::saveWidget(DCT_rebase, "DCT_rebase.html", selfcontained = TRUE)
 ```
 
 
 ```{r, echo = F, message = F, error = F, warning = F}
-rebase_linear <- ggplotly(ggplot(df_rebase %>% filter (Season_num < 3)) +
+DCT_rebase_linear <- ggplotly(ggplot(df_rebase %>% filter (Season_num < 3)) +
   stat_smooth(aes(x = period, y = dct_values, color = Show_Name), geom = "line", se = F,
                        method = "lm", alpha = 0.6) +
   scale_colour_hue(h = c(180, 270)) +
@@ -276,12 +280,15 @@ rebase_linear <- ggplotly(ggplot(df_rebase %>% filter (Season_num < 3)) +
   stat_smooth(aes(x = period, y = dct_values), geom = "line", se = F,
                        method = "lm", color = "black",
                        linetype = "dashed", size = 1.4) +
-  facet_grid(~Season_num) +
-  ggtitle("Rebase DCT linear trends. All Shows and Networks, ") +
-  my_theme,
-  width = 1600,
-  height = 750)
+  facet_wrap(~Season_num) +
+  my_theme) %>% 
+  layout(title = "DCT Rebase Linear Trends for All Shows and Networks", 
+         autosize = FALSE, width = 1200, height = 500, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
 
-rebase_linear 
+htmlwidgets::saveWidget(DCT_rebase_linear, "DCT_rebase_linear.html", selfcontained = TRUE) 
 ```
 
