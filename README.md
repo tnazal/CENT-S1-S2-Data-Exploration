@@ -33,20 +33,19 @@ You can also consult some (outdated but informative) basic documentation of the 
 
 # A few things to keep in mind to filter the right information for this exercise:
 
-LF_Season == 1 selects only shows/seasons that correspond to seasons as defined for forecasting (drops specials, repeats, sports, anything else that's not needed)
-Source == "Nielsen" selects only historical data
-A few variables to keep an eye out for:
-Show_Name is a short version of the show, but allows you to group by a unique id
-Season_num and Episode_num give you the corrected season and episode numbers
-SC3_Impressions gives you the C3 impressions by half hour
-SC3_Dur gives you the duration in seconds of commercials for that half hour
-A quick snippet of code to correctly aggregate the data at the show level:
-df_showlevel <- ddply(subset(yourdata,  Source == "Nielsen" & LF_Season == 1), 
-                     c("Network", "Broadcast_Year", "Cable_Qtr", "Date",
-                        "Show_Name", "Episode_num", "Season_num", "Start_Time", "End_time"), 
-                     summarize, 
-                     C3_Dur = sum(SC3_C_Dur),
-                     C3_Imps = sum(SC3_Impressions * SC3_C_Dur)/C3_Dur
-)
-
+LF_Season == 1 selects only shows/seasons that correspond to seasons as defined for forecasting (drops specials, repeats, sports, anything else that's not needed)  
+Source == "Nielsen" selects only historical data  
+A few variables to keep an eye out for:  
+Show_Name is a short version of the show, but allows you to group by a unique id  
+Season_num and Episode_num give you the corrected season and episode numbers  
+SC3_Impressions gives you the C3 impressions by half hour  
+SC3_Dur gives you the duration in seconds of commercials for that half hour  
+A quick snippet of code to correctly aggregate the data at the show level:  
+df_showlevel <- ddply(subset(yourdata,  Source == "Nielsen" & LF_Season == 1),  
+                     c("Network", "Broadcast_Year", "Cable_Qtr", "Date",  
+                       "Show_Name", "Episode_num", "Season_num", "Start_Time", "End_time"),  
+                     summarize,   
+                     C3_Dur = sum(SC3_C_Dur),  
+                     C3_Imps = sum(SC3_Impressions * SC3_C_Dur)/C3_Dur  
+)                     
 
