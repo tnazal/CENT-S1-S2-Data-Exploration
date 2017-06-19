@@ -7,9 +7,9 @@ output:
 
 ```{r}
 ##################################################################################
-# inputs:  CENT_growth_dct.csv, CENT_growth_dct_spread.csv, 
-#          CENT_dct_spread_cont_growth.csv, CENT_dct_cont_growth.csv, 
-#          CENT_growth_dct_s1_s2.csv
+# inputs: CENT_growth_dct.csv, CENT_growth_dct_spread.csv, 
+#         CENT_dct_spread_cont_growth.csv, CENT_dct_cont_growth.csv, 
+#         CENT_growth_dct_s1_s2.csv
 #
 # purpose: K-Shape and Dynamic Time Warp clustering (clusters for S1, S2,
 #          and S1 & S2 normalized separately and together)
