@@ -8,8 +8,8 @@ output:
 ```{r}
 ##################################################################################
 # inputs: CENT_LS_rebase_dct.csv, CENT_LS_rebase_dct_spread.csv,
-#        CENT_LS_rebase_dct_spread_cont.csv, CENT_LS_rebase_dct_cont.csv, 
-#        CENT_LS_rebase_dct_s1_s2.csv
+#         CENT_LS_rebase_dct_spread_cont.csv, CENT_LS_rebase_dct_cont.csv, 
+#         CENT_LS_rebase_dct_s1_s2.csv
 #
 # purpose: K-Shape and Dynamic Time Warp clustering (clusters for S1, S2,
 #          and S1 & S2 normalized separately and together)
