@@ -7,8 +7,8 @@ output:
 
 ```{r}
 ##################################################################################
-# inputs:  CENT_growth_dct_spread.csv, CENT_dct_cont_growth.csv,
-#          CENT_dct_spread_cont_growth.csv, CENT_growth_dct.csv
+# inputs: CENT_growth_dct_spread.csv, CENT_dct_cont_growth.csv,
+#         CENT_dct_spread_cont_growth.csv, CENT_growth_dct.csv
 #
 # purpose: tadpole clustering (3 and 5 clusters for S1, S2 (3 and 4 clusters),
 #          S1 & S2 normalized together, and S1-S2)
