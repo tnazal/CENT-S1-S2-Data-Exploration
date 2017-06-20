@@ -1,0 +1,77 @@
+---
+title: "CENT S1-S2 Clustering Diagnostics"
+output:
+  html_notebook: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(readr)
+library(dplyr)
+```
+
+```{r}
+# read in separate C3 diagnostics files
+diagnostics_C3_growth_kmeans <- read.csv("diagnostics_C3_growth_kmeans.csv") %>% select(-X)
+diagnostics_C3_growth_kshape_dtw <- read.csv("diagnostics_C3_growth_kshape_dtw.csv") %>% select(-X)
+diagnostics_C3_growth_pca <- read.csv("diagnostics_C3_growth_pca.csv") %>% select(-X)
+diagnostics_C3_growth_tadpole <- read.csv("diagnostics_C3_growth_tadpole.csv") %>% select(-X)
+diagnostics_C3_raw_kmeans <- read.csv("diagnostics_C3_raw_kmeans.csv") %>% select(-X)
+diagnostics_C3_raw_kshape_dtw <- read.csv("diagnostics_C3_raw_kshape_dtw.csv") %>% select(-X)
+diagnostics_C3_raw_pca <- read.csv("diagnostics_C3_raw_pca.csv") %>% select(-X)
+diagnostics_C3_raw_tadpole <- read.csv("diagnostics_C3_raw_tadpole.csv") %>% select(-X)
+diagnostics_C3_rebase_kmeans <- read.csv("diagnostics_C3_rebase_kmeans.csv") %>% select(-X)
+diagnostics_C3_rebase_kshape_dtw <- read.csv("diagnostics_C3_rebase_kshape_dtw.csv") %>% select(-X)
+diagnostics_C3_rebase_pca <- read.csv("diagnostics_C3_rebase_pca.csv") %>% select(-X)
+diagnostics_C3_rebase_tadpole <- read.csv("diagnostics_C3_rebase_tadpole.csv") %>% select(-X)
+```
+
+```{r}
+# combine all C3 diagnostics
+diagnostics_C3 <- rbind(diagnostics_C3_growth_kmeans, diagnostics_C3_growth_kshape_dtw, 
+                        diagnostics_C3_growth_pca, diagnostics_C3_growth_tadpole, 
+                        diagnostics_C3_raw_kmeans, diagnostics_C3_raw_kshape_dtw, 
+                        diagnostics_C3_raw_pca, diagnostics_C3_raw_tadpole, 
+                        diagnostics_C3_rebase_kmeans, diagnostics_C3_rebase_kshape_dtw, 
+                        diagnostics_C3_rebase_pca, diagnostics_C3_rebase_tadpole)
+```
+
+```{r}
+# read in separate LS diagnostics files
+diagnostics_LS_growth_kmeans <- read.csv("diagnostics_LS_growth_kmeans.csv") %>% select(-X)
+diagnostics_LS_growth_kshape_dtw <- read.csv("diagnostics_LS_growth_kshape_dtw.csv") %>% select(-X)
+diagnostics_LS_growth_pca <- read.csv("diagnostics_LS_growth_pca.csv") %>% select(-X)
+diagnostics_LS_growth_tadpole <- read.csv("diagnostics_LS_growth_tadpole.csv") %>% select(-X)
+diagnostics_LS_raw_kmeans <- read.csv("diagnostics_LS_raw_kmeans.csv") %>% select(-X)
+diagnostics_LS_raw_kshape_dtw <- read.csv("diagnostics_LS_raw_kshape_dtw.csv") %>% select(-X)
+diagnostics_LS_raw_pca <- read.csv("diagnostics_LS_raw_pca.csv") %>% select(-X)
+diagnostics_LS_raw_tadpole <- read.csv("diagnostics_LS_raw_tadpole.csv") %>% select(-X)
+diagnostics_LS_rebase_kmeans <- read.csv("diagnostics_LS_rebase_kmeans.csv") %>% select(-X)
+diagnostics_LS_rebase_kshape_dtw <- read.csv("diagnostics_LS_rebase_kshape_dtw.csv") %>% select(-X)
+diagnostics_LS_rebase_pca <- read.csv("diagnostics_LS_rebase_pca.csv") %>% select(-X)
+diagnostics_LS_rebase_tadpole <- read.csv("diagnostics_LS_rebase_tadpole.csv") %>% select(-X)
+```
+
+```{r}
+# combine all LS diagnostics
+diagnostics_LS <- rbind(diagnostics_LS_growth_kshape_dtw, diagnostics_LS_growth_pca, 
+                        diagnostics_LS_growth_tadpole, diagnostics_LS_raw_kshape_dtw, 
+                        diagnostics_LS_raw_pca, diagnostics_LS_raw_tadpole, 
+                        diagnostics_LS_rebase_kshape_dtw, diagnostics_LS_rebase_pca, 
+                        diagnostics_LS_rebase_tadpole)
+```
+
+```{r}
+# combine all C3 and LS diagnostics
+diagnostics <- rbind(diagnostics_C3, diagnostics_LS)
+```
+
+```{r}
+# write new file with all diagnostics
+write.csv(diagnostics, "diagnostics.csv")
+```
+
