@@ -94,7 +94,7 @@ best_clusters <- diagnostics %>% group_by(stream, data, season) %>%
             smallest_ss = paste(cluster.number[which.min(within.cluster.ss)], 
                                 algorithm[which.min(within.cluster.ss)], sep = " "))
 
-best_clusters$best_number <- apply(best_clusters, 1, function(x) names(which(table(x) == max(table(x)))))
+best_clusters$best <- apply(best_clusters, 1, function(x) names(which(table(x) == max(table(x)))))
 ```
 
 ```{r}
