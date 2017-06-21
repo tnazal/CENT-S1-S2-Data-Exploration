@@ -1,0 +1,41 @@
+---
+title: "CENT S1-S2 Show Names and Best Clusters"
+output: html_notebook
+---
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+C3_raw_s1_5kmeans_clusters <- read.csv("C3_raw_s1_5kmeans_clusters.csv")
+C3_raw_s1_5kmeans_clusters <- unique(C3_raw_s1_5kmeans_clusters[, 2:3])
+C3_raw_s1_5kmeans_clusters <- rename(C3_raw_s1_5kmeans_clusters, 
+                                     C3_raw_5kmeans = cluster_kmeans_5)
+
+C3_growth_s1_5kmeans_clusters <- read.csv("C3_growth_s1_5kmeans_clusters.csv")
+C3_growth_s1_5kmeans_clusters <- unique(C3_growth_s1_5kmeans_clusters[, 2:3])
+C3_growth_s1_5kmeans_clusters <- rename(C3_growth_s1_5kmeans_clusters, 
+                                        C3_growth_5kmeans = cluster_kmeans_5)
+
+LS_raw_s1_3dtw_clusters <- read.csv("LS_raw_s1_3dtw_clusters.csv")
+LS_raw_s1_3dtw_clusters <- unique(LS_raw_s1_3dtw_clusters[, 2:3])
+LS_raw_s1_3dtw_clusters <- rename(LS_raw_s1_3dtw_clusters, 
+                                  LS_raw_3dtw = cluster_dtw_3)
+
+LS_growth_s1_5tadpole_clusters <- read.csv("LS_growth_s1_5tadpole_clusters.csv")
+LS_growth_s1_5tadpole_clusters <- unique(LS_growth_s1_5tadpole_clusters[, 3:4])
+LS_growth_s1_5tadpole_clusters <- rename(LS_growth_s1_5tadpole_clusters, 
+                                         LS_growth_5tadpole = cluster)
+```
+
+```{r}
+s1_clusters <- Reduce(function(x, y) merge(x, y, all=TRUE), 
+                      list(C3_raw_s1_5kmeans_clusters, 
+                           C3_growth_s1_5kmeans_clusters, 
+                           LS_raw_s1_3dtw_clusters, 
+                           LS_growth_s1_5tadpole_clusters))
+
+write.csv(s1_clusters, "s1_shows_best_clusters.csv")
+```
+
