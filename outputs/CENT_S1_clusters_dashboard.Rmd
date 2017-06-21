@@ -1,0 +1,404 @@
+---
+title: "CENT S1 Clusters"
+output: 
+  flexdashboard::flex_dashboard:
+    vertical_layout: scroll
+    source_code: embed
+---
+
+```{r}
+library(dplyr)
+library(plotly)
+```
+
+S1 Clusters
+===================================== 
+
+Column {data-height=1800}
+-------------------------------------
+
+###
+
+```{r, fig.height=6}
+C3_raw_s1_5kmeans_clusters <- read.csv("C3_raw_s1_5kmeans_clusters.csv") 
+
+C3_raw_s1_5kmeans_clusters_plot <- C3_raw_s1_5kmeans_clusters %>% 
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 3) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(C3_raw_s1_5kmeans_clusters_plot) %>% 
+  layout(title = "S1 with 5 K-Means Clusters (C3)", 
+         autosize = FALSE, width = 750, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+###
+
+```{r, fig.height=6}
+C3_growth_s1_4kmeans_clusters <- read.csv("C3_growth_s1_4kmeans_clusters.csv")
+
+C3_growth_s1_4kmeans_clusters_plot <- C3_growth_s1_4kmeans_clusters %>% 
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_4) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(C3_growth_s1_4kmeans_clusters_plot) %>% 
+  layout(title = "S1 with 4 K-Means Clusters (C3 Growth)", 
+         autosize = FALSE, width = 750, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+###
+
+```{r, fig.height=6}
+C3_growth_s1_5kmeans_clusters <- read.csv("C3_growth_s1_5kmeans_clusters.csv")
+
+C3_growth_s1_5kmeans_clusters_plot <- C3_growth_s1_5kmeans_clusters %>% 
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 3) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(C3_growth_s1_5kmeans_clusters_plot) %>% 
+  layout(title = "S1 with 5 K-Means Clusters (C3 Growth)", 
+         autosize = FALSE, width = 750, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+Column {data-height=1800}
+-------------------------------------
+
+###
+
+```{r, fig.height=6}
+LS_raw_s1_3dtw_clusters <- read.csv("LS_raw_s1_3dtw_clusters.csv")
+
+LS_raw_s1_3dtw_clusters_plot <- LS_raw_s1_3dtw_clusters %>%
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_dtw_3, nrow = 3) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(LS_raw_s1_3dtw_clusters_plot) %>% 
+  layout(title = "S1 with 3 DTW Clusters (LS)", 
+         autosize = FALSE, width = 650, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+###
+
+```{r, fig.height=6}
+LS_growth_s1_5tadpole_clusters <- read.csv("LS_growth_s1_5tadpole_clusters.csv")
+
+LS_growth_s1_5tadpole_clusters_plot <- LS_growth_s1_5tadpole_clusters %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster, nrow = 3) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(LS_growth_s1_5tadpole_clusters_plot) %>% 
+  layout(title = "S1 with 5 TADpole Clusters (LS Growth)", 
+         autosize = FALSE, width = 650, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+C3 & LS Impressions
+============================================== 
+
+Column {data-height=850} {.tabset}
+-------------------------------------
+
+### S1 Clusters & S2 Trends
+
+```{r, fig.height=8.5}
+C3_raw_s1_5kmeans_s2trends <- read.csv("C3_raw_s1_5kmeans_s2trends.csv")
+
+C3_raw_s1_5kmeans_s2trends_plot <- plot_ly(C3_raw_s1_5kmeans_s2trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_kmeans_5), 
+        legendgroup = ~cluster_kmeans_5) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1 with 5 K-Means Clusters & S2 Trends (C3)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+C3_raw_s1_5kmeans_s2trends_plot
+```
+
+### S1-S2 Trends by S1 Clusters
+
+```{r, fig.height=8.5}
+C3_raw_s1_5kmeans_cont_trends <- read.csv("C3_raw_s1_5kmeans_cont_trends.csv") 
+
+C3_raw_s1_5kmeans_cont_trends_plot <- plot_ly(C3_raw_s1_5kmeans_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 K-Means Clusters (C3)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+C3_raw_s1_5kmeans_cont_trends_plot
+```
+
+Column {data-height=850} {.tabset}
+-------------------------------------
+
+### S1 Clusters & S2 Trends
+
+```{r, fig.height=8.5}
+LS_raw_s1_3dtw_s2trends <- read.csv("LS_raw_s1_3dtw_s2trends.csv")
+
+LS_raw_s1_3dtw_s2trends_plot <- plot_ly(LS_raw_s1_3dtw_s2trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_dtw_3), 
+        legendgroup = ~cluster_dtw_3) %>% 
+  add_lines() %>% 
+  subplot(nrows = 3, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1 with 3 DTW Clusters & S2 Trends (LS)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+LS_raw_s1_3dtw_s2trends_plot
+```
+
+### S1-S2 Trends by S1 Clusters
+
+```{r, fig.height=8.5}
+LS_raw_s1_3dtw_cont_trends <- read.csv("LS_raw_s1_3dtw_cont_trends.csv") 
+
+LS_raw_s1_3dtw_cont_trends_plot <- plot_ly(LS_raw_s1_3dtw_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 3, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 DTW Clusters (LS)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+LS_raw_s1_3dtw_cont_trends_plot
+```
+
+C3 & LS Growth
+============================================== 
+
+Column {data-height=850} {.tabset}
+-------------------------------------
+
+### S1 Clusters & S2 Trends (4)
+
+```{r, fig.height=8.5}
+C3_growth_s1_4kmeans_s2trends <- read.csv("C3_growth_s1_4kmeans_s2trends.csv")
+
+C3_growth_s1_4kmeans_s2trends_plot <- plot_ly(C3_growth_s1_4kmeans_s2trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_kmeans_4), 
+        legendgroup = ~cluster_kmeans_4) %>% 
+  add_lines() %>% 
+  subplot(nrows = 4, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1 with 4 K-Means Clusters & S2 Trends (C3 Growth)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+C3_growth_s1_4kmeans_s2trends_plot
+```
+
+### S1-S2 Trends by S1 Clusters (4)
+
+```{r, fig.height=8.5}
+C3_growth_s1_4kmeans_cont_trends <- read.csv("C3_growth_s1_4kmeans_cont_trends.csv") 
+
+C3_growth_s1_4kmeans_cont_trends_plot <- plot_ly(C3_growth_s1_4kmeans_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 4, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 4 K-Means Clusters (C3 Growth)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+C3_growth_s1_4kmeans_cont_trends_plot
+```
+
+### S1 Clusters & S2 Trends (5)
+
+```{r, fig.height=8.5}
+C3_growth_s1_5kmeans_s2trends <- read.csv("C3_growth_s1_5kmeans_s2trends.csv")
+
+C3_growth_s1_5kmeans_s2trends_plot <- plot_ly(C3_growth_s1_5kmeans_s2trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_kmeans_5), 
+        legendgroup = ~cluster_kmeans_5) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1 with 5 K-Means Clusters & S2 Trends (C3 Growth)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+C3_growth_s1_5kmeans_s2trends_plot
+```
+
+### S1-S2 Trends by S1 Clusters (5)
+
+```{r, fig.height=8.5}
+C3_growth_s1_5kmeans_cont_trends <- read.csv("C3_growth_s1_5kmeans_cont_trends.csv") 
+
+C3_growth_s1_5kmeans_cont_trends_plot <- plot_ly(C3_growth_s1_5kmeans_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 5 K-Means Clusters (C3 Growth)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+C3_growth_s1_5kmeans_cont_trends_plot
+```
+
+Column {data-height=850} {.tabset}
+-------------------------------------
+
+### S1 Clusters & S2 Trends
+
+```{r, fig.height=8.5}
+LS_growth_s1_5tadpole_s2trends <- read.csv("LS_growth_s1_5tadpole_s2trends.csv") 
+
+LS_growth_s1_5tadpole_s2trends_plot <- plot_ly(LS_growth_s1_5tadpole_s2trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster), 
+        legendgroup = ~cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1 with 5 TADpole Clusters & S2 Trends (LS Growth)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+LS_growth_s1_5tadpole_s2trends_plot
+```
+
+### S1-S2 Trends by S1 Clusters
+
+```{r, fig.height=8.5}
+LS_growth_s1_5tadpole_cont_trends <- read.csv("LS_growth_s1_5tadpole_cont_trends.csv") 
+
+LS_growth_s1_5tadpole_cont_trends_plot <- plot_ly(LS_growth_s1_5tadpole_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 5 TADpole Clusters (LS Growth)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+LS_growth_s1_5tadpole_cont_trends_plot
+```
+
