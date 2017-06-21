@@ -953,11 +953,11 @@ season1_kmeans4_clusters <- clusters4_s1_spread %>%
   rename(s1_cluster = cluster_kmeans_4)
 
 s1_4clusters_cont_trends <- merge(season1_kmeans4_clusters, 
-                                 dct_spread_cont, by = "Show_Name") %>% 
+                                  dct_spread_cont, by = "Show_Name") %>% 
   select(-X)
 
 s1_4clusters_cont_trends <- merge(s1_4clusters_cont_trends[, c("Show_Name", "s1_cluster")], 
-                                 dct_cont, by = "Show_Name") %>% 
+                                  dct_cont, by = "Show_Name") %>% 
   select(-X)
 ```
 
