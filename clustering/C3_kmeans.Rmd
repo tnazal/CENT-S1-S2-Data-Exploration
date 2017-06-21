@@ -247,6 +247,10 @@ clusters5_s1_spread <- assignments_s1 %>%
 clusters5_s1 <- merge(clusters5_s1_spread[, c("cluster_kmeans_5", "Show_Name")], 
                       dct_df, by = "Show_Name")
 
+write.csv(clusters5_s1, "C3_raw_s1_5kmeans_clusters.csv")
+```
+
+```{r}
 clusters5_s1_plot <- clusters5_s1 %>% 
   filter(Season_num == 1) %>% 
   ggplot(aes(x = period, y = dct_values, 
@@ -273,7 +277,7 @@ s1_5clusters
 ```
 
 ```{r}
-# PLOT FOR S1 CLUSTERS & S2 TRENDS
+# S1 CLUSTERS & S2 TRENDS
 s1_5clusters_s2_trends <- bind_cols(clusters5_s1_spread, 
                                     s2_spread[, 2:ncol(s2_spread)])
 
@@ -285,6 +289,11 @@ dct_s1_5clusters_s2_trends <- s1_5clusters_s2_trends %>%
   group_by(Network, Show_Name) %>% 
   mutate(period = row_number())
 
+write.csv(dct_s1_5clusters_s2_trends, "C3_raw_s1_5kmeans_s2trends.csv")
+```
+
+```{r}
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
 s1_5clusters_s2_trends_plot <- dct_s1_5clusters_s2_trends %>%
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
@@ -897,6 +906,7 @@ cont_5clusters
 ```
 
 ```{r}
+# Continuous Trends Clustered on S1 Clusters
 season1_kmeans5_clusters <- clusters5_s1_spread %>% 
   select(Show_Name, cluster_kmeans_5) %>% 
   rename(s1_cluster = cluster_kmeans_5)
@@ -909,7 +919,11 @@ s1_clusters_cont_trends <- merge(s1_clusters_cont_trends[, c("Show_Name", "s1_cl
                                  dct_cont, by = "Show_Name") %>% 
   select(-X)
 
+write.csv(s1_clusters_cont_trends, "C3_raw_s1_5kmeans_cont_trends.csv") 
+```
 
+```{r}
+# Plot for Continuous Trends Clustered on S1 Clusters
 s1_clusters_cont_trends_plot <- plot_ly(s1_clusters_cont_trends, 
         x = ~period, 
         y = ~dct_values, 
@@ -933,6 +947,7 @@ s1_clusters_cont_trends_plot
 ```
 
 ```{r}
+# Continuous Trends Clustered on S1 Clusters
 season1_kmeans4_clusters <- clusters4_s1_spread %>% 
   select(Show_Name, cluster_kmeans_4) %>% 
   rename(s1_cluster = cluster_kmeans_4)
@@ -944,8 +959,10 @@ s1_4clusters_cont_trends <- merge(season1_kmeans4_clusters,
 s1_4clusters_cont_trends <- merge(s1_4clusters_cont_trends[, c("Show_Name", "s1_cluster")], 
                                  dct_cont, by = "Show_Name") %>% 
   select(-X)
+```
 
-
+```{r}
+# Plot for Continuous Trends Clustered on S1 Clusters
 s1_4clusters_cont_trends_plot <- plot_ly(s1_4clusters_cont_trends, 
         x = ~period, 
         y = ~dct_values, 
@@ -961,6 +978,7 @@ s1_4clusters_cont_trends_plot <- plot_ly(s1_4clusters_cont_trends,
                        r = 50, 
                        b = 50, 
                        t = 125))
+
 s1_4clusters_cont_trends_plot
 ```
 
