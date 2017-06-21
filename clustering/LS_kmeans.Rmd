@@ -311,6 +311,20 @@ plot_ly(dct_s1_5clusters_s2_trends,
          title = "Season 1 with 5 K-Means Clusters & Season 2 Trends (LS)")
 ```
 
+```{r}
+# TEST PLOT WITH GROUPINGS BY CLUSTER
+plot_ly(dct_s1_5clusters_s2_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_kmeans_5), 
+        legendgroup = ~cluster_kmeans_5) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "Season 1 with 5 K-Means Clusters & Season 2 Trends (LS)")
+```
+
 
 ----------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------
