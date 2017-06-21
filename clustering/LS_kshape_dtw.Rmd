@@ -223,6 +223,29 @@ ggplotly(s1_3clusters_dtw_s2_trends_plot) %>%
          margin = list(t = 150))
 ```
 
+```{r}
+# TEST PLOT FOR S1 CLUSTERS & s2 TRENDS BY CLUSTER
+dct_s1_3clusters_dtw_s2_trends_plot <- plot_ly(dct_s1_3clusters_dtw_s2_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_dtw_3), 
+        legendgroup = ~cluster_dtw_3) %>% 
+  add_lines() %>% 
+  subplot(nrows = 3, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1 with 3 DTW Clusters & S2 Trends (LS)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+dct_s1_3clusters_dtw_s2_trends_plot
+```
+
+
 # Season 2 Time Series Clustering
 
 ```{r}
@@ -598,45 +621,40 @@ cont_2clusters_dtw
 
 ```{r}
 # S1-S2 Trends Clustered on S1 3 DTW Clusters
-clusters_cont_dtw3_spread <- dct_spread_cont
-clusters_cont_dtw3_spread$cluster_dtw_3 <- dtw_cont$k_3@cluster
-
-clusters_cont_dtw3 <- merge(clusters_cont_dtw3_spread[, c("cluster_dtw_3", "Show_Name")], 
-                            dct_cont, by = "Show_Name")
-
-season1_dtw3_clusters <- clusters_cont_dtw3_spread %>% 
+season1_dtw3_clusters <- clusters_s1_dtw3_spread %>% 
   select(Show_Name, cluster_dtw_3) %>% 
   rename(s1_cluster = cluster_dtw_3)
 
-s1_clusters_cont_trends <- merge(season1_dtw3_clusters, 
-                                 dct_spread_cont, by = "Show_Name") %>% 
+s1_3clusters_cont_trends <- merge(season1_dtw3_clusters, 
+                                  dct_spread_cont, by = "Show_Name") %>% 
   select(-X)
 
-s1_clusters_cont_trends <- merge(s1_clusters_cont_trends[, c("Show_Name", "s1_cluster")], 
-                                 dct_cont, by = "Show_Name") %>% 
+s1_3clusters_cont_trends <- merge(s1_3clusters_cont_trends[, c("Show_Name", "s1_cluster")], 
+                                  dct_cont, by = "Show_Name") %>% 
   select(-X)
 
-write.csv(s1_clusters_cont_trends, "LS_raw_s1_3dtw_cont_trends.csv") 
+write.csv(s1_3clusters_cont_trends, "LS_raw_s1_3dtw_cont_trends.csv") 
 ```
 
 ```{r}
-# Plot for S1-S2 Trends Clustered on S1 3 DTW Clusters
-s1_clusters_cont_trends_plot <- plot_ly(s1_clusters_cont_trends, 
+# Plot for Continuous Trends Clustered on S1 Clusters
+s1_3clusters_cont_trends_plot <- plot_ly(s1_3clusters_cont_trends, 
         x = ~period, 
         y = ~dct_values, 
         color = ~Show_Name,
         yaxis = ~paste0('y', s1_cluster), 
         legendgroup = ~s1_cluster) %>% 
   add_lines() %>% 
-  subplot(nrows = 3, shareX = TRUE) %>% 
+  subplot(nrows = 4, shareX = TRUE) %>% 
   layout(showlegend = TRUE, 
          title = "S1-S2 Clustered on S1 Clusters (LS)", 
-         autosize = FALSE, width = 650, height = 800, 
+         autosize = FALSE, width = 650, height = 750, 
          margin = list(l = 50, 
                        r = 50, 
                        b = 50, 
                        t = 125))
-s1_clusters_cont_trends_plot
+
+s1_3clusters_cont_trends_plot
 ```
 
 # Diagnostics
