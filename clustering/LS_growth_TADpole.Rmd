@@ -46,7 +46,7 @@ dtw_df_s1 <- dct_spread %>%
 set.seed(12)
 tadpole_clust5_s1 <- TADPole(dtw_df_s1, k = 5L, window.size = 2, dc = 2)
 
-tadpole_clust5_s1_df<- dct_spread %>% 
+tadpole_clust5_s1_df <- dct_spread %>% 
   filter(Season_num == 1) %>% 
   select(-Season_num)
 
@@ -57,6 +57,10 @@ tadpole5_s1_long <- gather(tadpole_clust5_s1_df, key = period, value = dct_value
 tadpole5_s1_long$period <- as.numeric(sub("X", "", tadpole5_s1_long$period))
 tadpole5_s1_long$period <- as.numeric(tadpole5_s1_long$period)
 
+write.csv(tadpole5_s1_long, "LS_growth_s1_5tadpole_clusters.csv")
+```
+
+```{r}
 tadpole5_s1_plot <- tadpole5_s1_long %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
@@ -80,7 +84,7 @@ tadpole_s1_5clusters
 ```
 
 ```{r}
-# PLOT FOR S1 CLUSTERS & S2 TRENDS
+# S1 CLUSTERS & S2 TRENDS
 s2_spread <- dct_spread %>% 
   filter(Season_num == 2) %>%
   ungroup() %>%
@@ -101,6 +105,12 @@ dct_s1_5clusters_tadpole_s2_trends <- s1_5clusters_tadpole_s2_trends %>%
   group_by(Network, Show_Name) %>% 
   mutate(period = row_number())
 
+LS_growth_s1_5tadpole_s2trends <- write.csv(dct_s1_5clusters_tadpole_s2_trends, 
+                                            "LS_growth_s1_5tadpole_s2trends.csv")
+```
+
+```{r}
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
 s1_5clusters_tadpole_s2_trends_plot <- dct_s1_5clusters_tadpole_s2_trends %>%
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
@@ -348,6 +358,43 @@ tadpole_cont_3clusters <- list(as.character(unique(tadpole_clust3_cont_df[tadpol
 
 tadpole_cont_3clusters
 
+```
+
+```{r}
+# Continuous Trends Clustered on S1 Clusters
+season1_tadpole5_clusters <- tadpole_clust5_s1_df %>% 
+  select(Show_Name, cluster) %>% 
+  rename(s1_cluster = cluster)
+
+s1_clusters_cont_trends <- merge(season1_tadpole5_clusters, 
+                                 dct_spread_cont, by = "Show_Name") %>% 
+  select(-X)
+
+s1_clusters_cont_trends <- merge(s1_clusters_cont_trends[, c("Show_Name", "s1_cluster")], 
+                                 dct_cont, by = "Show_Name") %>% 
+  select(-X)
+
+write.csv(s1_clusters_cont_trends, "LS_growth_s1_5tadpole_cont_trends.csv") 
+```
+
+```{r}
+s1_clusters_cont_trends_plot <- plot_ly(s1_clusters_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 Clusters (LS Growth)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+
+s1_clusters_cont_trends_plot
 ```
 
 
