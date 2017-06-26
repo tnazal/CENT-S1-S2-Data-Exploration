@@ -31,7 +31,7 @@ library(tidyr)
 
 Read data
 ```{r}
-df_with_dct <- read.csv("CENT_dct.csv")
+df_with_dct <- read.csv("CENT_dct_40p.csv")
 df <- df_with_dct %>% group_by(Network, Show_Name, Season_num) %>% 
   mutate(growth = lag(dct_values, 1) / dct_values)
 ```
@@ -88,10 +88,12 @@ DCT_trends <- ggplotly(ggplot(df %>% filter(Season_num < 3)) +
                        r = 50, 
                        b = 50, 
                        t = 125))
+
+DCT_trends
 ```
 
 ```{r}
-htmlwidgets::saveWidget(DCT_trends, "DCT_trends.html", selfcontained = TRUE)
+#htmlwidgets::saveWidget(DCT_trends, "DCT_trends.html", selfcontained = TRUE)
 ```
 
 ```{r}
@@ -125,10 +127,12 @@ DCT_linear <- ggplotly(ggplot(df %>% filter (Season_num < 3)) +
                        r = 50, 
                        b = 50, 
                        t = 125))
+
+DCT_linear
 ```
 
 ```{r}
-htmlwidgets::saveWidget(DCT_linear, "DCT_linear.html", selfcontained = TRUE)
+#htmlwidgets::saveWidget(DCT_linear, "DCT_linear.html", selfcontained = TRUE)
 ```
 
 # Growth
@@ -182,10 +186,12 @@ DCT_growth_trends <- ggplotly(ggplot(df_growth %>% filter(Season_num < 3)) +
                        r = 50, 
                        b = 50, 
                        t = 125))
+
+DCT_growth_trends
 ```
 
 ```{r}
-htmlwidgets::saveWidget(DCT_growth_trends, "DCT_growth_trends.html", selfcontained = TRUE) 
+#htmlwidgets::saveWidget(DCT_growth_trends, "DCT_growth_trends.html", selfcontained = TRUE) 
 ```
 
 ```{r}
@@ -219,10 +225,12 @@ DCT_growth_linear <- ggplotly(ggplot(df_growth  %>% filter (Season_num < 3)) +
                        r = 50, 
                        b = 50, 
                        t = 125))
+
+DCT_growth_linear
 ```
 
 ```{r}
-htmlwidgets::saveWidget(DCT_growth_linear, "DCT_growth_linear.html", selfcontained = TRUE)
+#htmlwidgets::saveWidget(DCT_growth_linear, "DCT_growth_linear.html", selfcontained = TRUE)
 ```
 
 # Rebase
@@ -275,10 +283,12 @@ DCT_rebase_trends <- ggplotly(ggplot(df_rebase %>% filter(Season_num < 3)) +
                        r = 50, 
                        b = 50, 
                        t = 125))
+
+DCT_rebase_trends
 ```
 
 ```{r}
-htmlwidgets::saveWidget(DCT_rebase_trends, "DCT_rebase_trends.html", selfcontained = TRUE)
+#htmlwidgets::saveWidget(DCT_rebase_trends, "DCT_rebase_trends.html", selfcontained = TRUE)
 ```
 
 ```{r}
@@ -312,9 +322,10 @@ DCT_rebase_linear <- ggplotly(ggplot(df_rebase %>% filter(Season_num < 3)) +
                        r = 50, 
                        b = 50, 
                        t = 125))
+
+DCT_rebase_linear
 ```
 
 ```{r}
-htmlwidgets::saveWidget(DCT_rebase_linear, "DCT_rebase_linear.html", selfcontained = TRUE) 
+#htmlwidgets::saveWidget(DCT_rebase_linear, "DCT_rebase_linear.html", selfcontained = TRUE) 
 ```
-
