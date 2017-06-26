@@ -9,8 +9,8 @@ output:
 ##################################################################################
 # inputs: CENT_showlevel.csv, s1_shows_best_clusters.csv
 #
-# purpose: Exploratory plots for raw, growth and 1st episode rebase trends,
-#          non-normalized impressions, clusters from nomralized data
+# purpose: Exploratory plots for raw and growth trends,
+#          non-normalized impressions, clusters from normalized data
 ##################################################################################
 ```
 
