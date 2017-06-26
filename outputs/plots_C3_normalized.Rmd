@@ -31,7 +31,7 @@ library(tidyr)
 
 Read data
 ```{r}
-df_with_dct <- read.csv("CENT_dct_40p.csv")
+df_with_dct <- read.csv("CENT_dct.csv")
 df <- df_with_dct %>% group_by(Network, Show_Name, Season_num) %>% 
   mutate(growth = lag(dct_values, 1) / dct_values)
 ```
