@@ -35,7 +35,8 @@ s1_clusters <- Reduce(function(x, y) merge(x, y, all=TRUE),
                            C3_growth_s1_5kmeans_clusters, 
                            LS_raw_s1_3dtw_clusters, 
                            LS_growth_s1_5tadpole_clusters))
-
-write.csv(s1_clusters, "s1_shows_best_clusters.csv")
 ```
 
+```{r}
+write.csv(s1_clusters, "s1_shows_best_clusters.csv")
+```
