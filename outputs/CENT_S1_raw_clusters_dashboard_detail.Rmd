@@ -1,5 +1,5 @@
 ---
-title: "CENT S1 Clusters. Raw Impressions. Detail "
+title: "CENT S1 Raw Clusters. Raw Impressions. Detail "
 output: 
   flexdashboard::flex_dashboard:
     vertical_layout: scroll
