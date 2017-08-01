@@ -49,3 +49,14 @@ df_showlevel <- ddply(subset(yourdata,  Source == "Nielsen" & LF_Season == 1),
                      C3_Dur = sum(SC3_C_Dur),  
                      C3_Imps = sum(SC3_Impressions * SC3_C_Dur)/C3_Dur)                     
 ```
+
+# More Exploration
+*	Why are C3 and LS clusters different? Deeper dive into them... Perhaps: 
+ 	* start with differences between C3-LS for every show
+  * try to cluster on these differences or think of ways to incorporate this info into the clusters
+* Further explorations of features of shows in each cluster: 
+  * proportions of DOW, Start Time, changes in DOW, Start Time
+
+### Worth Trying:
+* clustering with normalized C3 and LS curves
+*	explore clustering together normalized raw, growth, lagged, etc
