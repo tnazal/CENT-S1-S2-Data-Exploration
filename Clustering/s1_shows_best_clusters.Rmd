@@ -1,0 +1,90 @@
+---
+title: "CENT S1-S2 Show Names and Best Clusters"
+output: html_notebook
+---
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+kmeans_C3_raw_s1_5cl <- read.csv("kmeans_C3_raw_s1_5cl.csv")
+kmeans_C3_raw_s1_5cl <- unique(kmeans_C3_raw_s1_5cl[, c("Show_Name", "cluster_kmeans_5")])
+kmeans_C3_raw_s1_5cl <- rename(kmeans_C3_raw_s1_5cl, 
+                               C3_raw_cluster = cluster_kmeans_5)
+
+kmeans_C3_growth_s1_5cl <- read.csv("kmeans_C3_growth_s1_5cl.csv")
+kmeans_C3_growth_s1_5cl <- unique(kmeans_C3_growth_s1_5cl[, c("Show_Name", "cluster_kmeans_5")])
+kmeans_C3_growth_s1_5cl <- rename(kmeans_C3_growth_s1_5cl, 
+                                  C3_growth_cluster = cluster_kmeans_5)
+
+kmeans_LS_raw_s1_5cl <- read.csv("kmeans_LS_raw_s1_5cl.csv")
+kmeans_LS_raw_s1_5cl <- unique(kmeans_LS_raw_s1_5cl[, c("Show_Name", "cluster_kmeans_5")])
+kmeans_LS_raw_s1_5cl <- rename(kmeans_LS_raw_s1_5cl, 
+                               LS_raw_cluster = cluster_kmeans_5)
+
+kmeans_LS_growth_s1_5cl <- read.csv("kmeans_LS_growth_s1_5cl.csv")
+kmeans_LS_growth_s1_5cl <- unique(kmeans_LS_growth_s1_5cl[, c("Show_Name", "cluster_kmeans_5")])
+kmeans_LS_growth_s1_5cl <- rename(kmeans_LS_growth_s1_5cl, 
+                                  LS_growth_cluster = cluster_kmeans_5)
+
+kmeans_raw_growth_C3_s1_5cl <- read.csv("kmeans_raw_growth_C3_s1_5cl.csv")
+kmeans_raw_growth_C3_s1_5cl <- unique(kmeans_raw_growth_C3_s1_5cl[, c("Show_Name", "cluster_kmeans_5")])
+kmeans_raw_growth_C3_s1_5cl <- rename(kmeans_raw_growth_C3_s1_5cl, 
+                                      raw_growth_C3_cluster = cluster_kmeans_5)
+
+kmeans_raw_growth_LS_s1_5cl <- read.csv("kmeans_raw_growth_LS_s1_5cl.csv")
+kmeans_raw_growth_LS_s1_5cl <- unique(kmeans_raw_growth_LS_s1_5cl[, c("Show_Name", "cluster_kmeans_5")])
+kmeans_raw_growth_LS_s1_5cl <- rename(kmeans_raw_growth_LS_s1_5cl, 
+                                      raw_growth_LS_cluster = cluster_kmeans_5)
+
+kmeans_C3_LS_raw_s1_5cl <- read.csv("kmeans_C3_LS_raw_s1_5cl.csv")
+kmeans_C3_LS_raw_s1_5cl <- unique(kmeans_C3_LS_raw_s1_5cl[, c("Show_Name", "cluster_kmeans_5")])
+kmeans_C3_LS_raw_s1_5cl <- rename(kmeans_C3_LS_raw_s1_5cl, 
+                                  C3_LS_raw_cluster = cluster_kmeans_5)
+
+kmeans_C3_LS_raw_diff_s1_5cl <- read.csv("kmeans_C3_LS_raw_diff_s1_5cl.csv")
+kmeans_C3_LS_raw_diff_s1_5cl <- unique(kmeans_C3_LS_raw_diff_s1_5cl[, c("Show_Name", "cluster_kmeans_5")])
+kmeans_C3_LS_raw_diff_s1_5cl <- rename(kmeans_C3_LS_raw_diff_s1_5cl, 
+                                      C3_LS_raw_diff_cluster = cluster_kmeans_5)
+
+kmeans_C3_LS_raw_avg_s1_5cl <- read.csv("kmeans_C3_LS_raw_avg_s1_5cl.csv")
+kmeans_C3_LS_raw_avg_s1_5cl <- unique(kmeans_C3_LS_raw_avg_s1_5cl[, c("Show_Name", "cluster_kmeans_5")])
+kmeans_C3_LS_raw_avg_s1_5cl <- rename(kmeans_C3_LS_raw_avg_s1_5cl, 
+                                      C3_LS_raw_avg_cluster = cluster_kmeans_5)
+
+kmeans_C3_LS_growth_s1_5cl <- read.csv("kmeans_C3_LS_growth_s1_5cl.csv")
+kmeans_C3_LS_growth_s1_5cl <- unique(kmeans_C3_LS_growth_s1_5cl[, c("Show_Name", "cluster_kmeans_5")])
+kmeans_C3_LS_growth_s1_5cl <- rename(kmeans_C3_LS_growth_s1_5cl, 
+                                     C3_LS_growth_cluster = cluster_kmeans_5)
+
+kmeans_C3_LS_growth_diff_s1_5cl <- read.csv("kmeans_C3_LS_growth_diff_s1_5cl.csv")
+kmeans_C3_LS_growth_diff_s1_5cl <- unique(kmeans_C3_LS_growth_diff_s1_5cl[, c("Show_Name", "cluster_kmeans_5")])
+kmeans_C3_LS_growth_diff_s1_5cl <- rename(kmeans_C3_LS_growth_diff_s1_5cl, 
+                                          C3_LS_growth_diff_cluster = cluster_kmeans_5)
+
+kmeans_C3_LS_growth_avg_s1_5cl <- read.csv("kmeans_C3_LS_growth_avg_s1_5cl.csv")
+kmeans_C3_LS_growth_avg_s1_5cl <- unique(kmeans_C3_LS_growth_avg_s1_5cl[, c("Show_Name", "cluster_kmeans_5")])
+kmeans_C3_LS_growth_avg_s1_5cl <- rename(kmeans_C3_LS_growth_avg_s1_5cl, 
+                                         C3_LS_growth_avg_cluster = cluster_kmeans_5)
+```
+
+```{r}
+s1_clusters <- Reduce(function(x, y) merge(x, y, all = TRUE), 
+                      list(kmeans_C3_raw_s1_5cl, 
+                           kmeans_C3_growth_s1_5cl, 
+                           kmeans_LS_raw_s1_5cl, 
+                           kmeans_LS_growth_s1_5cl, 
+                           kmeans_raw_growth_C3_s1_5cl, 
+                           kmeans_raw_growth_LS_s1_5cl, 
+                           kmeans_C3_LS_raw_s1_5cl, 
+                           kmeans_C3_LS_raw_diff_s1_5cl, 
+                           kmeans_C3_LS_raw_avg_s1_5cl, 
+                           kmeans_C3_LS_growth_s1_5cl, 
+                           kmeans_C3_LS_growth_diff_s1_5cl, 
+                           kmeans_C3_LS_growth_avg_s1_5cl))
+```
+
+```{r}
+write.csv(s1_clusters, "s1_shows_best_clusters.csv")
+```
