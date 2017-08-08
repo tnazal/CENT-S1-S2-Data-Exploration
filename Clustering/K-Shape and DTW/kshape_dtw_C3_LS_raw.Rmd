@@ -1,0 +1,436 @@
+---
+title: "CENT S1-S2 K-Shape and DTW Clustering on C3 & LS Impressions"
+output:
+  html_notebook: default
+  html_document: default
+---
+
+```{r}
+##################################################################################
+# inputs: dct_C3_LS_raw.csv, dct_spread_C3_LS_raw.csv, 
+#         dct_C3_LS_diff.csv, dct_spread_C3_LS_diff.csv, 
+#         dct_C3_LS_avg.csv, dct_spread_C3_LS_avg.csv
+#
+# purpose: K-Shape and Dynamic Time Warp clustering on C3 & LS appended, 
+#          differences, and averages
+##################################################################################
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(dplyr)
+library(broom)
+library(ggplot2)
+library(plotly)
+library(dtwclust)
+library(fpc)
+```
+
+# Clustering Season 1 on C3 & LS Appended
+
+From example here: https://cran.r-project.org/web/packages/dtwclust/vignettes/dtwclust.pdf.
+
+```{r}
+dct_df <- read.csv("dct_C3_LS_raw.csv")
+dct_spread <- read.csv("dct_spread_C3_LS_raw.csv")
+```
+
+```{r}
+cluster_s1 <- dct_spread %>% 
+  filter(Season_num == 1) %>%
+  ungroup() %>%
+  select(-X, -Network, -Season_num, -Show_Name)
+```
+
+## K-Shape Clustering 
+
+```{r}
+kshape_s1 <- tsclust(cluster_s1, 
+                     type = 'partitional',
+                     k = 2:5,
+                     preproc = zscore,
+                     distance = 'sbd',
+                     centroid = 'shape',
+                     trace = FALSE,
+                     seed = 12)
+
+names(kshape_s1) <- paste0('k_', 2:5)
+sapply(kshape_s1, cvi, type = 'internal')
+which.max(sapply(kshape_s1, cvi, type = 'internal')['Sil',])
+```
+
+```{r}
+table(kshape_s1$k_5@cluster)
+```
+
+```{r}
+plot(kshape_s1$k_5, type = 'sc')
+```
+
+```{r}
+# export cluster predictions to the main data set
+clusters_s1_shape5_spread <- dct_spread %>% filter(Season_num == 1)
+clusters_s1_shape5_spread$cluster_shape_5 <- kshape_s1$k_5@cluster
+
+clusters_s1_shape5 <- merge(clusters_s1_shape5_spread[, c("cluster_shape_5", "Show_Name")], 
+                            dct_df, by = "Show_Name")
+```
+
+```{r}
+clusters_s1_shape5_plot <- clusters_s1_shape5 %>%
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_shape_5, nrow = 3) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(clusters_s1_shape5_plot) %>% 
+  layout(title = "Season 1 with 5 K-Shape Clusters (C3 & LS)", 
+         margin = list(t = 150))
+```
+
+
+## Dynamic Time Warp Clustering
+
+```{r}
+dtw_s1 <- tsclust(cluster_s1,
+                  type = 'partitional',
+                  k = 2:5,
+                  distance = 'dtw_lb',
+                  centroid = 'pam',
+                  control = partitional_control(iter.max = 25),
+                  args = tsclust_args(dist = list()),
+                  window.size = 20,
+                  trace = FALSE,
+                  seed = 12)
+
+names(dtw_s1) <- paste0('k_', 2:5)
+sapply(dtw_s1, cvi)
+which.max(sapply(dtw_s1, cvi, type = 'internal')['Sil',])
+```
+
+```{r}
+table(dtw_s1$k_4@cluster)
+```
+
+```{r}
+plot(dtw_s1$k_4, type = 'sc')
+```
+
+```{r}
+# export cluster predictions to the main data set
+clusters_s1_dtw4_spread <- dct_spread %>% filter(Season_num == 1)
+clusters_s1_dtw4_spread$cluster_dtw_4 <- dtw_s1$k_4@cluster
+
+clusters_s1_dtw4 <- merge(clusters_s1_dtw4_spread[, c("cluster_dtw_4", "Show_Name")], 
+                          dct_df, by = "Show_Name")
+```
+
+```{r}
+clusters_s1_dtw4_plot <- clusters_s1_dtw4 %>%
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_dtw_4) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(clusters_s1_dtw4_plot) %>% 
+  layout(title = "Season 1 with 4 DTW Clusters (C3 & LS)", 
+         margin = list(t = 150))
+```
+
+
+# S1 Clustering on C3-LS Differencs 
+
+```{r}
+dct_diff <- read.csv("dct_C3_LS_diff.csv")
+dct_spread_diff <- read.csv("dct_spread_C3_LS_diff.csv")
+```
+
+```{r}
+cluster_diff <- dct_spread_diff %>% 
+  filter(Season_num == 1) %>%
+  ungroup() %>%
+  select(-X, -Network, -Season_num, -Show_Name)
+```
+
+```{r}
+kshape_diff <- tsclust(cluster_diff, 
+                        type = 'partitional',
+                        k = 2:5,
+                        preproc = zscore,
+                        distance = 'sbd',
+                        centroid = 'shape',
+                        trace = FALSE,
+                        seed = 12)
+
+names(kshape_diff) <- paste0('k_', 2:5)
+sapply(kshape_diff, cvi, type = 'internal')
+which.max(sapply(kshape_diff, cvi, type = 'internal')['Sil',])
+```
+
+```{r}
+table(kshape_diff$k_4@cluster)
+```
+
+```{r}
+plot(kshape_diff$k_4, type = 'sc')
+```
+
+```{r}
+# export cluster predictions to the main data set
+clusters_diff_shape4_spread <- dct_spread_diff %>% filter(Season_num == 1)
+clusters_diff_shape4_spread$cluster_shape_4 <- kshape_diff$k_4@cluster
+
+clusters_diff_shape4 <- merge(clusters_diff_shape4_spread[, c("cluster_shape_4", "Show_Name")], 
+                               dct_diff, by = "Show_Name")
+```
+
+```{r}
+clusters_diff_shape4_plot <- clusters_diff_shape4 %>%
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_shape_4, nrow = 4) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(clusters_diff_shape4_plot) %>% 
+  layout(title = "S1 with 4 K-Shape Clusters (C3-LS Differences)", 
+         margin = list(t = 150))
+```
+
+
+## Dynamic Time Warp Clustering
+
+```{r}
+dtw_diff <- tsclust(cluster_diff,
+                     type = 'partitional',
+                     k = 2:5,
+                     distance = 'dtw_lb',
+                     centroid = 'pam',
+                     control = partitional_control(iter.max = 25),
+                     args = tsclust_args(dist = list()),
+                     window.size = 20,
+                     trace = FALSE,
+                     seed = 12)
+
+names(dtw_diff) <- paste0('k_', 2:5)
+sapply(dtw_diff, cvi)
+which.max(sapply(dtw_diff, cvi, type = 'internal')['Sil',])
+```
+
+```{r}
+table(dtw_diff$k_3@cluster)
+```
+
+```{r}
+plot(dtw_diff$k_3, type = 'sc')
+```
+
+```{r}
+# export cluster predictions to the main data set
+clusters_diff_dtw3_spread <- dct_spread_diff %>% filter(Season_num == 1)
+clusters_diff_dtw3_spread$cluster_dtw_3 <- dtw_diff$k_3@cluster
+
+clusters_diff_dtw3 <- merge(clusters_diff_dtw3_spread[, c("cluster_dtw_3", "Show_Name")], 
+                             dct_diff, by = "Show_Name")
+```
+
+```{r}
+clusters_diff_dtw3_plot <- clusters_diff_dtw3 %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_dtw_3, nrow = 3) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(clusters_diff_dtw3_plot) %>% 
+  layout(title = "S1 with 5 DTW Clusters (C3-LS Differences)", 
+         margin = list(t = 150))
+```
+
+
+# Season 1 Clustering on C3 & LS Averages
+
+```{r}
+dct_avg <- read.csv("dct_C3_LS_avg.csv")
+dct_spread_avg <- read.csv("dct_spread_C3_LS_avg.csv")
+cluster_avg <- dct_spread_avg %>%
+  select(-X, -Network, -Show_Name)
+```
+
+## K-Shape Clustering 
+
+```{r}
+kshape_avg <- tsclust(cluster_diff, 
+                       type = 'partitional',
+                       k = 2:5,
+                       preproc = zscore,
+                       distance = 'sbd',
+                       centroid = 'shape',
+                       trace = FALSE,
+                       seed = 12)
+
+names(kshape_avg) <- paste0('k_', 2:5)
+sapply(kshape_avg, cvi, type = 'internal')
+which.max(sapply(kshape_avg, cvi, type = 'internal')['Sil',])
+```
+
+```{r}
+table(kshape_avg$k_4@cluster)
+```
+
+```{r}
+plot(kshape_avg$k_4, type = 'sc')
+```
+
+```{r}
+# export cluster predictions to the main data set
+clusters_avg_shape4_spread <- dct_spread_avg %>% filter(Season_num == 1)
+clusters_avg_shape4_spread$cluster_shape_4 <- kshape_avg$k_4@cluster
+
+clusters_avg_shape4 <- merge(clusters_avg_shape4_spread[, c("cluster_shape_4", "Show_Name")], 
+                              dct_avg, by = "Show_Name")
+```
+
+```{r}
+clusters_avg_shape4_plot <- clusters_avg_shape4 %>%
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_shape_4) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(clusters_avg_shape4_plot) %>% 
+  layout(title = "S1 with 4 K-Shape Clusters (C3 & LS Averages)", 
+         margin = list(t = 150))
+```
+
+## Dynamic Time Warp Clustering
+
+```{r}
+dtw_avg <- tsclust(cluster_avg,
+                    type = 'partitional',
+                    k = 2:5,
+                    distance = 'dtw_lb',
+                    centroid = 'pam',
+                    control = partitional_control(iter.max = 25),
+                    args = tsclust_args(dist = list()),
+                    window.size = 20,
+                    trace = FALSE,
+                    seed = 12)
+
+names(dtw_avg) <- paste0('k_', 2:5)
+sapply(dtw_avg, cvi)
+which.max(sapply(dtw_avg, cvi, type = 'internal')['Sil',])
+```
+
+```{r}
+table(dtw_avg$k_2@cluster)
+```
+
+```{r}
+plot(dtw_avg$k_2, type = 'sc')
+```
+
+```{r}
+# export cluster predictions to the main data set
+clusters_avg_dtw2_spread <- dct_spread_avg
+clusters_avg_dtw2_spread$cluster_dtw_2 <- dtw_avg$k_2@cluster
+
+clusters_avg_dtw2 <- merge(clusters_avg_dtw2_spread[, c("cluster_dtw_2", "Show_Name")], 
+                            dct_avg, by = "Show_Name")
+
+clusters_avg_dtw2_spread <- clusters_avg_dtw2_spread %>% filter(Season_num == 1)
+```
+
+```{r}
+clusters_avg_dtw2_plot <- clusters_avg_dtw2 %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_dtw_2) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(clusters_avg_dtw2_plot) %>% 
+  layout(title = "S1 with 2 DTW Clusters (C3 & LS Averages)", 
+         margin = list(t = 150))
+```
+
+# Diagnostics
+
+```{r}
+# create distance matrices for clusters
+s1_5clusters_d <- dist(clusters_s1_shape5_spread[, 5:205])
+s1_4clusters_d <- dist(clusters_s1_dtw4_spread[, 5:205])
+diff_4clusters_d <- dist(clusters_diff_shape4_spread[, 5:105])
+diff_3clusters_d <- dist(clusters_diff_dtw3_spread[, 5:105])
+avg_4clusters_d <- dist(clusters_avg_shape4_spread[, 5:105])
+avg_2clusters_d <- dist(clusters_avg_dtw2_spread[, 5:105])
+
+# diagnostics
+diagnostics_kshape_C3_LS_raw_s1_5cl <- cluster.stats(s1_5clusters_d, as.numeric(clusters_s1_shape5_spread$cluster_shape_5))
+diagnostics_dtw_C3_LS_raw_s1_4cl <- cluster.stats(s1_4clusters_d, as.numeric(clusters_s1_dtw4_spread$cluster_dtw_4))
+diagnostics_kshape_C3_LS_raw_diff_s1_4cl <- cluster.stats(diff_4clusters_d, as.numeric(clusters_diff_shape4_spread$cluster_shape_4))
+diagnostics_dtw_C3_LS_raw_diff_s1_3cl <- cluster.stats(diff_3clusters_d, as.numeric(clusters_diff_dtw3_spread$cluster_dtw_3))
+diagnostics_kshape_C3_LS_raw_avg_s1_4cl <- cluster.stats(avg_4clusters_d, as.numeric(clusters_avg_shape4_spread$cluster_shape_4))
+diagnostics_dtw_C3_LS_raw_avg_s1_2cl <- cluster.stats(avg_2clusters_d, as.numeric(clusters_avg_dtw2_spread$cluster_dtw_2))
+
+
+# gather diagnostic names and list all diagnostics objects
+d_names <- ls()[grep("diagnostics", ls())]
+d_list <- mget(ls()[grep("diagnostics", ls())])
+
+# generate df with statsitics of interest for comparison
+diagnostic_df <- as.data.frame(NA)
+
+for (n in 1:length(d_names)){
+  diagnostic_df[n, 1] <- paste(d_names[n])
+  diagnostic_df[n, 2] <- d_list[[n]]["average.between"]
+  diagnostic_df[n, 3] <- d_list[[n]]["average.within"]
+  diagnostic_df[n, 4] <- d_list[[n]]["wb.ratio"]
+  diagnostic_df[n, 5] <- d_list[[n]]["widestgap"]
+  diagnostic_df[n, 6] <- d_list[[n]]["dunn2"]
+  diagnostic_df[n, 7] <- d_list[[n]]["avg.silwidth"]
+  diagnostic_df[n, 8] <- d_list[[n]]["within.cluster.ss"]
+  diagnostic_df[n, 9] <- d_list[[n]]["cluster.number"]
+}
+
+# add information for decision making
+colnames(diagnostic_df)[1] <- "name"
+
+diagnostic_df$name <- sub("diagnostics_", "", diagnostic_df$name)
+
+diagnostic_df$algorithm <- ifelse(grepl("kmeans", diagnostic_df$name) == 1, "kmeans", 
+                                  ifelse(grepl("kshape", diagnostic_df$name) == 1, "kshape", 
+                                         ifelse(grepl("PCA", diagnostic_df$name) == 1, "PCA", 
+                                                ifelse(grepl("tadpole", diagnostic_df$name) == 1, "TADpole", 
+                                                       ifelse(grepl("dtw", diagnostic_df$name) == 1, "DTW", 0)))))
+
+diagnostic_df$season <- ifelse(grepl("s1", diagnostic_df$name) == 1, "s1", 
+                               ifelse(grepl("s2", diagnostic_df$name) == 1, "s2",
+                                      ifelse(grepl("sep", diagnostic_df$name) == 1, "sep",
+                                             ifelse(grepl("cont", diagnostic_df$name) == 1, "cont", 0))))
+
+diagnostic_df$stream <- ifelse(grepl("C3_LS", diagnostic_df$name) == 1, "C3+LS",
+                                             ifelse(grepl("LS", diagnostic_df$name) == 1, "LS",
+                                                    ifelse(grepl("C3", diagnostic_df$name) == 1, "C3", 0)))
+
+diagnostic_df$data <- ifelse(grepl("raw_diff", diagnostic_df$name) == 1, "raw diff",
+                             ifelse(grepl("raw_avg", diagnostic_df$name) == 1, "raw avg",
+                                    ifelse(grepl("growth_diff", diagnostic_df$name) == 1, "growth diff",
+                                           ifelse(grepl("growth_avg", diagnostic_df$name) == 1, "growth avg", 
+                                                  ifelse(grepl("raw_growth", diagnostic_df$name) == 1, "raw+growth",
+                                                         ifelse(grepl("growth", diagnostic_df$name) == 1, "growth",
+                                                                ifelse(grepl("raw", diagnostic_df$name) == 1, "raw",0)))))))
+```
+
+```{r}
+# write table
+write.csv(diagnostic_df, "diagnostics_kshape_dtw_C3_LS_raw.csv")
+```
