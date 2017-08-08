@@ -1,0 +1,783 @@
+---
+title: "Show Name within Clusters Standalone"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+```{r}
+library(plyr)
+library(dplyr)
+library(tidyr)
+library(broom)
+library(ggplot2)
+library(plotly)
+library(factoextra)
+library(dtwclust)
+library(fpc)
+```
+
+# Raw - K-Means
+
+## S1 - 5 Clusters
+
+```{r}
+dct_df <- read.csv("dct_C3_raw.csv")
+dct_spread <- read.csv("dct_spread_C3_Raw.csv")
+```
+
+```{r}
+cluster_s1 <- dct_spread %>% 
+  filter(Season_num == 1) %>%
+  ungroup() %>%
+  select(-X, -Network, -Season_num, -Show_Name)
+```
+
+```{r}
+set.seed(12)
+kclusts_s1 <- data.frame(k = 1:5) %>% 
+  group_by(k) %>% 
+  do(kclust = kmeans(cluster_s1, centers = .$k, nstart = 20))
+
+assignments_s1 <- kclusts_s1 %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s1))
+```
+
+```{r}
+clusters5_s1_spread <- assignments_s1 %>% 
+  filter(k == 5) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_5 = .cluster) %>% 
+  bind_cols(filter(dct_spread, Season_num == 1)) 
+
+clusters5_s1 <- merge(clusters5_s1_spread[, c("cluster_kmeans_5", 
+                                       "Show_Name")], 
+                      dct_df, by = "Show_Name")
+```
+
+```{r}
+comp_raw_s1_5cl <- list(as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 1,]$Show_Name)), 
+                        as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 2,]$Show_Name)), 
+                        as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 3,]$Show_Name)), 
+                        as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 4,]$Show_Name)), 
+                        as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 5,]$Show_Name)))
+
+```
+
+## S2 - 5 Clusters
+
+```{r}
+cluster_s2 <- dct_spread %>% 
+  filter(Season_num == 2) %>%
+  ungroup() %>%
+  select(-X, -Network, -Season_num, -Show_Name)
+```
+
+```{r}
+set.seed(12)
+kclusts_s2 <- data.frame(k = 1:5) %>% 
+  group_by(k) %>% 
+  do(kclust = kmeans(cluster_s2, centers = .$k, nstart = 20))
+
+assignments_s2 <- kclusts_s2 %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s2))
+```
+
+```{r}
+clusters5_s2_spread<- assignments_s2 %>% 
+  filter(k == 5) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_5 = .cluster) %>% 
+  bind_cols(filter(dct_spread, Season_num == 2)) 
+
+clusters5_s2 <- merge(clusters5_s2_spread[, c("cluster_kmeans_5", 
+                                       "Show_Name")], 
+                      dct_df, by = "Show_Name")
+```
+
+```{r}
+comp_raw_s2_5cl <- list(as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 1,]$Show_Name)),
+                        as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 2,]$Show_Name)),
+                        as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 3,]$Show_Name)),
+                        as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 4,]$Show_Name)),
+                        as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 5,]$Show_Name)))
+
+```
+
+
+## S1 & S2 Sep - 5 Clusters
+
+```{r}
+temp1 <- filter(dct_spread, Season_num == 1)
+temp2 <- filter(dct_spread, Season_num == 2)
+temp2_newcols <- c(paste("X", 101:200, sep = ""))
+colnames(temp2)[5:ncol(temp2)] <- c(temp2_newcols)
+
+dct_spread_s1_s2 <- bind_cols(temp1, temp2[, 5:ncol(temp2)])
+rm(temp1, temp2, temp2_newcols)
+
+cluster_s1_s2 <- dct_spread_s1_s2 %>%
+  select(-X, -Network, -Season_num, -Show_Name)
+
+dct_s1_s2 <- read.csv("dct_C3_raw_s1_s2.csv")
+```
+
+```{r}
+set.seed(12)
+kclusts_s1_s2 <- data.frame(k = 1:5) %>% 
+  group_by(k) %>% 
+  do(kclust = kmeans(cluster_s1_s2, centers = .$k, nstart = 20))
+
+assignments_s1_s2 <- kclusts_s1_s2 %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s1_s2))
+```
+
+```{r}
+clusters5_s1_s2_spread <- assignments_s1_s2 %>% 
+  filter(k == 5) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_5 = .cluster) %>% 
+  bind_cols(dct_spread_s1_s2) 
+
+clusters5_s1_s2 <- merge(clusters5_s1_s2_spread[, c("cluster_kmeans_5", 
+                                       "Show_Name")], 
+                         dct_s1_s2, by = "Show_Name")
+```
+
+```{r}
+comp_raw_sep_5cl <- list(as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 1,]$Show_Name)),
+                         as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 2,]$Show_Name)),
+                         as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 3,]$Show_Name)),
+                         as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 4,]$Show_Name)),
+                         as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 5,]$Show_Name)))
+```
+
+## S1 & S2 Cont - 5 Clusters
+
+```{r}
+dct_cont <- read.csv("dct_C3_raw_cont.csv")
+dct_spread_cont <- read.csv("dct_spread_C3_raw_cont.csv")
+cluster_cont <- dct_spread_cont %>%
+  select(-X, -Network, -Show_Name)
+```
+
+```{r}
+set.seed(12)
+kclusts_cont <- data.frame(k = 1:5) %>% 
+  group_by(k) %>% 
+  do(kclust = kmeans(cluster_cont, centers = .$k, nstart = 20))
+
+assignments_cont <- kclusts_cont %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_cont))
+```
+
+```{r}
+clusters5_cont_spread <- assignments_cont %>% 
+  filter(k == 5) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_5 = .cluster) %>% 
+  bind_cols(dct_spread_cont) 
+
+clusters5_cont <- merge(clusters5_cont_spread[, c("cluster_kmeans_5", 
+                                       "Show_Name")], 
+                          dct_cont, by = "Show_Name")
+```
+
+```{r}
+comp_raw_cont_5cl <- list(as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 1,]$Show_Name)),
+                          as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 2,]$Show_Name)),
+                          as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 3,]$Show_Name)),
+                          as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 4,]$Show_Name)),
+                          as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 5,]$Show_Name)))
+```
+
+
+# Raw - TADpole - 5 Clusters - S1 & S2 Cont
+
+```{r}
+dct_cont <- read.csv("dct_C3_raw_cont.csv")
+dct_spread_cont <- read.csv("dct_spread_C3_raw_cont.csv")
+dtw_df_cont <- dct_spread_cont %>%
+  select(-X, -Network, -Show_Name)
+```
+
+```{r}
+set.seed(12)
+tadpole_clust5_cont <- tsclust(dtw_df_cont, type = "tadpole", k = 5L, 
+                               control = tadpole_control(dc = 50, window.size = 5))
+
+tadpole_clust5_cont_df<- dct_spread_cont
+
+tadpole_clust5_cont_df$cluster <- tadpole_clust5_cont@cluster
+```
+
+```{r}
+tadpole5_cont_long <- gather(tadpole_clust5_cont_df, key = period, value = dct_values ,X1:X100) %>% 
+  select(-X)
+tadpole5_cont_long$period <- as.numeric(sub("X", "", tadpole5_cont_long$period ))
+tadpole5_cont_long$period <- as.numeric(tadpole5_cont_long$period)
+```
+
+```{r}
+comp_raw_cont_5cl_tadpole <- list(as.character(unique(tadpole_clust5_cont_df[tadpole_clust5_cont_df$cluster == 1,]$Show_Name)),
+                                  as.character(unique(tadpole_clust5_cont_df[tadpole_clust5_cont_df$cluster == 2,]$Show_Name)),
+                                  as.character(unique(tadpole_clust5_cont_df[tadpole_clust5_cont_df$cluster == 3,]$Show_Name)),
+                                  as.character(unique(tadpole_clust5_cont_df[tadpole_clust5_cont_df$cluster == 4,]$Show_Name)),
+                                  as.character(unique(tadpole_clust5_cont_df[tadpole_clust5_cont_df$cluster == 5,]$Show_Name)))
+```
+
+
+# Growth - K-Means
+
+## S1 - 5 Clusters
+
+```{r}
+dct_df <- read.csv("dct_C3_growth.csv")
+dct_spread <- read.csv("dct_spread_C3_growth.csv")
+```
+
+```{r}
+cluster_s1 <- dct_spread %>% 
+  filter(Season_num == 1) %>%
+  ungroup() %>%
+  select(-X, -Network, -Season_num, -Show_Name)
+```
+
+```{r}
+set.seed(12)
+kclusts_s1 <- data.frame(k = 1:5) %>% 
+  group_by(k) %>% 
+  do(kclust = kmeans(cluster_s1, centers = .$k, nstart = 20))
+
+assignments_s1 <- kclusts_s1 %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s1))
+```
+
+```{r}
+clusters5_s1_spread <- assignments_s1 %>% 
+  filter(k == 5) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_5 = .cluster) %>% 
+  bind_cols(filter(dct_spread, Season_num == 1)) 
+
+clusters5_s1 <- merge(clusters5_s1_spread[, c("cluster_kmeans_5", 
+                                       "Show_Name")], 
+                      dct_df, by = "Show_Name")
+```
+
+```{r}
+comp_growth_s1_5cl <- list(as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 1,]$Show_Name)), 
+                           as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 2,]$Show_Name)), 
+                           as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 3,]$Show_Name)), 
+                           as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 4,]$Show_Name)), 
+                           as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 5,]$Show_Name)))
+```
+
+## S2 - 5 Clusters
+
+```{r}
+cluster_s2 <- dct_spread %>% 
+  filter(Season_num == 2) %>%
+  ungroup() %>%
+  select(-X, -Network, -Season_num, -Show_Name)
+```
+
+```{r}
+set.seed(12)
+kclusts_s2 <- data.frame(k = 1:5) %>% 
+  group_by(k) %>% 
+  do(kclust = kmeans(cluster_s2, centers = .$k, nstart = 20))
+
+assignments_s2 <- kclusts_s2 %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s2))
+```
+
+```{r}
+clusters5_s2_spread<- assignments_s2 %>% 
+  filter(k == 5) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_5 = .cluster) %>% 
+  bind_cols(filter(dct_spread, Season_num == 2)) 
+
+clusters5_s2 <- merge(clusters5_s2_spread[, c("cluster_kmeans_5", 
+                                       "Show_Name")], 
+                      dct_df, by = "Show_Name")
+```
+
+```{r}
+comp_growth_s2_5cl <- list(as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 1,]$Show_Name)),
+                           as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 2,]$Show_Name)),
+                           as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 3,]$Show_Name)),
+                           as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 4,]$Show_Name)),
+                           as.character(unique(clusters5_s2[clusters5_s2$cluster_kmeans_5 == 5,]$Show_Name)))
+```
+
+## S1 & S2 Sep - 5 Clusters
+
+```{r}
+temp1 <- filter(dct_spread, Season_num == 1)
+temp2 <- filter(dct_spread, Season_num == 2)
+temp2_newcols <- c(paste("X", 101:200, sep = ""))
+colnames(temp2)[5:ncol(temp2)] <- c(temp2_newcols)
+
+dct_spread_s1_s2 <- bind_cols(temp1, temp2[, 5:ncol(temp2)])
+rm(temp1, temp2, temp2_newcols)
+
+cluster_s1_s2 <- dct_spread_s1_s2 %>%
+  select(-X, -Network, -Season_num, -Show_Name)
+
+dct_s1_s2 <- read.csv("dct_C3_growth_s1_s2.csv")
+```
+
+```{r}
+set.seed(12)
+kclusts_s1_s2 <- data.frame(k = 1:5) %>% 
+  group_by(k) %>% 
+  do(kclust = kmeans(cluster_s1_s2, centers = .$k, nstart = 20))
+
+assignments_s1_s2 <- kclusts_s1_s2 %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s1_s2))
+```
+
+```{r}
+clusters5_s1_s2_spread <- assignments_s1_s2 %>% 
+  filter(k == 5) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_5 = .cluster) %>% 
+  bind_cols(dct_spread_s1_s2) 
+
+clusters5_s1_s2 <- merge(clusters5_s1_s2_spread[, c("cluster_kmeans_5", 
+                                       "Show_Name")], 
+                         dct_s1_s2, by = "Show_Name")
+```
+
+```{r}
+comp_growth_sep_5cl <- list(as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 1,]$Show_Name)),
+                            as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 2,]$Show_Name)),
+                            as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 3,]$Show_Name)),
+                            as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 4,]$Show_Name)),
+                            as.character(unique(clusters5_s1_s2[clusters5_s1_s2$cluster_kmeans_5 == 5,]$Show_Name)))
+```
+
+## S1 & S2 Cont - 5 Clusters
+
+```{r}
+dct_cont <- read.csv("dct_C3_growth_cont.csv")
+dct_spread_cont <- read.csv("dct_spread_C3_growth_cont.csv")
+cluster_cont <- dct_spread_cont %>%
+  select(-X, -Network, -Show_Name)
+```
+
+```{r}
+set.seed(12)
+kclusts_cont <- data.frame(k = 1:5) %>% 
+  group_by(k) %>% 
+  do(kclust = kmeans(cluster_cont, centers = .$k, nstart = 20))
+
+assignments_cont <- kclusts_cont %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_cont))
+```
+
+```{r}
+clusters5_cont_spread <- assignments_cont %>% 
+  filter(k == 5) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_5 = .cluster) %>% 
+  bind_cols(dct_spread_cont) 
+
+clusters5_cont <- merge(clusters5_cont_spread[, c("cluster_kmeans_5", 
+                                       "Show_Name")], 
+                          dct_cont, by = "Show_Name")
+```
+
+```{r}
+comp_growth_cont_5cl <- list(as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 1,]$Show_Name)),
+                             as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 2,]$Show_Name)),
+                             as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 3,]$Show_Name)),
+                             as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 4,]$Show_Name)),
+                             as.character(unique(clusters5_cont[clusters5_cont$cluster_kmeans_5 == 5,]$Show_Name)))
+```
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+
+# S1 Clusters Shows
+
+# Compare
+
+```{r}
+rm(list = ls()[!(grepl("comp_", ls()))])
+```
+
+```{r}
+compare_s1_raw_growth <- expand.grid(comp_growth_s1_5cl, comp_raw_s1_5cl)
+
+b <- expand.grid(c(paste("s1_growth", "[", 1:5, "]", sep = "")),
+                       c(paste("s1_raw", "[", 1:5, "]", sep = "")))
+colnames(b) <- c("Var1_name", "Var2_name")
+c <- paste(b$Var1, b$Var2, sep = "_")
+compare_s1_raw_growth$clusts <- c
+compare_s1_raw_growth <- bind_cols(compare_s1_raw_growth, b)
+
+for (n in 1:25){
+compare_s1_raw_growth$intersect[n] <- length(intersect(compare_s1_raw_growth$Var1[[n]], compare_s1_raw_growth$Var2[[n]]))
+compare_s1_raw_growth$cluster_size1[n] <- length(unique(compare_s1_raw_growth$Var1[[n]]))
+compare_s1_raw_growth$cluster_size2[n] <- length(unique(compare_s1_raw_growth$Var2[[n]]))
+compare_s1_raw_growth$intersect_weight[n] <- length(intersect(compare_s1_raw_growth$Var1[[n]], compare_s1_raw_growth$Var2[[n]])) /
+  (length(unique(c(compare_s1_raw_growth$Var1[[n]], compare_s1_raw_growth$Var2[[n]]))))
+
+}
+
+rm(b, c)
+```
+
+
+---------------------------
+S1 Raw Clusters Comparison
+---------------------------
+
+```{r}
+compare_s1_s2_raw <- expand.grid(comp_raw_s2_5cl, comp_raw_s1_5cl)
+
+b <- expand.grid(c(paste("s2_raw", "[", 1:5, "]", sep = "")),
+                       c(paste("s1_raw", "[", 1:5, "]", sep = "")))
+colnames(b) <- c("Var1_name", "Var2_name")
+c <- paste(b$Var1, b$Var2, sep = "_")
+compare_s1_s2_raw$clusts <- c
+compare_s1_s2_raw <- bind_cols(compare_s1_s2_raw, b)
+
+for (n in 1:25){
+compare_s1_s2_raw$intersect[n] <- length(intersect(compare_s1_s2_raw$Var1[[n]], compare_s1_s2_raw$Var2[[n]]))
+compare_s1_s2_raw$cluster_size1[n] <- length(unique(compare_s1_s2_raw$Var1[[n]]))
+compare_s1_s2_raw$cluster_size2[n] <- length(unique(compare_s1_s2_raw$Var2[[n]]))
+compare_s1_s2_raw$intersect_weight[n] <- length(intersect(compare_s1_s2_raw$Var1[[n]], compare_s1_s2_raw$Var2[[n]])) /
+  (length(unique(c(compare_s1_s2_raw$Var1[[n]], compare_s1_s2_raw$Var2[[n]]))))
+
+}
+
+rm(b, c)
+```
+
+```{r}
+compare_s1_raw_s2_growth <- expand.grid(comp_growth_s2_5cl, comp_raw_s1_5cl)
+
+b <- expand.grid(c(paste("s2_growth", "[", 1:5, "]", sep = "")),
+                       c(paste("s1_raw", "[", 1:5, "]", sep = "")))
+colnames(b) <- c("Var1_name", "Var2_name")
+c <- paste(b$Var1, b$Var2, sep = "_")
+compare_s1_raw_s2_growth$clusts <- c
+compare_s1_raw_s2_growth <- bind_cols(compare_s1_raw_s2_growth, b)
+
+for (n in 1:25){
+compare_s1_raw_s2_growth$intersect[n] <- length(intersect(compare_s1_raw_s2_growth$Var1[[n]], compare_s1_raw_s2_growth$Var2[[n]]))
+compare_s1_raw_s2_growth$cluster_size1[n] <- length(unique(compare_s1_raw_s2_growth$Var1[[n]]))
+compare_s1_raw_s2_growth$cluster_size2[n] <- length(unique(compare_s1_raw_s2_growth$Var2[[n]]))
+compare_s1_raw_s2_growth$intersect_weight[n] <- length(intersect(compare_s1_raw_s2_growth$Var1[[n]], compare_s1_raw_s2_growth$Var2[[n]])) /
+  (length(unique(c(compare_s1_raw_s2_growth$Var1[[n]], compare_s1_raw_s2_growth$Var2[[n]]))))
+
+}
+
+rm(b, c)
+```
+
+```{r}
+compare_s1_cont_raw <- expand.grid(comp_raw_cont_5cl, comp_raw_s1_5cl)
+
+b <- expand.grid(c(paste("cont_raw", "[", 1:5, "]", sep = "")),
+                       c(paste("s1_raw", "[", 1:5, "]", sep = "")))
+colnames(b) <- c("Var1_name", "Var2_name")
+c <- paste(b$Var1, b$Var2, sep = "_")
+compare_s1_cont_raw$clusts <- c
+compare_s1_cont_raw <- bind_cols(compare_s1_cont_raw, b)
+
+for (n in 1:25){
+compare_s1_cont_raw$intersect[n] <- length(intersect(compare_s1_cont_raw$Var1[[n]], compare_s1_cont_raw$Var2[[n]]))
+compare_s1_cont_raw$cluster_size1[n] <- length(unique(compare_s1_cont_raw$Var1[[n]]))
+compare_s1_cont_raw$cluster_size2[n] <- length(unique(compare_s1_cont_raw$Var2[[n]]))
+compare_s1_cont_raw$intersect_weight[n] <- length(intersect(compare_s1_cont_raw$Var1[[n]], compare_s1_cont_raw$Var2[[n]])) /
+  (length(unique(c(compare_s1_cont_raw$Var1[[n]], compare_s1_cont_raw$Var2[[n]]))))
+
+}
+
+rm(b, c)
+```
+
+```{r}
+compare_s1_sep_raw <- expand.grid(comp_raw_sep_5cl, comp_raw_s1_5cl)
+
+b <- expand.grid(c(paste("sep_raw", "[", 1:5, "]", sep = "")),
+                       c(paste("s1_raw", "[", 1:5, "]", sep = "")))
+colnames(b) <- c("Var1_name", "Var2_name")
+c <- paste(b$Var1, b$Var2, sep = "_")
+compare_s1_sep_raw$clusts <- c
+compare_s1_sep_raw <- bind_cols(compare_s1_sep_raw, b)
+
+for (n in 1:25){
+compare_s1_sep_raw$intersect[n] <- length(intersect(compare_s1_sep_raw$Var1[[n]], compare_s1_sep_raw$Var2[[n]]))
+compare_s1_sep_raw$cluster_size1[n] <- length(unique(compare_s1_sep_raw$Var1[[n]]))
+compare_s1_sep_raw$cluster_size2[n] <- length(unique(compare_s1_sep_raw$Var2[[n]]))
+compare_s1_sep_raw$intersect_weight[n] <- length(intersect(compare_s1_sep_raw$Var1[[n]], compare_s1_sep_raw$Var2[[n]])) /
+  (length(unique(c(compare_s1_sep_raw$Var1[[n]], compare_s1_sep_raw$Var2[[n]]))))
+
+}
+
+rm(b, c)
+```
+
+```{r}
+compare_s1_raw_cont_growth <- expand.grid(comp_growth_cont_5cl, comp_raw_s1_5cl)
+
+b <- expand.grid(c(paste("cont_growth", "[", 1:5, "]", sep = "")),
+                       c(paste("s1_raw", "[", 1:5, "]", sep = "")))
+colnames(b) <- c("Var1_name", "Var2_name")
+c <- paste(b$Var1, b$Var2, sep = "_")
+compare_s1_raw_cont_growth$clusts <- c
+compare_s1_raw_cont_growth <- bind_cols(compare_s1_raw_cont_growth, b)
+
+for (n in 1:25){
+compare_s1_raw_cont_growth$intersect[n] <- length(intersect(compare_s1_raw_cont_growth$Var1[[n]], compare_s1_raw_cont_growth$Var2[[n]]))
+compare_s1_raw_cont_growth$cluster_size1[n] <- length(unique(compare_s1_raw_cont_growth$Var1[[n]]))
+compare_s1_raw_cont_growth$cluster_size2[n] <- length(unique(compare_s1_raw_cont_growth$Var2[[n]]))
+compare_s1_raw_cont_growth$intersect_weight[n] <- length(intersect(compare_s1_raw_cont_growth$Var1[[n]], compare_s1_raw_cont_growth$Var2[[n]])) /
+  (length(unique(c(compare_s1_raw_cont_growth$Var1[[n]], compare_s1_raw_cont_growth$Var2[[n]]))))
+
+}
+
+rm(b, c)
+```
+
+```{r}
+compare_s1_raw_sep_growth <- expand.grid(comp_growth_sep_5cl, comp_raw_s1_5cl)
+
+b <- expand.grid(c(paste("sep_growth", "[", 1:5, "]", sep = "")),
+                       c(paste("s1_raw", "[", 1:5, "]", sep = "")))
+colnames(b) <- c("Var1_name", "Var2_name")
+c <- paste(b$Var1, b$Var2, sep = "_")
+compare_s1_raw_sep_growth$clusts <- c
+compare_s1_raw_sep_growth <- bind_cols(compare_s1_raw_sep_growth, b)
+
+for (n in 1:25){
+compare_s1_raw_sep_growth$intersect[n] <- length(intersect(compare_s1_raw_sep_growth$Var1[[n]], compare_s1_raw_sep_growth$Var2[[n]]))
+compare_s1_raw_sep_growth$cluster_size1[n] <- length(unique(compare_s1_raw_sep_growth$Var1[[n]]))
+compare_s1_raw_sep_growth$cluster_size2[n] <- length(unique(compare_s1_raw_sep_growth$Var2[[n]]))
+compare_s1_raw_sep_growth$intersect_weight[n] <- length(intersect(compare_s1_raw_sep_growth$Var1[[n]], compare_s1_raw_sep_growth$Var2[[n]])) /
+  (length(unique(c(compare_s1_raw_sep_growth$Var1[[n]], compare_s1_raw_sep_growth$Var2[[n]]))))
+
+}
+
+rm(b, c)
+```
+
+------------------------------
+S1 Growth Clusters Comparison
+------------------------------
+
+```{r}
+compare_s1_s2_growth <- expand.grid(comp_growth_s2_5cl, comp_growth_s1_5cl)
+
+b <- expand.grid(c(paste("s2_growth", "[", 1:5, "]", sep = "")),
+                       c(paste("s1_growth", "[", 1:5, "]", sep = "")))
+colnames(b) <- c("Var1_name", "Var2_name")
+c <- paste(b$Var1, b$Var2, sep = "_")
+compare_s1_s2_growth$clusts <- c
+compare_s1_s2_growth <- bind_cols(compare_s1_s2_growth, b)
+
+for (n in 1:25){
+compare_s1_s2_growth$intersect[n] <- length(intersect(compare_s1_s2_growth$Var1[[n]], compare_s1_s2_growth$Var2[[n]]))
+compare_s1_s2_growth$cluster_size1[n] <- length(unique(compare_s1_s2_growth$Var1[[n]]))
+compare_s1_s2_growth$cluster_size2[n] <- length(unique(compare_s1_s2_growth$Var2[[n]]))
+compare_s1_s2_growth$intersect_weight[n] <- length(intersect(compare_s1_s2_growth$Var1[[n]], compare_s1_s2_growth$Var2[[n]])) /
+  (length(unique(c(compare_s1_s2_growth$Var1[[n]], compare_s1_s2_growth$Var2[[n]]))))
+
+}
+
+rm(b, c)
+```
+
+```{r}
+compare_s1_growth_s2_raw <- expand.grid(comp_raw_s2_5cl, comp_growth_s1_5cl)
+
+b <- expand.grid(c(paste("s2_raw", "[", 1:5, "]", sep = "")),
+                       c(paste("s1_growth", "[", 1:5, "]", sep = "")))
+colnames(b) <- c("Var1_name", "Var2_name")
+c <- paste(b$Var1, b$Var2, sep = "_")
+compare_s1_growth_s2_raw$clusts <- c
+compare_s1_growth_s2_raw <- bind_cols(compare_s1_growth_s2_raw, b)
+
+for (n in 1:25){
+compare_s1_growth_s2_raw$intersect[n] <- length(intersect(compare_s1_growth_s2_raw$Var1[[n]], compare_s1_growth_s2_raw$Var2[[n]]))
+compare_s1_growth_s2_raw$cluster_size1[n] <- length(unique(compare_s1_growth_s2_raw$Var1[[n]]))
+compare_s1_growth_s2_raw$cluster_size2[n] <- length(unique(compare_s1_growth_s2_raw$Var2[[n]]))
+compare_s1_growth_s2_raw$intersect_weight[n] <- length(intersect(compare_s1_growth_s2_raw$Var1[[n]], compare_s1_growth_s2_raw$Var2[[n]])) /
+  (length(unique(c(compare_s1_growth_s2_raw$Var1[[n]], compare_s1_growth_s2_raw$Var2[[n]]))))
+
+}
+
+rm(b, c)
+```
+
+```{r}
+compare_s1_cont_growth <- expand.grid(comp_growth_cont_5cl, comp_growth_s1_5cl)
+
+b <- expand.grid(c(paste("cont_growth", "[", 1:5, "]", sep = "")),
+                       c(paste("s1_growth", "[", 1:5, "]", sep = "")))
+colnames(b) <- c("Var1_name", "Var2_name")
+c <- paste(b$Var1, b$Var2, sep = "_")
+compare_s1_cont_growth$clusts <- c
+compare_s1_cont_growth <- bind_cols(compare_s1_cont_growth, b)
+
+for (n in 1:25){
+compare_s1_cont_growth$intersect[n] <- length(intersect(compare_s1_cont_growth$Var1[[n]], compare_s1_cont_growth$Var2[[n]]))
+compare_s1_cont_growth$cluster_size1[n] <- length(unique(compare_s1_cont_growth$Var1[[n]]))
+compare_s1_cont_growth$cluster_size2[n] <- length(unique(compare_s1_cont_growth$Var2[[n]]))
+compare_s1_cont_growth$intersect_weight[n] <- length(intersect(compare_s1_cont_growth$Var1[[n]], compare_s1_cont_growth$Var2[[n]])) /
+  (length(unique(c(compare_s1_cont_growth$Var1[[n]], compare_s1_cont_growth$Var2[[n]]))))
+
+}
+
+rm(b, c)
+```
+
+```{r}
+compare_s1_sep_growth <- expand.grid(comp_growth_sep_5cl, comp_growth_s1_5cl)
+
+b <- expand.grid(c(paste("sep_growth", "[", 1:5, "]", sep = "")),
+                       c(paste("s1_growth", "[", 1:5, "]", sep = "")))
+colnames(b) <- c("Var1_name", "Var2_name")
+c <- paste(b$Var1, b$Var2, sep = "_")
+compare_s1_sep_growth$clusts <- c
+compare_s1_sep_growth <- bind_cols(compare_s1_sep_growth, b)
+
+for (n in 1:25){
+compare_s1_sep_growth$intersect[n] <- length(intersect(compare_s1_sep_growth$Var1[[n]], compare_s1_sep_growth$Var2[[n]]))
+compare_s1_sep_growth$cluster_size1[n] <- length(unique(compare_s1_sep_growth$Var1[[n]]))
+compare_s1_sep_growth$cluster_size2[n] <- length(unique(compare_s1_sep_growth$Var2[[n]]))
+compare_s1_sep_growth$intersect_weight[n] <- length(intersect(compare_s1_sep_growth$Var1[[n]], compare_s1_sep_growth$Var2[[n]])) /
+  (length(unique(c(compare_s1_sep_growth$Var1[[n]], compare_s1_sep_growth$Var2[[n]]))))
+
+}
+
+rm(b, c)
+```
+
+```{r}
+compare_s1_growth_cont_raW <- expand.grid(comp_raw_cont_5cl, comp_growth_s1_5cl)
+
+b <- expand.grid(c(paste("cont_raw", "[", 1:5, "]", sep = "")),
+                       c(paste("s1_growth", "[", 1:5, "]", sep = "")))
+colnames(b) <- c("Var1_name", "Var2_name")
+c <- paste(b$Var1, b$Var2, sep = "_")
+compare_s1_growth_cont_raW$clusts <- c
+compare_s1_growth_cont_raW <- bind_cols(compare_s1_growth_cont_raW, b)
+
+for (n in 1:25){
+compare_s1_growth_cont_raW$intersect[n] <- length(intersect(compare_s1_growth_cont_raW$Var1[[n]], compare_s1_growth_cont_raW$Var2[[n]]))
+compare_s1_growth_cont_raW$cluster_size1[n] <- length(unique(compare_s1_growth_cont_raW$Var1[[n]]))
+compare_s1_growth_cont_raW$cluster_size2[n] <- length(unique(compare_s1_growth_cont_raW$Var2[[n]]))
+compare_s1_growth_cont_raW$intersect_weight[n] <- length(intersect(compare_s1_growth_cont_raW$Var1[[n]], compare_s1_growth_cont_raW$Var2[[n]])) /
+  (length(unique(c(compare_s1_growth_cont_raW$Var1[[n]], compare_s1_growth_cont_raW$Var2[[n]]))))
+
+}
+
+rm(b, c)
+```
+
+```{r}
+compare_s1_growth_sep_raw <- expand.grid(comp_raw_sep_5cl, comp_growth_s1_5cl)
+
+b <- expand.grid(c(paste("sep_raw", "[", 1:5, "]", sep = "")),
+                       c(paste("s1_growth", "[", 1:5, "]", sep = "")))
+colnames(b) <- c("Var1_name", "Var2_name")
+c <- paste(b$Var1, b$Var2, sep = "_")
+compare_s1_growth_sep_raw$clusts <- c
+compare_s1_growth_sep_raw <- bind_cols(compare_s1_growth_sep_raw, b)
+
+for (n in 1:25){
+compare_s1_growth_sep_raw$intersect[n] <- length(intersect(compare_s1_growth_sep_raw$Var1[[n]], compare_s1_growth_sep_raw$Var2[[n]]))
+compare_s1_growth_sep_raw$cluster_size1[n] <- length(unique(compare_s1_growth_sep_raw$Var1[[n]]))
+compare_s1_growth_sep_raw$cluster_size2[n] <- length(unique(compare_s1_growth_sep_raw$Var2[[n]]))
+compare_s1_growth_sep_raw$intersect_weight[n] <- length(intersect(compare_s1_growth_sep_raw$Var1[[n]], compare_s1_growth_sep_raw$Var2[[n]])) /
+  (length(unique(c(compare_s1_growth_sep_raw$Var1[[n]], compare_s1_growth_sep_raw$Var2[[n]]))))
+
+}
+
+rm(b, c, n)
+```
+
+
+-----------------------------------------
+Aggregate All for Graphics, Best Matches
+-----------------------------------------
+```{r}
+rm(list = ls()[!(grepl("compare_", ls()))])
+```
+
+```{r}
+compare_all <- do.call(bind_rows, mget(ls()[(grep("compare_", ls()))]))
+```
+
+```{r}
+rm(list = ls()[!(grepl("compare_all", ls()))])
+```
+
+```{r}
+for (n in 1:nrow(compare_all)){
+  compare_all$matches[[n]] <- intersect(compare_all$Var1[[n]], compare_all$Var2[[n]]) 
+}
+
+compare_all$matches <- ifelse(compare_all$intersect == 0, NA, compare_all$matches)
+```
+
+```{r}
+best_matches <- compare_all %>% group_by(Var2_name) %>% slice(which.max(intersect))
+S2_best_matches <- compare_all %>% filter(grepl("s2", compare_all$Var1_name) == T) %>% group_by(Var2_name) %>% slice(which.max(intersect))
+
+#best_matches %>% select(-c(1, 2, 3)) %>% mutate(matches = as.character(matches)) %>% write.csv("best_matches.csv", row.names = F)
+#S2_best_matches %>% select(-c(1, 2, 3)) %>% mutate(matches = as.character(matches)) %>% write.csv("S2_best_matches.csv", row.names = F)
+
+best_matches_extend <- best_matches %>% select(-c(1:3)) %>% unnest()
+best_matches_extend$ef_cluster_type <-  ifelse(grepl("raw", best_matches_extend$Var2_name) == 1, "raw", "growth")
+best_matches_extend$Var2_name <- sub(".*\\[(.*)\\].*", "\\1", best_matches_extend$Var2_name, perl=TRUE)
+best_matches_extend$matches <- trimws(best_matches_extend$matches)
+
+best_S2_matches_extend <- S2_best_matches %>% select(-c(1:3)) %>% unnest()
+best_S2_matches_extend$ef_cluster_type <-  ifelse(grepl("raw", best_S2_matches_extend$Var2_name) == 1, "raw", "growth")
+best_S2_matches_extend$Var2_name <- sub(".*\\[(.*)\\].*", "\\1", best_S2_matches_extend$Var2_name, perl=TRUE)
+```
+
+```{r}
+#Export compare all for future reference
+compare_all$Var1 <- as.character(compare_all$Var1)
+compare_all$Var2 <- as.character(compare_all$Var2)
+compare_all$matches <- as.character(compare_all$matches)
+compare_all <- compare_all[, c(3:10, 1:2)]
+
+#write.csv(compare_all, "compare_all_best_clusters.csv")
+```
+
+-----------------------------------------
+Include Best Matches on Lookup Table
+-----------------------------------------
+```{r}
+lookup <- read.csv("s1_shows_best_clusters.csv") %>% select(-X)
+lookup$C3_raw_best_matches <- best_matches_extend[best_matches_extend$ef_cluster_type == "raw",]$Var2_name[match(lookup$Show_Name, best_matches_extend[best_matches_extend$ef_cluster_type == "raw",]$matches)]
+
+lookup$C3_raw_best_matches_S2 <- best_S2_matches_extend[best_S2_matches_extend$ef_cluster_type == "raw",]$Var2_name[match(lookup$Show_Name, best_S2_matches_extend[best_S2_matches_extend$ef_cluster_type == "raw",]$matches)]
+
+lookup$C3_growth_best_matches <- best_matches_extend[best_matches_extend$ef_cluster_type == "growth",]$Var2_name[match(lookup$Show_Name, best_matches_extend[best_matches_extend$ef_cluster_type == "growth",]$matches)]
+
+lookup$C3_growth_best_matches_S2 <- best_S2_matches_extend[best_S2_matches_extend$ef_cluster_type == "growth",]$Var2_name[match(lookup$Show_Name, best_S2_matches_extend[best_S2_matches_extend$ef_cluster_type == "growth",]$matches)]
+```
+
+```{r}
+write.csv(lookup, "s1_shows_best_clusters_and_matches.csv", row.names = F)
+```
+

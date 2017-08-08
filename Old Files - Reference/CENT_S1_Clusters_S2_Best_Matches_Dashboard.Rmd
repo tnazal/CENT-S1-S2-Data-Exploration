@@ -1,0 +1,952 @@
+---
+author: "CENT S1 Raw Clusters. Raw Impressions/Normalized. Best Matches on S2. Detail."
+output: 
+  flexdashboard::flex_dashboard:
+    vertical_layout: scroll
+    orientation: rows
+    source_code: embed
+---
+
+```{r}
+##########################################################
+#
+# Inputs: s1_s2_data.csv, dct_C3_raw_cont.csv, 
+#         dct_C3_growth_cont.csv, 
+#         s1_shows_best_clusters_and_matches.csv
+#
+# Purpose: Detailed trends of C3 impressions and Growth,
+#          Season two graphs include only cases that either
+#          [1] are intersections of the best other cluster
+#          matches, or [2] are intersections of the best other
+#          Season 2 alone clusters
+#
+##########################################################
+```
+
+```{r}
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(scales)
+```
+
+```{r}
+df <- read.csv("s1_s2_data.csv") %>% select(-X) %>% filter(Episode_num < 15)
+df_dct <- read.csv("dct_C3_raw_cont.csv") %>% select(-X)
+df_dct_growth <- read.csv("dct_C3_growth_cont.csv") %>% select(-X)
+s1_shows_best_clusters_and_matches <- read.csv("s1_shows_best_clusters_and_matches.csv")
+matches_only <- read.csv("s1_shows_best_clusters_and_matches.csv") %>% 
+  select(Show_Name, C3_raw_best_matches, C3_raw_best_matches_S2, 
+         C3_growth_best_matches, C3_growth_best_matches_S2)
+
+df <- merge(df, matches_only)
+df_dct <- merge(df_dct, s1_shows_best_clusters_and_matches)
+df_dct_growth <- merge(df_dct_growth, s1_shows_best_clusters_and_matches)
+```
+
+```{r}
+my_theme <-  theme(panel.background = element_blank(), 
+                   panel.grid.major = element_line(color = "#d8d8d8", linetype = "dotted"), 
+                   panel.grid.major.x = element_blank(), 
+                   plot.title = element_text(hjust = 0.5),
+                   axis.title.y = element_blank(),
+                   axis.line.y = element_blank(),
+                   axis.ticks.y = element_blank(),
+                   axis.line.x = element_line(color = "#d8d8d8", linetype = "dashed"),
+                   strip.background = element_blank())
+```
+
+C3 Raw S1 Clusters. Best Match
+====================
+
+Row {.tabset}
+---------------------------------------
+
+### Raw Cluster 1
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 1, Season_num == 1 | Season_num == 2 & !is.na(C3_raw_best_matches))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 1500000), xlim = c(1, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Cluster 1",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Raw Cluster 2
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 2, Season_num == 1 | Season_num == 2 & !is.na(C3_raw_best_matches))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 1500000), xlim = c(1, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Cluster 2",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Raw Cluster 3
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 3, Season_num == 1 | Season_num == 2& !is.na(C3_raw_best_matches))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 1500000), xlim = c(1, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Cluster 3",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Raw Cluster 4
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 4, Season_num == 1 | Season_num == 2 & !is.na(C3_raw_best_matches))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+ coord_cartesian(ylim = c(0, 1500000), xlim = c(1, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Cluster 4",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Raw Cluster 5
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 5, Season_num == 1 | Season_num == 2 & !is.na(C3_raw_best_matches))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 1500000), xlim = c(1, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Cluster 5",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+Row {.tabset}
+---------------------------------------
+
+### Normalized Cluster 1
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 1, period <= 50 | period > 50 & !is.na(C3_raw_best_matches))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2  Raw Cluster 1",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Normalized Cluster 2
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 2, period <= 50 | period > 50 & !is.na(C3_raw_best_matches))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2  Raw Cluster 2",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Normalized Cluster 3
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 3, period <= 50 | period > 50 & !is.na(C3_raw_best_matches))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2  Raw Cluster 3",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+
+
+```
+
+### Normalized Cluster 4
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 4, period <= 50 | period > 50 & !is.na(C3_raw_best_matches))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2  Raw Cluster 4",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100,
+                       t = 50))
+
+```
+
+
+### Normalized Cluster 5
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 5, period <= 50 | period > 50 & !is.na(C3_raw_best_matches))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2  Raw Cluster 4",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100,
+                       t = 50))
+```
+
+
+
+C3 Raw S1 Clusters. S1-S2. Best S2 Match
+====================
+
+Row {.tabset}
+---------------------------------------
+
+### Raw Cluster 1
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 1, Season_num == 1 | Season_num == 2 & !is.na(C3_raw_best_matches_S2))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 1500000), xlim = c(1, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Cluster 1",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Raw Cluster 2
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 2, Season_num == 1 | Season_num == 2 & !is.na(C3_raw_best_matches_S2))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 1500000), xlim = c(1, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Cluster 2",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Raw Cluster 3
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 3, Season_num == 1 | Season_num == 2& !is.na(C3_raw_best_matches_S2))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 1500000), xlim = c(1, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Cluster 3",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Raw Cluster 4
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 4, Season_num == 1 | Season_num == 2 & !is.na(C3_raw_best_matches_S2))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+ coord_cartesian(ylim = c(0, 1500000), xlim = c(1, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Cluster 4",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Raw Cluster 5
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 5, Season_num == 1 | Season_num == 2 & !is.na(C3_raw_best_matches_S2))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 1500000), xlim = c(1, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Cluster 5",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+Row {.tabset}
+---------------------------------------
+
+### Normalized Cluster 1
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 1, period <= 50 | period > 50 & !is.na(C3_raw_best_matches_S2))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2  Raw Cluster 1",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Normalized Cluster 2
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 2, period <= 50 | period > 50 & !is.na(C3_raw_best_matches_S2))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2  Raw Cluster 2",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Normalized Cluster 3
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 3, period <= 50 | period > 50 & !is.na(C3_raw_best_matches_S2))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2  Raw Cluster 3",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+
+
+```
+
+### Normalized Cluster 4
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 4, period <= 50 | period > 50 & !is.na(C3_raw_best_matches_S2))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2  Raw Cluster 4",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100,
+                       t = 50))
+
+```
+
+
+### Normalized Cluster 5
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct %>% filter(is.na(C3_raw_cluster) == F, C3_raw_cluster == 5, period <= 50 | period > 50 & !is.na(C3_raw_best_matches_S2))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2  Raw Cluster 4",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100,
+                       t = 50))
+```
+
+
+C3 Growth S1 Clusters. Best Match
+====================
+
+Row {.tabset}
+---------------------------------------
+
+### Raw Cluster 1
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 1, Season_num == 1 | Season_num == 2 & !is.na(C3_growth_best_matches))) +
+  geom_line(aes(x = Episode_num, y = C3_Growth, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 3), xlim = c(2, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Growth Cluster 1",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Raw Cluster 2
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 2, Season_num == 1 | Season_num == 2 & !is.na(C3_growth_best_matches))) +
+  geom_line(aes(x = Episode_num, y = C3_Growth, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 3), xlim = c(2, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Growth Cluster 2",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Raw Cluster 3
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 3, Season_num == 1 | Season_num == 2& !is.na(C3_growth_best_matches))) +
+  geom_line(aes(x = Episode_num, y = C3_Growth, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 3), xlim = c(2, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Growth Cluster 3",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Raw Cluster 4
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 4, Season_num == 1 | Season_num == 2 & !is.na(C3_growth_best_matches))) +
+  geom_line(aes(x = Episode_num, y = C3_Growth, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+ coord_cartesian(ylim = c(0, 3), xlim = c(2, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Growth Cluster 4",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Raw Cluster 5
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 5, Season_num == 1 | Season_num == 2 & !is.na(C3_growth_best_matches))) +
+  geom_line(aes(x = Episode_num, y = C3_Growth, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 3), xlim = c(2, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Growth Cluster 5",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+Row {.tabset}
+---------------------------------------
+
+### Normalized Cluster 1
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct_growth %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 1, period <= 50 | period > 50 & !is.na(C3_growth_best_matches))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2 Growth Cluster 1",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Normalized Cluster 2
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct_growth %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 2, period <= 50 | period > 50 & !is.na(C3_growth_best_matches))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2 Growth Cluster 2",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Normalized Cluster 3
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct_growth %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 3, period <= 50 | period > 50 & !is.na(C3_growth_best_matches))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2 Growth Cluster 3",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+
+
+```
+
+### Normalized Cluster 4
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct_growth %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 4, period <= 50 | period > 50 & !is.na(C3_growth_best_matches))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2 Growth Cluster 4",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100,
+                       t = 50))
+
+```
+
+
+### Normalized Cluster 5
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct_growth %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 5, period <= 50 | period > 50 & !is.na(C3_growth_best_matches))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2 Growth Cluster 4",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100,
+                       t = 50))
+```
+
+
+
+C3 Growth S1 Clusters. S1-S2. Best S2 Match
+====================
+
+Row {.tabset}
+---------------------------------------
+
+### Raw Cluster 1
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 1, Season_num == 1 | Season_num == 2 & !is.na(C3_growth_best_matches_S2))) +
+  geom_line(aes(x = Episode_num, y = C3_Growth, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 3), xlim = c(2, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Growth Cluster 1",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Raw Cluster 2
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 2, Season_num == 1 | Season_num == 2 & !is.na(C3_growth_best_matches_S2))) +
+  geom_line(aes(x = Episode_num, y = C3_Growth, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 3), xlim = c(2, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Growth Cluster 2",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Raw Cluster 3
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 3, Season_num == 1 | Season_num == 2& !is.na(C3_growth_best_matches_S2))) +
+  geom_line(aes(x = Episode_num, y = C3_Growth, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 3), xlim = c(2, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Growth Cluster 3",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Raw Cluster 4
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 4, Season_num == 1 | Season_num == 2 & !is.na(C3_growth_best_matches_S2))) +
+  geom_line(aes(x = Episode_num, y = C3_Growth, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+ coord_cartesian(ylim = c(0, 3), xlim = c(2, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Growth Cluster 4",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Raw Cluster 5
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 5, Season_num == 1 | Season_num == 2 & !is.na(C3_growth_best_matches_S2))) +
+  geom_line(aes(x = Episode_num, y = C3_Growth, color = Show_Name)) +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Linear"), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  geom_smooth(aes(x = Episode_num, y = C3_Growth, alpha = "Smooth"), 
+              color = "#747677", se = F, linetype = "dotted") +
+  labs(x = "Episode Number") +
+  scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(0, 3), xlim = c(2, 13)) +
+  facet_wrap(~ Season_num) +
+  theme(panel.spacing = unit(0, "lines")) +
+  my_theme
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Impressions, S1-S2 Growth Cluster 5",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+Row {.tabset}
+---------------------------------------
+
+### Normalized Cluster 1
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct_growth %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 1, period <= 50 | period > 50 & !is.na(C3_growth_best_matches_S2))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2 Growth Cluster 1",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Normalized Cluster 2
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct_growth %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 2, period <= 50 | period > 50 & !is.na(C3_growth_best_matches_S2))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2 Growth Cluster 2",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Normalized Cluster 3
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct_growth %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 3, period <= 50 | period > 50 & !is.na(C3_growth_best_matches_S2))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2 Growth Cluster 3",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100, 
+                       t = 50))
+```
+
+### Normalized Cluster 4
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct_growth %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 4, period <= 50 | period > 50 & !is.na(C3_growth_best_matches_S2))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2 Growth Cluster 4",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100,
+                       t = 50))
+```
+
+
+### Normalized Cluster 5
+
+```{r, fig.align = 'center'}
+C3_raw <- ggplot(df_dct_growth %>% filter(is.na(C3_growth_cluster) == F, C3_growth_cluster == 5, period <= 50 | period > 50 & !is.na(C3_growth_best_matches_S2))) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) +
+  scale_y_continuous(labels = comma) +
+  my_theme 
+
+ggplotly(C3_raw) %>% 
+  layout(title = "C3 Normalized Impressions, S1-S2 Growth Cluster 4",
+         autosize = FALSE, width = 1700, height = 500, 
+         margin = list(l = 150, 
+                       r = 50, 
+                       b = 100,
+                       t = 50))
+```

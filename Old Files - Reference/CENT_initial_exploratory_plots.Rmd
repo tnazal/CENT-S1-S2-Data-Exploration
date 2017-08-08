@@ -1,0 +1,220 @@
+---
+title: "CENT S1-S2 Exploratory Visualizations"
+author: "Mallory Evans"
+date: "May 31, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(purrr)
+library(tidyverse)
+library(syuzhet)
+library(broom)
+library(factoextra)
+library(dtwclust)
+```
+
+```{r set directory}
+d <- read.csv("CENT_showlevel.csv")
+```
+
+## Visualize Raw Data
+
+```{r}
+d %>% filter(Season_num == 1, Episode_num < 14 & Episode_num > 1) %>% 
+  group_by(Episode_num) %>% 
+  summarise(impressions = mean(C3_Impressions)) %>% 
+  plot_ly(x = ~Episode_num, y = ~impressions, 
+          type = 'scatter', mode = 'lines') %>% 
+  layout(showlegend = FALSE)
+
+d %>% filter(Season_num == 1, Episode_num < 14 & Episode_num > 1) %>% 
+  plot_ly(x = ~Episode_num, y = ~C3_Impressions, 
+          color = ~Show_Name, type = 'scatter', mode = 'lines') %>% 
+  layout(showlegend = FALSE)
+
+d %>% filter(Season_num == 1, Episode_num < 14 & Episode_num > 1) %>% 
+  group_by(Episode_num) %>% 
+  summarise(C3_Rebase = mean(C3_Rebase)) %>% 
+  plot_ly(x = ~Episode_num, y = ~C3_Rebase, 
+          type = 'scatter', mode = 'lines') %>% 
+  layout(showlegend = FALSE)
+
+d %>% filter(Season_num == 1, Episode_num < 14 & Episode_num > 1) %>% 
+  plot_ly(x = ~Episode_num, y = ~C3_Rebase, 
+          color = ~Show_Name, type = 'scatter', mode = 'lines') %>% 
+  layout(showlegend = FALSE)
+
+d %>% filter(Season_num == 1, Episode_num < 14 & Episode_num > 1) %>% 
+  group_by(Episode_num) %>% 
+  summarise(C3_Growth = mean(C3_Growth)) %>% 
+  plot_ly(x = ~Episode_num, y = ~C3_Growth, 
+          type = 'scatter', mode = 'lines') %>% 
+  layout(showlegend = FALSE)
+
+d %>% filter(Season_num == 1, Episode_num < 14 & Episode_num > 1) %>% 
+  plot_ly(x = ~Episode_num, y = ~C3_Growth, 
+          color = ~Show_Name, type = 'scatter', mode = 'lines') %>% 
+  layout(showlegend = FALSE)
+```
+
+```{r}
+gg <- d %>% filter(Season_num == 1, Episode_num < 14 & Episode_num > 1) %>% 
+  group_by(Network, Episode_num) %>% 
+  summarise(impressions = mean(C3_Impressions)) %>%
+  ggplot(aes(x = Episode_num, y = impressions)) + 
+  geom_line() + 
+  facet_wrap(~ Network) + 
+  theme(legend.position = "none")
+
+ggplotly(gg)
+
+gg <- d %>% filter(Season_num == 1, Episode_num < 14 & Episode_num > 1) %>% 
+  ggplot(aes(x = Episode_num, y = C3_Impressions, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ Network) + 
+  theme(legend.position = "none")
+
+ggplotly(gg)
+
+gg <- d %>% filter(Season_num == 1, Episode_num < 14 & Episode_num > 1) %>% 
+  group_by(Network, Episode_num) %>% 
+  summarise(C3_Rebase = mean(C3_Rebase)) %>%
+  ggplot(aes(x = Episode_num, y = C3_Rebase)) + 
+  geom_line() + 
+  facet_wrap(~ Network) + 
+  theme(legend.position = "none")
+
+ggplotly(gg)
+
+gg <- d %>% filter(Season_num == 1, Episode_num < 14 & Episode_num > 1) %>% 
+  ggplot(aes(x = Episode_num, y = C3_Rebase, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ Network) + 
+  theme(legend.position = "none")
+
+ggplotly(gg)
+
+gg <- d %>% filter(Season_num == 1, Episode_num < 14 & Episode_num > 1) %>% 
+  group_by(Network, Episode_num) %>% 
+  summarise(C3_Growth = mean(C3_Growth)) %>%
+  ggplot(aes(x = Episode_num, y = C3_Growth)) + 
+  geom_line() + 
+  facet_wrap(~ Network) + 
+  theme(legend.position = "none")
+
+ggplotly(gg)
+
+gg <- d %>% filter(Season_num == 1, Episode_num < 14 & Episode_num > 1) %>% 
+  ggplot(aes(x = Episode_num, y = C3_Growth, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ Network) + 
+  theme(legend.position = "none")
+
+ggplotly(gg)
+```
+
+```{r}
+d %>% filter(Season_num == 1, Episode_num < 14) %>% 
+  plot_ly(y = ~reorder(DOW, C3_Impressions), x = ~C3_Impressions, 
+          color = ~Network, type = 'box')
+
+d %>% filter(Season_num == 1) %>% 
+  plot_ly(y = ~reorder(Genre, C3_Impressions), x = ~C3_Impressions, 
+          color = ~Network, type = 'box')
+
+d %>% filter(Season_num == 1) %>% 
+  plot_ly(y = ~reorder(Episode_num, C3_Impressions), x = ~C3_Impressions, 
+          color = ~Network, type = 'box')
+```
+
+```{r}
+gg <- d %>% filter(Season_num == 1, Episode_num < 14 & Episode_num > 1) %>% 
+  group_by(Network, Episode_num, C3_Impressions) %>% 
+  summarise(impressions = mean(C3_Impressions)) %>% 
+  ggplot(aes(x = Episode_num, y = impressions)) + 
+  geom_boxplot() + facet_wrap(~ Network)
+
+ggplotly(gg)
+```
+
+## Normalize Show Curves with DCT
+
+```{r}
+df <- d %>% group_by(Network, Show_Name) %>%
+  filter(all(c(1, 2) %in% Season_num))
+```
+
+```{r}
+df <- df[df$Show_Name != "RHOM", ]
+```
+
+```{r}
+df_curves <- df %>% 
+  group_by(Network, Show_Name, Season_num) %>% 
+  summarise(imps = list(C3_Impressions), 
+            episode_count_max = max(Episode_num)) %>% 
+  filter(episode_count_max >= 3)
+```
+
+```{r}
+dct <- function(x){
+  get_dct_transform(
+      x, 
+      low_pass_size = 3, 
+      x_reverse_len = 100,
+      scale_vals = FALSE,
+      scale_range = TRUE
+      )
+}
+```
+
+```{r}
+df_with_dct <- df_curves %>% 
+  mutate(dct_values = map(imps, dct)) %>% 
+  select(-c(imps, episode_count_max)) %>% 
+  unnest(dct_values) %>% 
+  group_by(Network, Show_Name, Season_num) %>% 
+  mutate(period = row_number()) 
+```
+
+```{r}
+df_final <- df_with_dct %>% 
+  spread(key = period, value = dct_values)
+```
+
+## Visualize Show Curves
+
+```{r}
+df_with_dct %>% filter(Season_num == 1) %>% 
+  plot_ly(x = ~period, y = ~dct_values, color = ~Show_Name, 
+          type = 'scatter', mode = 'lines')
+```
+
+```{r}
+g <- df_with_dct %>% filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + theme(legend.position = "none") + 
+  facet_wrap(~ Network)
+
+ggplotly(g)
+```
+
+```{r}
+plot1 <- df_with_dct %>% filter(Season_num == 1) %>% 
+  plot_ly(x = ~period, y = ~dct_values, color = ~Show_Name, 
+          type = 'scatter', mode = 'lines')
+plot2 <- df_with_dct %>% filter(Season_num == 2) %>% 
+  plot_ly(x = ~period, y = ~dct_values, color = ~Show_Name, 
+          type = 'scatter', mode = 'lines')
+p <- subplot(plot1, plot2)
+p
+```
+
