@@ -1,0 +1,885 @@
+---
+title: "CENT S1 K-Means Clustering on C3 & LS Appended, Differences, and Averages"
+output:
+  html_notebook: default
+  html_document: default
+---
+
+```{r}
+##################################################################################
+# inputs: dct_C3_LS_raw.csv, dct_spread_C3_LS_raw.csv, 
+#         dct_C3_LS_diff.csv, dct_spread_C3_LS_diff.csv, 
+#         dct_C3_LS_avg.csv, dct_spread_C3_LS_avg.csv
+#
+# purpose: K-Means clustering for CENT S1 using C3 and LS appended,
+#          C3-LS (difference) normalized, and C3 & LS averaged normalized
+##################################################################################
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(dplyr)
+library(broom)
+library(ggplot2)
+library(plotly)
+library(factoextra)
+library(dtwclust)
+library(fpc)
+```
+
+# S1 Curve Clustering on C3 & LS Normalized Separately and Appended
+
+Using examples from https://cran.r-project.org/web/packages/broom/vignettes/kmeans.html.
+
+```{r}
+dct_df <- read.csv("dct_C3_LS_raw.csv") %>% select(-X)
+dct_spread <- read.csv("dct_spread_C3_LS_raw.csv") %>% select(-X)
+```
+
+```{r}
+cluster_s1 <- dct_spread %>% 
+  filter(Season_num == 1) %>%
+  ungroup() %>%
+  select(-Network, -Season_num, -Show_Name)
+```
+
+## General K-Means Clustering
+
+```{r}
+set.seed(12)
+kclusts_s1 <- data.frame(k = 1:5) %>% 
+  group_by(k) %>% 
+  do(kclust = kmeans(cluster_s1, centers = .$k, nstart = 20))
+
+assignments_s1 <- kclusts_s1 %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s1))
+```
+
+### Optimal Number of Clusters
+
+```{r}
+fviz_nbclust(cluster_s1, 
+             kmeans, 
+             method = "wss",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1, 
+             kmeans, 
+             method = "silhouette",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1, 
+             kmeans, 
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1, 
+             cluster::pam, 
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1, 
+             hcut, 
+             hc_method = "single",
+             hc_metric = "euclidean",
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1, 
+             hcut, 
+             hc_method = "single",
+             hc_metric = "pearson",
+             method = "silhouette",
+             k.max = 5,
+             nboot = 500)
+```
+
+### 3 Clusters (K-Means)
+
+```{r}
+clusters3_s1_spread <- assignments_s1 %>% 
+  filter(k == 3) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_3 = .cluster) %>% 
+  bind_cols(filter(dct_spread, Season_num == 1)) 
+
+clusters3_s1 <- merge(clusters3_s1_spread[, c("cluster_kmeans_3", "Show_Name")], 
+                      dct_df, by = "Show_Name")
+
+write.csv(clusters3_s1, "kmeans_C3_LS_raw_s1_3cl.csv")
+```
+
+```{r}
+clusters3_s1_plot <- clusters3_s1 %>% 
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_3, nrow = 3) + 
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(clusters3_s1_plot) %>% 
+  layout(title = "Season 1 with 3 K-Means Clusters (C3 & LS)", 
+         margin = list(t = 150))
+```
+
+#### List Show Names within Clusters
+
+```{r}
+s1_3clusters <- list(as.character(unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 1,]$Show_Name)),
+                     as.character(unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 2,]$Show_Name)),
+                     as.character(unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 3,]$Show_Name)))
+s1_3clusters
+```
+
+```{r}
+# GROUPINGS BY CLUSTER
+by_cluster_3kmeans <- clusters3_s1 %>% 
+  filter(Season_num == 1) %>% 
+  plot_ly(x = ~period, 
+         y = ~dct_values, 
+         color = ~Show_Name,
+         yaxis = ~paste0('y', cluster_kmeans_3), 
+         legendgroup = ~cluster_kmeans_3) %>% 
+  add_lines() %>% 
+  subplot(nrows = 3, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "Season 1 with 3 K-Means Clusters (C3 & LS)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+by_cluster_3kmeans
+```
+
+### 5 Clusters (K-Means)
+
+```{r}
+clusters5_s1_spread <- assignments_s1 %>% 
+  filter(k == 5) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_5 = .cluster) %>% 
+  bind_cols(filter(dct_spread, Season_num == 1)) 
+
+clusters5_s1 <- merge(clusters5_s1_spread[, c("cluster_kmeans_5", "Show_Name")], 
+                      dct_df, by = "Show_Name")
+
+write.csv(clusters5_s1, "kmeans_C3_LS_raw_s1_5cl.csv")
+```
+
+```{r}
+clusters5_s1_plot <- clusters5_s1 %>% 
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, 
+             color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 3) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(clusters5_s1_plot) %>% 
+  layout(title = "Season 1 with 5 K-Means Clusters (C3 & LS)", 
+         margin = list(t = 150))
+```
+
+#### List Show Names within Clusters
+
+```{r}
+s1_5clusters <- list(as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 1,]$Show_Name)), 
+                     as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 2,]$Show_Name)), 
+                     as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 3,]$Show_Name)), 
+                     as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 4,]$Show_Name)), 
+                     as.character(unique(clusters5_s1[clusters5_s1$cluster_kmeans_5 == 5,]$Show_Name)))
+s1_5clusters
+```
+
+```{r}
+# GROUPINGS BY CLUSTER
+by_cluster_5kmeans <- clusters5_s1 %>% 
+  filter(Season_num == 1) %>% 
+  plot_ly(x = ~period, 
+         y = ~dct_values, 
+         color = ~Show_Name,
+         yaxis = ~paste0('y', cluster_kmeans_5), 
+         legendgroup = ~cluster_kmeans_5) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "Season 1 with 5 K-Means Clusters (C3 & LS)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+by_cluster_5kmeans
+```
+
+
+----------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
+
+
+# S1 Curve Clustering on C3-LS Differences
+
+```{r}
+dct_df_diff <- read.csv("dct_C3_LS_diff.csv") %>% select(-X)
+dct_spread_diff <- read.csv("dct_spread_C3_LS_diff.csv") %>% select(-X)
+```
+
+```{r}
+cluster_s1_diff <- dct_spread_diff %>% 
+  filter(Season_num == 1) %>%
+  ungroup() %>%
+  select(-Network, -Season_num, -Show_Name)
+```
+
+## General K-Means Clustering
+
+```{r}
+set.seed(12)
+kclusts_s1_diff <- data.frame(k = 1:5) %>% 
+  group_by(k) %>% 
+  do(kclust = kmeans(cluster_s1_diff, centers = .$k, nstart = 20))
+
+assignments_s1_diff <- kclusts_s1_diff %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s1_diff))
+```
+
+### Optimal Number of Clusters
+
+```{r}
+fviz_nbclust(cluster_s1_diff, 
+             kmeans, 
+             method = "wss",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1_diff, 
+             kmeans, 
+             method = "silhouette",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1_diff, 
+             kmeans, 
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1_diff, 
+             cluster::pam, 
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1_diff, 
+             hcut, 
+             hc_method = "single",
+             hc_metric = "euclidean",
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1_diff, 
+             hcut, 
+             hc_method = "single",
+             hc_metric = "pearson",
+             method = "silhouette",
+             k.max = 5,
+             nboot = 500)
+```
+
+### 5 Clusters (K-Means)
+
+```{r}
+clusters5_s1_diff_spread <- assignments_s1_diff %>% 
+  filter(k == 5) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_5 = .cluster) %>% 
+  bind_cols(filter(dct_spread_diff, Season_num == 1)) 
+
+clusters5_s1_diff <- merge(clusters5_s1_diff_spread[, c("cluster_kmeans_5", "Show_Name")], 
+                           dct_df_diff, by = "Show_Name")
+
+write.csv(clusters5_s1_diff, "kmeans_C3_LS_raw_diff_s1_5cl.csv")
+```
+
+```{r}
+clusters5_s1_diff_plot <- clusters5_s1_diff %>% 
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, 
+             color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 5) + 
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+s1_diff_5kmeans <- ggplotly(clusters5_s1_diff_plot) %>% 
+  layout(showlegend = TRUE, 
+         title = "Season 1 with 5 K-Means Clusters (C3-LS Differences)", 
+         autosize = FALSE, width = 550, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+s1_diff_5kmeans
+```
+
+```{r}
+# S1 CLUSTERS & S2 TRENDS
+s2_spread <- dct_spread_diff %>% 
+  filter(Season_num == 2) %>%
+  ungroup() %>%
+  select(-Network, -Season_num)
+
+s2_spread_newcols <- c(paste("X", 101:200, sep = ""))
+colnames(s2_spread)[2:ncol(s2_spread)] <- c(s2_spread_newcols)
+
+s1_diff_5clusters_s2_trends <- bind_cols(clusters5_s1_diff_spread, 
+                                         s2_spread[, 2:ncol(s2_spread)])
+
+s1_diff_5clusters_s2_trends <- merge(s1_diff_5clusters_s2_trends[, c("cluster_kmeans_5", "Show_Name")], 
+                                     dct_df_diff, by = "Show_Name")
+
+s1_diff_5clusters_s2_trends <- s1_diff_5clusters_s2_trends %>% 
+  filter(Season_num == 1 | Season_num == 2) %>% 
+  group_by(Network, Show_Name) %>% 
+  mutate(period = row_number())
+
+write.csv(s1_diff_5clusters_s2_trends, "kmeans_C3_LS_raw_diff_s1_5cl_s2trends.csv")
+```
+
+#### List Show Names within Clusters
+
+```{r}
+s1_diff_5clusters <- list(as.character(unique(clusters5_s1_diff[clusters5_s1_diff$cluster_kmeans_5 == 1,]$Show_Name)),
+                          as.character(unique(clusters5_s1_diff[clusters5_s1_diff$cluster_kmeans_5 == 2,]$Show_Name)),
+                          as.character(unique(clusters5_s1_diff[clusters5_s1_diff$cluster_kmeans_5 == 3,]$Show_Name)),
+                          as.character(unique(clusters5_s1_diff[clusters5_s1_diff$cluster_kmeans_5 == 4,]$Show_Name)),
+                          as.character(unique(clusters5_s1_diff[clusters5_s1_diff$cluster_kmeans_5 == 5,]$Show_Name)))
+s1_diff_5clusters
+```
+
+```{r}
+# GROUPINGS BY CLUSTER
+by_cluster_5kmeans_diff <- plot_ly(dct_s1_diff_5clusters_s2_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_kmeans_5), 
+        legendgroup = ~cluster_kmeans_5) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "Season 1 with 5 K-Means Clusters & Season 2 Trends (C3-LS Differences)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+by_cluster_5kmeans_diff
+```
+
+```{r}
+# S1-S2 Trends Clustered on S1 Clusters
+dct_spread_diff_cont <- read.csv("dct_spread_C3_LS_diff_cont.csv") %>% select(-X)
+dct_diff_cont <- read.csv("dct_C3_LS_diff_cont.csv")
+
+season1_kmeans5_clusters <- clusters5_s1_diff_spread %>% 
+  select(Show_Name, cluster_kmeans_5) %>% 
+  rename(s1_cluster = cluster_kmeans_5)
+
+s1_clusters_cont_trends <- merge(season1_kmeans5_clusters, 
+                                 dct_spread_diff_cont, by = "Show_Name")
+
+s1_clusters_cont_trends <- merge(s1_clusters_cont_trends[, c("Show_Name", "s1_cluster")], 
+                                 dct_diff_cont, by = "Show_Name") %>% select(-X)
+
+write.csv(s1_clusters_cont_trends, "kmeans_C3_LS_raw_diff_s1_5cl_cont_trends.csv") 
+```
+
+```{r}
+# Plot for Continuous Trends Clustered on S1 Clusters
+s1_clusters_cont_trends_plot <- plot_ly(s1_clusters_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 Clusters (C3 + LS Raw Differences)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+
+s1_clusters_cont_trends_plot
+```
+
+
+----------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
+
+# S1 Curve Clustering on C3 & LS Averages
+
+```{r}
+dct_df_avg <- read.csv("dct_C3_LS_avg.csv") %>% select(-X)
+dct_spread_avg <- read.csv("dct_spread_C3_LS_avg.csv") %>% select(-X)
+```
+
+```{r}
+cluster_s1_avg <- dct_spread_avg %>% 
+  filter(Season_num == 1) %>%
+  ungroup() %>%
+  select(-Network, -Season_num, -Show_Name)
+```
+
+## General K-Means Clustering
+
+```{r}
+set.seed(12)
+kclusts_s1_avg <- data.frame(k = 1:5) %>% 
+  group_by(k) %>% 
+  do(kclust = kmeans(cluster_s1_avg, centers = .$k, nstart = 20))
+
+assignments_s1_avg <- kclusts_s1_avg %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s1_avg))
+```
+
+### Optimal Number of Clusters
+
+```{r}
+fviz_nbclust(cluster_s1_avg, 
+             kmeans, 
+             method = "wss",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1_avg, 
+             kmeans, 
+             method = "silhouette",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1_avg, 
+             kmeans, 
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1_avg, 
+             cluster::pam, 
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1_avg, 
+             hcut, 
+             hc_method = "single",
+             hc_metric = "euclidean",
+             method = "gap_stat",
+             k.max = 5)
+```
+
+```{r}
+fviz_nbclust(cluster_s1_avg, 
+             hcut, 
+             hc_method = "single",
+             hc_metric = "pearson",
+             method = "silhouette",
+             k.max = 5,
+             nboot = 500)
+```
+
+### 3 Clusters (K-Means)
+
+```{r}
+clusters3_s1_avg_spread<- assignments_s1_avg %>% 
+  filter(k == 3) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_3 = .cluster) %>% 
+  bind_cols(filter(dct_spread_avg, Season_num == 1)) 
+
+clusters3_s1_avg <- merge(clusters3_s1_avg_spread[, c("cluster_kmeans_3", "Show_Name")], 
+                          dct_df_avg, by = "Show_Name")
+
+write.csv(clusters3_s1_avg, "kmeans_C3_LS_raw_avg_s1_3cl.csv")
+```
+
+```{r}
+clusters3_s1_avg_plot <- clusters3_s1_avg %>% 
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, 
+             color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_3, nrow = 3) + 
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+s1_avg_3kmeans <- ggplotly(clusters3_s1_avg_plot) %>% 
+  layout(showlegend = TRUE, 
+         title = "Season 1 with 3 K-Means Clusters (C3 & LS Averages)", 
+         autosize = FALSE, width = 550, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+s1_avg_3kmeans
+```
+
+#### List Show Names within Clusters
+
+```{r}
+s1_avg_3clusters <- list(as.character(unique(clusters3_s1_avg[clusters3_s1_avg$cluster_kmeans_3 == 1,]$Show_Name)),
+                         as.character(unique(clusters3_s1_avg[clusters3_s1_avg$cluster_kmeans_3 == 2,]$Show_Name)),
+                         as.character(unique(clusters3_s1_avg[clusters3_s1_avg$cluster_kmeans_3 == 3,]$Show_Name)))
+s1_avg_3clusters
+```
+
+```{r}
+# S1 CLUSTERS & S2 TRENDS
+s2_spread <- dct_spread_avg %>% 
+  filter(Season_num == 2) %>%
+  ungroup() %>%
+  select(-Network, -Season_num)
+
+s2_spread_newcols <- c(paste("X", 101:200, sep = ""))
+colnames(s2_spread)[2:ncol(s2_spread)] <- c(s2_spread_newcols)
+
+s1_avg_3clusters_s2_trends <- bind_cols(clusters3_s1_avg_spread, 
+                                        s2_spread[, 2:ncol(s2_spread)])
+
+s1_avg_3clusters_s2_trends <- merge(s1_avg_3clusters_s2_trends[, c("cluster_kmeans_3", "Show_Name")], 
+                                     dct_df_avg, by = "Show_Name")
+
+dct_s1_avg_3clusters_s2_trends <- s1_avg_3clusters_s2_trends %>% 
+  filter(Season_num == 1 | Season_num == 2) %>% 
+  group_by(Network, Show_Name) %>% 
+  mutate(period = row_number())
+
+write.csv(dct_s1_avg_3clusters_s2_trends, "kmeans_C3_LS_raw_avg_s1_3cl_s2trends.csv")
+```
+
+```{r}
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
+s1_avg_3clusters_s2_trends_plot <- dct_s1_avg_3clusters_s2_trends %>%
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_3, nrow = 3) + 
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank(), 
+        panel.grid.major.x = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major = element_line(color = "#d8d8d8", 
+                                        linetype = "dotted"), 
+        strip.background = element_blank())
+
+s1_avg_3kmeans_s2trends <- ggplotly(s1_avg_3clusters_s2_trends_plot) %>% 
+  layout(title = "Season 1 with 3 K-Means Clusters & Season 2 Trends (C3 & LS Averages)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+s1_avg_3kmeans_s2trends
+```
+
+```{r}
+# GROUPINGS BY CLUSTER
+by_cluster_3kmeans_avg <- plot_ly(dct_s1_avg_3clusters_s2_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_kmeans_3), 
+        legendgroup = ~cluster_kmeans_3) %>% 
+  add_lines() %>% 
+  subplot(nrows = 3, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "Season 1 with 3 K-Means Clusters & Season 2 Trends (C3 & LS Averages)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+by_cluster_3kmeans_avg
+```
+
+### 5 Clusters (K-Means)
+
+```{r}
+clusters5_s1_avg_spread<- assignments_s1_avg %>% 
+  filter(k == 5) %>% 
+  ungroup() %>% 
+  select(.cluster) %>% 
+  rename(cluster_kmeans_5 = .cluster) %>% 
+  bind_cols(filter(dct_spread_avg, Season_num == 1)) 
+
+clusters5_s1_avg <- merge(clusters5_s1_avg_spread[, c("cluster_kmeans_5", "Show_Name")], 
+                          dct_df_avg, by = "Show_Name")
+
+write.csv(clusters5_s1_avg, "kmeans_C3_LS_raw_avg_s1_5cl.csv")
+```
+
+```{r}
+clusters5_s1_avg_plot <- clusters5_s1_avg %>% 
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, 
+             color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 5) + 
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+s1_avg_5kmeans <- ggplotly(clusters5_s1_avg_plot) %>% 
+  layout(showlegend = TRUE, 
+         title = "Season 1 with 5 K-Means Clusters (C3 & LS Averages)", 
+         autosize = FALSE, width = 550, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+s1_avg_5kmeans
+```
+
+#### List Show Names within Clusters
+
+```{r}
+s1_avg_5clusters <- list(as.character(unique(clusters5_s1_avg[clusters5_s1_avg$cluster_kmeans_5 == 1,]$Show_Name)),
+                         as.character(unique(clusters5_s1_avg[clusters5_s1_avg$cluster_kmeans_5 == 2,]$Show_Name)),
+                         as.character(unique(clusters5_s1_avg[clusters5_s1_avg$cluster_kmeans_5 == 3,]$Show_Name)),
+                         as.character(unique(clusters5_s1_avg[clusters5_s1_avg$cluster_kmeans_5 == 4,]$Show_Name)),
+                         as.character(unique(clusters5_s1_avg[clusters5_s1_avg$cluster_kmeans_5 == 5,]$Show_Name)))
+s1_avg_5clusters
+```
+
+```{r}
+# S1 CLUSTERS & S2 TRENDS
+s1_avg_5clusters_s2_trends <- bind_cols(clusters5_s1_avg_spread, 
+                                        s2_spread[, 2:ncol(s2_spread)])
+
+s1_avg_5clusters_s2_trends <- merge(s1_avg_5clusters_s2_trends[, c("cluster_kmeans_5", "Show_Name")], 
+                                    dct_df_avg, by = "Show_Name")
+
+dct_s1_avg_5clusters_s2_trends <- s1_avg_5clusters_s2_trends %>% 
+  filter(Season_num == 1 | Season_num == 2) %>% 
+  group_by(Network, Show_Name) %>% 
+  mutate(period = row_number())
+
+write.csv(dct_s1_avg_5clusters_s2_trends, "kmeans_C3_LS_raw_avg_s1_5cl_s2trends.csv")
+```
+
+```{r}
+# PLOT FOR S1 CLUSTERS & S2 TRENDS
+s1_avg_5clusters_s2_trends_plot <- dct_s1_avg_5clusters_s2_trends %>%
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 5) + 
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank(), 
+        panel.grid.major.x = element_blank(), 
+        panel.background = element_blank(),
+        panel.grid.major = element_line(color = "#d8d8d8", 
+                                        linetype = "dotted"), 
+        strip.background = element_blank())
+
+s1_avg_5kmeans_s2trends <- ggplotly(s1_avg_5clusters_s2_trends_plot) %>% 
+  layout(title = "Season 1 with 5 K-Means Clusters & Season 2 Trends (C3 & LS Averages)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+s1_avg_5kmeans_s2trends
+```
+
+```{r}
+# GROUPINGS BY CLUSTER
+by_cluster_5kmeans_avg <- plot_ly(dct_s1_avg_5clusters_s2_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_kmeans_5), 
+        legendgroup = ~cluster_kmeans_5) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "Season 1 with 5 K-Means Clusters & Season 2 Trends (C3 & LS Averages)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+by_cluster_5kmeans_avg
+```
+
+```{r}
+# S1-S2 Trends Clustered on S1 Clusters
+dct_spread_avg_cont <- read.csv("dct_spread_C3_LS_avg_cont.csv") %>% select(-X)
+dct_avg_cont <- read.csv("dct_C3_LS_avg_cont.csv")
+
+season1_kmeans5_clusters <- clusters5_s1_avg_spread %>% 
+  select(Show_Name, cluster_kmeans_5) %>% 
+  rename(s1_cluster = cluster_kmeans_5)
+
+s1_clusters_cont_trends <- merge(season1_kmeans5_clusters, 
+                                 dct_spread_avg_cont, by = "Show_Name")
+
+s1_clusters_cont_trends <- merge(s1_clusters_cont_trends[, c("Show_Name", "s1_cluster")], 
+                                 dct_avg_cont, by = "Show_Name") %>% select(-X)
+
+write.csv(s1_clusters_cont_trends, "kmeans_C3_LS_raw_avg_s1_5cl_cont_trends.csv") 
+```
+
+```{r}
+# Plot for Continuous Trends Clustered on S1 Clusters
+s1_clusters_cont_trends_plot <- plot_ly(s1_clusters_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 Clusters (C3 + LS Raw Averages)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+
+s1_clusters_cont_trends_plot
+```
+
+```{r}
+# S1-S2 Trends Clustered on S1 Clusters
+season1_kmeans3_clusters <- clusters3_s1_avg_spread %>% 
+  select(Show_Name, cluster_kmeans_3) %>% 
+  rename(s1_cluster = cluster_kmeans_3)
+
+s1_clusters_cont_trends <- merge(season1_kmeans3_clusters, 
+                                 dct_spread_avg_cont, by = "Show_Name")
+
+s1_clusters_cont_trends <- merge(s1_clusters_cont_trends[, c("Show_Name", "s1_cluster")], 
+                                 dct_avg_cont, by = "Show_Name") %>% select(-X)
+
+write.csv(s1_clusters_cont_trends, "kmeans_C3_LS_raw_avg_s1_3cl_cont_trends.csv") 
+```
+
+```{r}
+# Plot for Continuous Trends Clustered on S1 Clusters
+s1_clusters_cont_trends_plot <- plot_ly(s1_clusters_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 3, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 Clusters (C3 + LS Raw Avergages)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+
+s1_clusters_cont_trends_plot
+```
+
+# Diagnostics
+ 
+```{r}
+# create distance matrices for clusters
+kmeans_s1_3cl_d <- dist(clusters3_s1_spread[, 5:204])
+kmeans_s1_5cl_d <- dist(clusters5_s1_spread[, 5:204])
+kmeans_s1_diff_5cl_d <- dist(clusters5_s1_diff_spread[, 5:104])
+kmeans_s1_avg_3cl_d <- dist(clusters3_s1_avg_spread[, 5:104])
+kmeans_s1_avg_5cl_d <- dist(clusters5_s1_avg_spread[, 5:104])
+
+# diagnostics
+diagnostics_kmeans_C3_LS_raw_s1_3cl <- cluster.stats(kmeans_s1_3cl_d, as.numeric(clusters3_s1_spread$cluster_kmeans_3))
+diagnostics_kmeans_C3_LS_raw_s1_5cl <- cluster.stats(kmeans_s1_5cl_d, as.numeric(clusters5_s1_spread$cluster_kmeans_5))
+diagnostics_kmeans_C3_LS_raw_diff_s1_5cl <- cluster.stats(kmeans_s1_diff_5cl_d, as.numeric(clusters5_s1_diff_spread$cluster_kmeans_5))
+diagnostics_kmeans_C3_LS_raw_avg_s1_3cl <- cluster.stats(kmeans_s1_avg_3cl_d, as.numeric(clusters3_s1_avg_spread$cluster_kmeans_3))
+diagnostics_kmeans_C3_LS_raw_avg_s1_5cl <- cluster.stats(kmeans_s1_avg_5cl_d, as.numeric(clusters5_s1_avg_spread$cluster_kmeans_5))
+
+# gather diagnostic names and list all diagnostics objects
+d_names <- ls()[grep("diagnostics", ls())]
+d_list <- mget(ls()[grep("diagnostics", ls())])
+
+# generate df with statsitics of interest for comparison
+diagnostic_df <- as.data.frame(NA)
+
+for (n in 1:length(d_names)){
+  diagnostic_df[n, 1] <- paste(d_names[n])
+  diagnostic_df[n, 2] <- d_list[[n]]["average.between"]
+  diagnostic_df[n, 3] <- d_list[[n]]["average.within"]
+  diagnostic_df[n, 4] <- d_list[[n]]["wb.ratio"]
+  diagnostic_df[n, 5] <- d_list[[n]]["widestgap"]
+  diagnostic_df[n, 6] <- d_list[[n]]["dunn2"]
+  diagnostic_df[n, 7] <- d_list[[n]]["avg.silwidth"]
+  diagnostic_df[n, 8] <- d_list[[n]]["within.cluster.ss"]
+  diagnostic_df[n, 9] <- d_list[[n]]["cluster.number"]
+}
+
+# add information for decision making
+colnames(diagnostic_df)[1] <- "name"
+
+diagnostic_df$name <- sub("diagnostics_", "", diagnostic_df$name)
+
+diagnostic_df$algorithm <- ifelse(grepl("kmeans", diagnostic_df$name) == 1, "kmeans", 
+                                  ifelse(grepl("kshape", diagnostic_df$name) == 1, "kshape", 
+                                         ifelse(grepl("PCA", diagnostic_df$name) == 1, "PCA", 
+                                                ifelse(grepl("tadpole", diagnostic_df$name) == 1, "TADpole", 
+                                                       ifelse(grepl("dtw", diagnostic_df$name) == 1, "DTW", 0)))))
+
+diagnostic_df$season <- ifelse(grepl("s1", diagnostic_df$name) == 1, "s1", 
+                               ifelse(grepl("s2", diagnostic_df$name) == 1, "s2",
+                                      ifelse(grepl("sep", diagnostic_df$name) == 1, "sep",
+                                             ifelse(grepl("cont", diagnostic_df$name) == 1, "cont", 0))))
+
+diagnostic_df$stream <- ifelse(grepl("C3_LS", diagnostic_df$name) == 1, "C3+LS",
+                                             ifelse(grepl("LS", diagnostic_df$name) == 1, "LS",
+                                                    ifelse(grepl("C3", diagnostic_df$name) == 1, "C3", 0)))
+
+diagnostic_df$data <- ifelse(grepl("raw_diff", diagnostic_df$name) == 1, "raw diff",
+                             ifelse(grepl("raw_avg", diagnostic_df$name) == 1, "raw avg",
+                                    ifelse(grepl("growth_diff", diagnostic_df$name) == 1, "growth diff",
+                                           ifelse(grepl("growth_avg", diagnostic_df$name) == 1, "growth avg", 
+                                                  ifelse(grepl("raw_growth", diagnostic_df$name) == 1, "raw+growth",
+                                                         ifelse(grepl("growth", diagnostic_df$name) == 1, "growth",
+                                                                ifelse(grepl("raw", diagnostic_df$name) == 1, "raw",0)))))))
+```
+
+```{r}
+# write table
+write.csv(diagnostic_df, "diagnostics_kmeans_C3_LS_raw.csv")
+```
