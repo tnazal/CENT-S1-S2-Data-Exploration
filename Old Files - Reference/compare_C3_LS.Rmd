@@ -1,0 +1,462 @@
+---
+title: "CENT C3 vs LS"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, echo = FALSE)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(scales)
+library(plotly)
+```
+
+```{r}
+data <- read.csv("s1_s2_data.csv") %>% select(-X)
+stats_by_season <- read.csv("s1_s2_stats_by_season.csv") %>% select(-X)
+```
+
+```{r}
+s1_C3_clusters <- data %>% 
+  filter(Season_num == 1) %>% 
+  group_by(C3_raw_cluster) %>% 
+  summarise(unique_DOW = length(unique(DOW)), 
+            unique_start = length(unique(Start_Time)), 
+            unique_network = length(unique(Network)), 
+            unique_broadcast_year = length(unique(Broadcast_Year)), 
+            unique_genre = length(unique(Genre)), 
+            unique_duration = length(unique(Program_Duration)), 
+            higher_imps_by_ep = ifelse(((sum(higher_imps == "C3")) > sum(higher_imps == "LS")), 
+                                         "C3", "LS"), 
+            avg_C3 = mean(C3_Impressions), 
+            avg_LS = mean(LS_Impressions))
+
+s1_LS_clusters <- data %>% 
+  filter(Season_num == 1) %>% 
+  group_by(LS_raw_cluster) %>% 
+  summarise(unique_DOW = length(unique(DOW)), 
+            unique_start = length(unique(Start_Time)), 
+            unique_network = length(unique(Network)), 
+            unique_broadcast_year = length(unique(Broadcast_Year)), 
+            unique_genre = length(unique(Genre)), 
+            unique_duration = length(unique(Program_Duration)), 
+            higher_imps_by_ep = ifelse(((sum(higher_imps == "C3")) > sum(higher_imps == "LS")), 
+                                         "C3", "LS"), 
+            avg_C3 = mean(C3_Impressions), 
+            avg_LS = mean(LS_Impressions))
+```
+
+```{r}
+data %>% filter(Season_num == 1) %>% 
+  count(C3_raw_cluster, DOW) %>%
+  group_by(C3_raw_cluster) %>% 
+  mutate(proportion = round(100 * n / sum(n), 2), 
+         total = sum(n)) %>% 
+  plot_ly(x = ~C3_raw_cluster, y = ~proportion, 
+          type = "bar", color = ~DOW, 
+          text = ~paste('Count: ', n, 
+                        '<br> Total: ', total)) %>% 
+  layout(barmode = "stack",
+         yaxis = list(title = "Proportion"), 
+         xaxis = list(title = "Cluster"), 
+         title = paste("Proportion of Days of Week in Clusters"))
+```
+
+```{r}
+data %>% filter(Season_num == 1) %>%
+  group_by(Network) %>% 
+  count(C3_raw_cluster) %>%
+  group_by(C3_raw_cluster) %>% 
+  mutate(proportion = round(100 * n / sum(n), 2), 
+         total = sum(n))
+```
+
+```{r}
+data %>% filter(Season_num == 1) %>%
+  count(C3_raw_cluster, Network) %>%
+  group_by(C3_raw_cluster) %>% 
+  mutate(proportion = round(100 * n / sum(n), 2), 
+         total = sum(n))
+```
+
+```{r}
+data %>% filter(Season_num == 1) %>% 
+  group_by(C3_raw_cluster) %>% 
+  summarise(unique_DOW = length(unique(DOW)), 
+            unique_starts = length(unique(Start_Time)),
+            unique_network = length(unique(Network)), 
+            unique_genre = length(unique(Genre)), 
+            unique_duration = length(unique(Program_Duration)),
+            unique_year = length(unique(Broadcast_Year)),
+            DOW_changes = max(unique_DOWs_season) - 1, 
+            start_changes = max(unique_starts_season) - 1)
+```
+
+```{r}
+data %>% filter(Season_num == 1) %>% 
+  group_by(LS_raw_cluster) %>% 
+  summarise(unique_DOW = length(unique(DOW)), 
+            unique_starts = length(unique(Start_Time)),
+            unique_network = length(unique(Network)), 
+            unique_genre = length(unique(Genre)), 
+            unique_duration = length(unique(Program_Duration)),
+            unique_year = length(unique(Broadcast_Year)),
+            DOW_changes = max(unique_DOWs_season) - 1, 
+            start_changes = max(unique_starts_season) - 1)
+```
+
+```{r}
+data %>% filter(Season_num == 1) %>% 
+  group_by(C3_LS_raw_cluster) %>% 
+  summarise(unique_DOW = length(unique(DOW)), 
+            unique_starts = length(unique(Start_Time)),
+            unique_network = length(unique(Network)), 
+            unique_genre = length(unique(Genre)), 
+            unique_duration = length(unique(Program_Duration)),
+            unique_year = length(unique(Broadcast_Year)),
+            DOW_changes = max(unique_DOWs_season) - 1, 
+            start_changes = max(unique_starts_season) - 1)
+```
+
+```{r}
+data %>% filter(Season_num == 1) %>% 
+  group_by(C3_LS_raw_diff_cluster) %>% 
+  summarise(unique_DOW = length(unique(DOW)), 
+            unique_starts = length(unique(Start_Time)),
+            unique_network = length(unique(Network)), 
+            unique_genre = length(unique(Genre)), 
+            unique_duration = length(unique(Program_Duration)),
+            unique_year = length(unique(Broadcast_Year)),
+            DOW_changes = max(unique_DOWs_season) - 1, 
+            start_changes = max(unique_starts_season) - 1)
+```
+
+```{r}
+data %>% filter(Season_num == 1) %>% 
+  group_by(C3_LS_raw_avg_cluster) %>% 
+  summarise(unique_DOW = length(unique(DOW)), 
+            unique_starts = length(unique(Start_Time)),
+            unique_network = length(unique(Network)), 
+            unique_genre = length(unique(Genre)), 
+            unique_duration = length(unique(Program_Duration)),
+            unique_year = length(unique(Broadcast_Year)),
+            DOW_changes = max(unique_DOWs_season) - 1, 
+            start_changes = max(unique_starts_season) - 1)
+```
+
+```{r}
+data %>% filter(Season_num == 1) %>% 
+  filter(!is.na(raw_growth_C3_cluster)) %>% 
+  group_by(raw_growth_C3_cluster) %>% 
+  summarise(unique_DOW = length(unique(DOW)), 
+            unique_starts = length(unique(Start_Time)),
+            unique_network = length(unique(Network)), 
+            unique_genre = length(unique(Genre)), 
+            unique_duration = length(unique(Program_Duration)),
+            unique_year = length(unique(Broadcast_Year)),
+            DOW_changes = max(unique_DOWs_season) - 1, 
+            start_changes = max(unique_starts_season) - 1)
+```
+
+# Plots
+
+```{r}
+my_theme <- theme(panel.background = element_blank(), 
+                  panel.grid.major = element_line(color = "#d8d8d8", linetype = "dotted"), 
+                  panel.grid.major.x = element_blank(), 
+                  plot.title = element_text(hjust = 0.5),
+                  legend.position = "bottom",
+                  axis.line.y = element_blank(),
+                  axis.ticks.y = element_blank(),
+                  axis.line.x = element_line(color = "#d8d8d8", linetype = "dashed"),
+                  strip.background = element_blank())
+```
+
+```{r}
+data %>% 
+  group_by(Network) %>% 
+  summarise(avg_LS = mean(LS_Impressions), 
+                          avg_C3 = mean(C3_Impressions)) %>% 
+  plot_ly(x = ~Network, colors = c("#31a354", "#3182bd")) %>%
+  add_trace(y = ~avg_C3, color = "C3 Impressions", type = "bar") %>%
+  add_trace(y = ~avg_LS, color = "LS Impressions", type = "bar") %>% 
+  layout(title = "Average C3 vs LS Impressions by Network", 
+         yaxis = list(title = ""))
+
+data %>% 
+  group_by(DOW) %>% 
+  summarise(avg_LS = mean(LS_Impressions), 
+            avg_C3 = mean(C3_Impressions)) %>% 
+  plot_ly(x = ~DOW, colors = c("#31a354", "#3182bd")) %>%
+  add_trace(y = ~avg_C3, color = "C3", type = "bar") %>%
+  add_trace(y = ~avg_LS, color = "LS", type = "bar") %>% 
+  layout(title = "Average C3 vs LS Impressions by Day of Week", 
+         xaxis = list(title = "Day of Week"),
+         yaxis = list(title = ""))
+
+data %>% 
+  group_by(Start_Time) %>% 
+  summarise(avg_LS = mean(LS_Impressions), 
+            avg_C3 = mean(C3_Impressions)) %>% 
+  plot_ly(x = ~Start_Time, colors = c("#31a354", "#3182bd")) %>%
+  add_trace(y = ~avg_C3, color = "C3", type = "bar") %>%
+  add_trace(y = ~avg_LS, color = "LS", type = "bar") %>% 
+  layout(title = "Average C3 vs LS Impressions by Start Time", 
+         xaxis = list(title = "Start Time"),
+         yaxis = list(title = ""))
+
+data %>% 
+  group_by(Genre) %>% 
+  summarise(avg_LS = mean(LS_Impressions), 
+            avg_C3 = mean(C3_Impressions)) %>% 
+  plot_ly(x = ~Genre, colors = c("#31a354", "#3182bd")) %>%
+  add_trace(y = ~avg_C3, color = "C3", type = "bar") %>%
+  add_trace(y = ~avg_LS, color = "LS", type = "bar") %>% 
+  layout(title = "Average C3 vs LS Impressions by Genre", 
+         xaxis = list(title = "Genre"),
+         yaxis = list(title = ""))
+
+data %>% 
+  group_by(Program_Duration) %>% 
+  summarise(avg_LS = mean(LS_Impressions), 
+            avg_C3 = mean(C3_Impressions)) %>% 
+  plot_ly(x = ~Program_Duration, colors = c("#31a354", "#3182bd")) %>%
+  add_trace(y = ~avg_C3, color = "C3", type = "bar") %>%
+  add_trace(y = ~avg_LS, color = "LS", type = "bar") %>% 
+  layout(title = "Average C3 vs LS Impressions by Program Duration", 
+         xaxis = list(title = "Program Duration"),
+         yaxis = list(title = ""))
+
+data %>% 
+  group_by(Broadcast_Year) %>% 
+  summarise(avg_LS = mean(LS_Impressions), 
+            avg_C3 = mean(C3_Impressions)) %>% 
+  plot_ly(x = ~Broadcast_Year, colors = c("#31a354", "#3182bd")) %>%
+  add_trace(y = ~avg_C3, color = "C3", type = "bar") %>%
+  add_trace(y = ~avg_LS, color = "LS", type = "bar") %>% 
+  layout(title = "Average C3 vs LS Impressions by Broadcast Year", 
+         xaxis = list(title = "Broadcast Year"),
+         yaxis = list(title = ""))
+
+data %>% 
+  group_by(Cable_Qtr) %>% 
+  summarise(avg_LS = mean(LS_Impressions), 
+            avg_C3 = mean(C3_Impressions)) %>% 
+  plot_ly(x = ~Cable_Qtr, colors = c("#31a354", "#3182bd")) %>%
+  add_trace(y = ~avg_C3, color = "C3", type = "bar") %>%
+  add_trace(y = ~avg_LS, color = "LS", type = "bar") %>% 
+  layout(title = "Average C3 vs LS Impressions by Cable_Qtr", 
+         xaxis = list(title = "Program Duration"),
+         yaxis = list(title = ""))
+```
+
+```{r, fig.height=15}
+data %>% 
+  group_by(Show_Name) %>% 
+  summarise(avg_LS = mean(LS_Impressions), 
+            avg_C3 = mean(C3_Impressions)) %>% 
+  plot_ly(y = ~Show_Name, colors = c("#31a354", "#3182bd")) %>%
+  add_trace(x = ~avg_C3, color = "C3", type = "bar") %>%
+  add_trace(x = ~avg_LS, color = "LS", type = "bar") %>% 
+  layout(title = "Average C3 vs LS Impressions by Show", 
+         xaxis = list(title = ""),
+         yaxis = list(title = ""),
+         margin = list(l = 170))
+```
+
+```{r}
+comp_imps <- function(show)
+{
+  season2 <- data %>% filter(Show_Name == show, Season_num == 2)
+   data %>% 
+    filter(Show_Name == show) %>% 
+    plot_ly(x = ~cum_ep) %>%  
+    add_trace(y = ~C3_Impressions, type = "scatter", mode = "line+markers", 
+              color = "C3", line = list(color = "#31a354")) %>%
+    add_trace(y = ~LS_Impressions, type = "scatter", mode = "line+markers", 
+              color = "LS", line = list(color = "#3182bd")) %>%
+    layout(title = paste("C3 vs LS Impressions for", show),
+           yaxis = list(title = ""), 
+           xaxis = list(title = "Episode"),
+           margin = list(l = 80, 
+                         r = 0, 
+                         b = 50, 
+                         t = 50), 
+           shapes = list(type = "line", 
+                         x0 = ~min(season2$cum_ep), 
+                         x1 = ~min(season2$cum_ep), 
+                         xref = "x",
+                         y0 = 0, 
+                         y1 = 1,
+                         yref = "paper",
+                         line = list(dash = 'dot', width = 1)), 
+           annotations = list(text = "Season 2",
+                              font = list(family = "Arial", 
+                                          color = "grey"),
+                              x = ~min(season2$cum_ep),
+                              xref = "x",
+                              xanchor = "right",
+                              y = 1,
+                              yref = "paper",
+                              textangle = 270,
+                              showarrow = FALSE))
+}
+
+comp_imps_s1 <- function(show)
+{
+  season1 %>% 
+    filter(Show_Name == show) %>% 
+    plot_ly(x = ~cum_ep) %>%  
+    add_trace(y = ~C3_Impressions, type = "scatter", mode = "line+markers", 
+              color = "C3", line = list(color = "#31a354")) %>%
+    add_trace(y = ~LS_Impressions, type = "scatter", mode = "line+markers", 
+              color = "LS", line = list(color = "#3182bd")) %>%
+    layout(title = paste("C3 vs LS Impressions for", show),
+           yaxis = list(title = ""), 
+           xaxis = list(title = "Episode"),
+           margin = list(l = 80, 
+                         r = 0, 
+                         b = 50, 
+                         t = 50))
+}
+```
+
+```{r}
+comp_imps("UNTYING KNOT")
+comp_imps("WAGS")
+```
+
+```{r}
+data %>% 
+  filter(Season_num == 1) %>% 
+  group_by(Date) %>%
+  mutate(avg_LS = mean(LS_Impressions), 
+         avg_C3 = mean(C3_Impressions)) %>% 
+  ggplot() +
+  geom_line(aes(y = avg_C3, x = Date, 
+                group = 1, color = "C3")) +
+  geom_line(aes(y = avg_LS, x = Date, 
+                group = 2, color = "LS")) +
+  facet_wrap(~ Network) + 
+  labs(x = "Broadcast Date", y = NULL, color = NULL) + 
+  scale_color_manual(values = c("#31a354", "#3182bd")) + 
+  scale_y_continuous(labels = comma) + 
+  my_theme + 
+  ggtitle("Avg C3 vs LS Over Time by Network")
+
+data %>% 
+  filter(Season_num == 1) %>% 
+  group_by(Date) %>%
+  mutate(avg_LS = mean(LS_Impressions), 
+         avg_C3 = mean(C3_Impressions)) %>% 
+  ggplot() +
+  geom_line(aes(y = avg_C3, x = Date, 
+                group = 1, color = "C3")) +
+  geom_line(aes(y = avg_LS, x = Date, 
+                group = 2, color = "LS")) +
+  facet_wrap(~ DOW) + 
+  labs(x = "Broadcast Date", y = NULL, color = NULL) + 
+  scale_color_manual(values = c("#31a354", "#3182bd")) + 
+  scale_y_continuous(labels = comma) + 
+  my_theme + 
+  ggtitle("Avg C3 vs LS Over Time by Network")
+
+data %>% 
+  filter(Season_num == 1) %>% 
+  group_by(Date) %>%
+  mutate(avg_LS = mean(LS_Impressions), 
+         avg_C3 = mean(C3_Impressions)) %>% 
+  ggplot() +
+  geom_line(aes(y = avg_C3, x = Date, 
+                group = 1, color = "C3")) +
+  geom_line(aes(y = avg_LS, x = Date, 
+                group = 2, color = "LS")) +
+  facet_wrap(~ DOW) + 
+  labs(x = "Broadcast Date", y = NULL, color = NULL) + 
+  scale_color_manual(values = c("#31a354", "#3182bd")) + 
+  scale_y_continuous(labels = comma) + 
+  my_theme + 
+  ggtitle("Avg C3 vs LS Over Time by DOW")
+
+p <- data %>% 
+  filter(Season_num == 1) %>% 
+  group_by(Date) %>%
+  mutate(avg_LS = mean(LS_Impressions), 
+         avg_C3 = mean(C3_Impressions)) %>% 
+  ggplot() +
+  geom_line(aes(y = avg_C3, x = Date, 
+                group = 1, color = "C3")) +
+  geom_line(aes(y = avg_LS, x = Date, 
+                group = 2, color = "LS")) +
+  facet_wrap(~ Start_Time) + 
+  labs(x = "Broadcast Date", y = NULL, color = NULL) + 
+  scale_color_manual(values = c("#31a354", "#3182bd")) + 
+  scale_y_continuous(labels = comma) + 
+  my_theme + 
+  ggtitle("Avg C3 vs LS Over Time by Start Time")
+
+ggplotly(p)
+```
+
+```{r}
+data %>% 
+  group_by(Date) %>%
+  mutate(avg_LS = mean(LS_Impressions), 
+         avg_C3 = mean(C3_Impressions)) %>% 
+  plot_ly(x = ~Date) %>% 
+  add_trace(y = ~avg_C3, type = "scatter", mode = "line") %>% 
+  add_trace(y = ~avg_LS, type = "scatter", mode = "line")
+```
+
+```{r}
+data %>% 
+  filter(Season_num == 1) %>%
+  filter(Network == "SYFY") %>% 
+  group_by(Date) %>%
+  mutate(avg_LS = mean(LS_Impressions), 
+         avg_C3 = mean(C3_Impressions)) %>%
+  plot_ly(x = ~Date) %>% 
+  add_trace(y = ~avg_C3, mode = "line", color = "C3", line = list(color = "#31a354")) %>% 
+  add_trace(y = ~avg_LS, mode = "line", color = "LS", line = list(color = "#3182bd")) 
+
+data %>% 
+  filter(Season_num == 1) %>%
+  filter(DOW == "Thu") %>% 
+  group_by(Date) %>%
+  mutate(avg_LS = mean(LS_Impressions), 
+         avg_C3 = mean(C3_Impressions)) %>%
+  plot_ly(x = ~Date) %>% 
+  add_trace(y = ~avg_C3, mode = "line", color = "C3", line = list(color = "#31a354")) %>% 
+  add_trace(y = ~avg_LS, mode = "line", color = "LS", line = list(color = "#3182bd"))
+```
+
+```{r, fig.height=8, fig.width=10}
+p <- data %>% 
+  filter(Season_num == 1) %>% 
+  group_by(Date) %>%
+  mutate(avg_LS = mean(LS_Impressions), 
+         avg_C3 = mean(C3_Impressions)) %>% 
+  ggplot() +
+  geom_line(aes(y = avg_C3, x = Date, 
+                group = 1, color = "C3")) +
+  geom_line(aes(y = avg_LS, x = Date, 
+                group = 2, color = "LS")) +
+  facet_wrap(~ DOW) +
+  scale_color_manual(values = c("#31a354", "#3182bd")) + 
+  scale_y_continuous(labels = comma) + 
+  labs(x = NULL, y = NULL, color = NULL) +
+  my_theme
+
+ggplotly(p) %>%
+  layout(title = "Avg C3 vs LS Over Time by Day of Week",
+         margin = list(l = 80, 
+                       r = 0, 
+                       b = 50, 
+                       t = 50))
+```
+
