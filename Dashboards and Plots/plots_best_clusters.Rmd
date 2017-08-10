@@ -1,0 +1,1037 @@
+---
+title: "Plots of Best Clusters"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, echo = FALSE)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(plotly)
+```
+
+```{r}
+my_theme <-  theme(panel.background = element_blank(), 
+                   panel.grid.major = element_line(color = "#d8d8d8", linetype = "dotted"), 
+                   panel.grid.major.x = element_blank(), 
+                   plot.title = element_text(hjust = 0.5),
+                   axis.title.y = element_blank(),
+                   axis.line.y = element_blank(),
+                   axis.ticks.y = element_blank(),
+                   axis.line.x = element_line(color = "#d8d8d8", linetype = "dashed"),
+                   strip.background = element_blank(), 
+                   legend.position = "none")
+```
+
+# S1 Clusters
+
+## C3 Raw
+
+```{r, fig.height=6}
+kmeans_C3_raw_s1_5cl <- read.csv("kmeans_C3_raw_s1_5cl.csv") 
+
+kmeans_C3_raw_s1_5cl_plot <- kmeans_C3_raw_s1_5cl %>% 
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 3) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(kmeans_C3_raw_s1_5cl_plot) %>% 
+  layout(title = "S1 with 5 K-Means Clusters (C3)", 
+         autosize = FALSE, width = 750, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+## C3 Growth
+
+```{r, fig.height=6}
+kmeans_C3_growth_s1_5cl <- read.csv("kmeans_C3_growth_s1_5cl.csv")
+
+kmeans_C3_growth_s1_5cl_plot <- kmeans_C3_growth_s1_5cl %>% 
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 3) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(kmeans_C3_growth_s1_5cl_plot) %>% 
+  layout(title = "S1 with 5 K-Means Clusters (C3 Growth)", 
+         autosize = FALSE, width = 750, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+## LS Raw
+
+```{r, fig.height=6}
+kmeans_LS_raw_s1_5cl <- read.csv("kmeans_LS_raw_s1_5cl.csv")
+
+kmeans_LS_raw_s1_5cl_plot <- kmeans_LS_raw_s1_5cl %>%
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 3) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(kmeans_LS_raw_s1_5cl_plot) %>% 
+  layout(title = "S1 with 5 K-Means Clusters (LS)", 
+         autosize = FALSE, width = 650, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+## LS Growth
+
+```{r, fig.height=6}
+kmeans_LS_growth_s1_5cl <- read.csv("kmeans_LS_growth_s1_5cl.csv")
+
+kmeans_LS_growth_s1_5cl_plot <- kmeans_LS_growth_s1_5cl %>%
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 3) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(kmeans_LS_growth_s1_5cl_plot) %>% 
+  layout(title = "S1 with 5 K-Means Clusters (LS Growth)", 
+         autosize = FALSE, width = 650, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+## C3 Raw + Growth
+
+```{r, fig.height=6}
+kmeans_raw_growth_C3_s1_5cl <- read.csv("kmeans_raw_growth_C3_s1_5cl.csv")
+
+kmeans_raw_growth_C3_s1_5cl_plot <- kmeans_raw_growth_C3_s1_5cl %>%
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 5) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(kmeans_raw_growth_C3_s1_5cl_plot) %>% 
+  layout(title = "S1 with 5 K-Means Clusters (C3 Raw + Growth)", 
+         autosize = FALSE, width = 650, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+## LS Raw + Growth
+
+```{r, fig.height=6}
+kmeans_raw_growth_LS_s1_5cl <- read.csv("kmeans_raw_growth_LS_s1_5cl.csv")
+
+kmeans_raw_growth_LS_s1_5cl_plot <- kmeans_raw_growth_LS_s1_5cl %>%
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 5) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(kmeans_raw_growth_LS_s1_5cl_plot) %>% 
+  layout(title = "S1 with 5 K-Means Clusters (LS Raw + Growth)", 
+         autosize = FALSE, width = 650, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+## C3 + LS Raw
+
+```{r, fig.height=6}
+kmeans_C3_LS_raw_s1_5cl <- read.csv("kmeans_C3_LS_raw_s1_5cl.csv")
+
+kmeans_C3_LS_raw_s1_5cl_plot <- kmeans_C3_LS_raw_s1_5cl %>%
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 5) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(kmeans_C3_LS_raw_s1_5cl_plot) %>% 
+  layout(title = "S1 with 5 K-Means Clusters (C3 + LS Raw)", 
+         autosize = FALSE, width = 650, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+Diagnostics indicated that 3 clusters were best on a majority of indicators:
+
+```{r, fig.height=6}
+kmeans_C3_LS_raw_s1_3cl <- read.csv("kmeans_C3_LS_raw_s1_3cl.csv")
+
+kmeans_C3_LS_raw_s1_3cl_plot <- kmeans_C3_LS_raw_s1_3cl %>%
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_3, nrow = 3) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(kmeans_C3_LS_raw_s1_3cl_plot) %>% 
+  layout(title = "S1 with 3 K-Means Clusters (C3 + LS Raw)", 
+         autosize = FALSE, width = 650, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+## C3 + LS Raw Differences
+
+```{r, fig.height=6}
+kmeans_C3_LS_raw_diff_s1_5cl <- read.csv("kmeans_C3_LS_raw_diff_s1_5cl.csv")
+
+kmeans_C3_LS_raw_diff_s1_5cl_plot <- kmeans_C3_LS_raw_diff_s1_5cl %>%
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 3) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(kmeans_C3_LS_raw_diff_s1_5cl_plot) %>% 
+  layout(title = "S1 with 5 K-Means Clusters (C3 + LS Raw Differences)", 
+         autosize = FALSE, width = 650, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+## C3 + LS Raw Averages
+
+```{r, fig.height=6}
+kmeans_C3_LS_raw_avg_s1_5cl <- read.csv("kmeans_C3_LS_raw_avg_s1_5cl.csv")
+
+kmeans_C3_LS_raw_avg_s1_5cl_plot <- kmeans_C3_LS_raw_avg_s1_5cl %>%
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 3) +   
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(kmeans_C3_LS_raw_avg_s1_5cl_plot) %>% 
+  layout(title = "S1 with 5 K-Means Clusters (C3 + LS Raw Averages)", 
+         autosize = FALSE, width = 650, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+Diagnostics indicated that 3 clusters were best on a majority of indicators:
+
+```{r, fig.height=6}
+kmeans_C3_LS_raw_avg_s1_3cl <- read.csv("kmeans_C3_LS_raw_avg_s1_3cl.csv")
+
+kmeans_C3_LS_raw_avg_s1_3cl_plot <- kmeans_C3_LS_raw_avg_s1_3cl %>%
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_3, nrow = 3) +   
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(kmeans_C3_LS_raw_avg_s1_3cl_plot) %>% 
+  layout(title = "S1 with 5 K-Means Clusters (C3 + LS Raw Averages)", 
+         autosize = FALSE, width = 650, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+## C3 + LS Growth 
+
+```{r, fig.height=6}
+kmeans_C3_LS_growth_s1_5cl <- read.csv("kmeans_C3_LS_growth_s1_5cl.csv")
+
+kmeans_C3_LS_growth_s1_5cl_plot <- kmeans_C3_LS_growth_s1_5cl %>%
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 5) +  
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(kmeans_C3_LS_growth_s1_5cl_plot) %>% 
+  layout(title = "S1 with 5 K-Means Clusters (C3 + LS Growth)", 
+         autosize = FALSE, width = 650, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+## C3 + LS Growth Differences
+
+```{r, fig.height=6}
+kmeans_C3_LS_growth_diff_s1_5cl <- read.csv("kmeans_C3_LS_growth_diff_s1_5cl.csv")
+
+kmeans_C3_LS_growth_diff_s1_5cl_plot <- kmeans_C3_LS_growth_diff_s1_5cl %>%
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 3) +   
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(kmeans_C3_LS_growth_diff_s1_5cl_plot) %>% 
+  layout(title = "S1 with 5 K-Means Clusters (C3 + LS Growth Differences)", 
+         autosize = FALSE, width = 650, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+## C3 + LS Growth Averages
+
+```{r, fig.height=6}
+kmeans_C3_LS_growth_avg_s1_5cl <- read.csv("kmeans_C3_LS_growth_avg_s1_5cl.csv")
+
+kmeans_C3_LS_growth_avg_s1_5cl_plot <- kmeans_C3_LS_growth_avg_s1_5cl %>%
+  filter(Season_num == 1) %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 3) +   
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank())
+
+ggplotly(kmeans_C3_LS_growth_avg_s1_5cl_plot) %>% 
+  layout(title = "S1 with 5 K-Means Clusters (C3 + LS Growth Averages)", 
+         autosize = FALSE, width = 650, height = 600, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+```
+
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+
+# S1 Clusters + S2 Trends
+
+## C3 Raw
+
+```{r, fig.height=8.5}
+kmeans_C3_raw_s1_5cl_s2trends <- read.csv("kmeans_C3_raw_s1_5cl_s2trends.csv")
+
+kmeans_C3_raw_s1_5cl_s2trends_plot <- plot_ly(kmeans_C3_raw_s1_5cl_s2trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_kmeans_5), 
+        legendgroup = ~cluster_kmeans_5) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1 Clusters & S2 Trends (C3)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+kmeans_C3_raw_s1_5cl_s2trends_plot
+```
+
+## C3 Growth
+
+```{r, fig.height=8.5}
+kmeans_C3_growth_s1_5cl_s2trends <- read.csv("kmeans_C3_growth_s1_5cl_s2trends.csv")
+
+kmeans_C3_growth_s1_5cl_s2trends_plot <- plot_ly(kmeans_C3_growth_s1_5cl_s2trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_kmeans_5), 
+        legendgroup = ~cluster_kmeans_5) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1 Clusters & S2 Trends (C3 Growth)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+kmeans_C3_growth_s1_5cl_s2trends_plot
+```
+
+## LS Raw
+
+```{r, fig.height=8.5}
+kmeans_LS_raw_s1_5cl_s2trends <- read.csv("kmeans_LS_raw_s1_5cl_s2trends.csv")
+
+kmeans_LS_raw_s1_5cl_s2trends_plot <- plot_ly(kmeans_LS_raw_s1_5cl_s2trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_kmeans_5), 
+        legendgroup = ~cluster_kmeans_5) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1 Clusters & S2 Trends (LS)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+kmeans_LS_raw_s1_5cl_s2trends_plot
+```
+
+## LS Growth
+
+```{r, fig.height=8.5}
+kmeans_LS_growth_s1_5cl_s2trends <- read.csv("kmeans_LS_growth_s1_5cl_s2trends.csv") 
+
+kmeans_LS_growth_s1_5cl_s2trends_plot <- plot_ly(kmeans_LS_growth_s1_5cl_s2trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_kmeans_5), 
+        legendgroup = ~cluster_kmeans_5) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1 Clusters & S2 Trends (LS Growth)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+kmeans_LS_growth_s1_5cl_s2trends_plot
+```
+
+## C3 + LS Raw Differences
+
+```{r, fig.height=8.5}
+kmeans_C3_LS_raw_diff_s1_5cl_s2trends <- read.csv("kmeans_C3_LS_raw_diff_s1_5cl_s2trends.csv") 
+
+kmeans_C3_LS_raw_diff_s1_5cl_s2trends_plot <- plot_ly(kmeans_C3_LS_raw_diff_s1_5cl_s2trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_kmeans_5), 
+        legendgroup = ~cluster_kmeans_5) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1 Clusters & S2 Trends (C3 + LS Raw Differences)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+kmeans_C3_LS_raw_diff_s1_5cl_s2trends_plot
+```
+
+## C3 + LS Raw Averages
+
+```{r, fig.height=8.5}
+kmeans_C3_LS_raw_avg_s1_5cl_s2trends <- read.csv("kmeans_C3_LS_raw_avg_s1_5cl_s2trends.csv") 
+
+kmeans_C3_LS_raw_avg_s1_5cl_s2trends_plot <- plot_ly(kmeans_C3_LS_raw_avg_s1_5cl_s2trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_kmeans_5), 
+        legendgroup = ~cluster_kmeans_5) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1 Clusters & S2 Trends (C3 + LS Raw Averages)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+kmeans_C3_LS_raw_avg_s1_5cl_s2trends_plot
+```
+
+## C3 + LS Growth Differences
+
+```{r, fig.height=8.5}
+kmeans_C3_LS_growth_diff_s1_5cl_s2trends <- read.csv("kmeans_C3_LS_growth_diff_s1_5cl_s2trends.csv") 
+
+kmeans_C3_LS_growth_diff_s1_5cl_s2trends_plot <- plot_ly(kmeans_C3_LS_growth_diff_s1_5cl_s2trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_kmeans_5), 
+        legendgroup = ~cluster_kmeans_5) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1 Clusters & S2 Trends (C3 + LS Growth Differences)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+kmeans_C3_LS_growth_diff_s1_5cl_s2trends_plot
+```
+
+## C3 + LS Growth Averages
+
+```{r, fig.height=8.5}
+kmeans_C3_LS_growth_avg_s1_5cl_s2trends <- read.csv("kmeans_C3_LS_growth_avg_s1_5cl_s2trends.csv") 
+
+kmeans_C3_LS_growth_avg_s1_5cl_s2trends_plot <- plot_ly(kmeans_C3_LS_growth_avg_s1_5cl_s2trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', cluster_kmeans_5), 
+        legendgroup = ~cluster_kmeans_5) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1 Clusters & S2 Trends (C3 + LS Growth Averages)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+kmeans_C3_LS_growth_avg_s1_5cl_s2trends_plot
+```
+
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+
+# S1-S2 Continuous Trends Clustered on S1 Clusters
+
+## C3 Raw
+
+```{r, fig.height=8.5}
+kmeans_C3_raw_s1_5cl_cont_trends <- read.csv("kmeans_C3_raw_s1_5cl_cont_trends.csv") 
+
+kmeans_C3_raw_s1_5cl_cont_trends_plot <- plot_ly(kmeans_C3_raw_s1_5cl_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 Clusters (C3 Raw)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+kmeans_C3_raw_s1_5cl_cont_trends_plot
+```
+
+## C3 Growth
+
+```{r, fig.height=8.5}
+kmeans_C3_growth_s1_5cl_cont_trends <- read.csv("kmeans_C3_growth_s1_5cl_cont_trends.csv") 
+
+kmeans_C3_growth_s1_5cl_cont_trends_plot <- plot_ly(kmeans_C3_growth_s1_5cl_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 Clusters (C3 Growth)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+kmeans_C3_growth_s1_5cl_cont_trends_plot
+```
+
+## LS Raw
+
+```{r, fig.height=8.5}
+kmeans_LS_raw_s1_5cl_cont_trends <- read.csv("kmeans_LS_raw_s1_5cl_cont_trends.csv") 
+
+kmeans_LS_raw_s1_5cl_cont_trends_plot <- plot_ly(kmeans_LS_raw_s1_5cl_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 Clusters (LS Raw)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+kmeans_LS_raw_s1_5cl_cont_trends_plot
+```
+
+## LS Growth
+
+```{r, fig.height=8.5}
+kmeans_LS_growth_s1_5cl_cont_trends <- read.csv("kmeans_LS_growth_s1_5cl_cont_trends.csv") 
+
+kmeans_LS_growth_s1_5cl_cont_trends_plot <- plot_ly(kmeans_LS_growth_s1_5cl_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 Clusters (LS Growth)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+kmeans_LS_growth_s1_5cl_cont_trends_plot
+```
+
+## C3 + LS Raw Differences
+
+```{r, fig.height=8.5}
+kmeans_C3_LS_raw_diff_s1_5cl_cont_trends <- read.csv("kmeans_C3_LS_raw_diff_s1_5cl_cont_trends.csv") 
+
+kmeans_C3_LS_raw_diff_s1_5cl_cont_trends_plot <- plot_ly(kmeans_C3_LS_raw_diff_s1_5cl_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 Clusters (C3 + LS Raw Differences)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+kmeans_C3_LS_raw_diff_s1_5cl_cont_trends_plot
+```
+
+## C3 + LS Raw Averages
+
+```{r, fig.height=8.5}
+kmeans_C3_LS_raw_avg_s1_5cl_cont_trends <- read.csv("kmeans_C3_LS_raw_avg_s1_5cl_cont_trends.csv") 
+
+kmeans_C3_LS_raw_avg_s1_5cl_cont_trends_plot <- plot_ly(kmeans_C3_LS_raw_avg_s1_5cl_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 Clusters (C3 + LS Raw Differences)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+kmeans_C3_LS_raw_avg_s1_5cl_cont_trends_plot
+```
+
+## C3 + LS Growth Differences
+
+```{r, fig.height=8.5}
+kmeans_C3_LS_growth_diff_s1_5cl_cont_trends <- read.csv("kmeans_C3_LS_growth_diff_s1_5cl_cont_trends.csv") 
+
+kmeans_C3_LS_growth_diff_s1_5cl_cont_trends_plot <- plot_ly(kmeans_C3_LS_growth_diff_s1_5cl_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 Clusters (C3 + LS Growth Differences)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+kmeans_C3_LS_growth_diff_s1_5cl_cont_trends_plot
+```
+
+## C3 + LS Growth Averages
+
+```{r, fig.height=8.5}
+kmeans_C3_LS_growth_avg_s1_5cl_cont_trends <- read.csv("kmeans_C3_LS_growth_avg_s1_5cl_cont_trends.csv") 
+
+kmeans_C3_LS_growth_avg_s1_5cl_cont_trends_plot <- plot_ly(kmeans_C3_LS_growth_avg_s1_5cl_cont_trends, 
+        x = ~period, 
+        y = ~dct_values, 
+        color = ~Show_Name,
+        yaxis = ~paste0('y', s1_cluster), 
+        legendgroup = ~s1_cluster) %>% 
+  add_lines() %>% 
+  subplot(nrows = 5, shareX = TRUE) %>% 
+  layout(showlegend = TRUE, 
+         title = "S1-S2 Clustered on S1 Clusters (C3 + LS Growth Averages)", 
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125), 
+         xaxis = list(title = ""))
+
+kmeans_C3_LS_growth_avg_s1_5cl_cont_trends_plot
+```
+
+------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
+
+# S1 & S2 Raw Data Clustered on S1 Clusters
+
+```{r}
+df <- read.csv("s1_s2_data.csv") %>% select(-X) %>% filter(Episode_num < 15)
+```
+
+## C3 Raw
+
+```{r, fig.height=8}
+C3_raw <- ggplot(df %>% filter(!is.na(C3_raw_cluster))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  facet_grid(C3_raw_cluster ~ Season_num, scales = "free") + 
+  scale_y_continuous(labels = comma) +
+  my_theme + 
+  labs(x = "Episode Number")
+
+ggplotly(C3_raw) %>% 
+  layout(title = "S1 & S2 C3 Trends on S1 C3 Raw Clusters",
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 100, 
+                       r = 50, 
+                       b = 100, 
+                       t = 125))
+```
+
+## C3 Growth
+
+```{r, fig.height=8}
+C3_growth <- ggplot(df %>% filter(!is.na(C3_growth_cluster))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  facet_grid(C3_growth_cluster ~ Season_num, scales = "free") + 
+  scale_y_continuous(labels = comma) +
+  my_theme + 
+  labs(x = "Episode Number")
+
+ggplotly(C3_growth) %>% 
+  layout(title = "S1 & S2 C3 Trends on S1 C3 Growth Clusters",
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 100, 
+                       r = 50, 
+                       b = 100, 
+                       t = 125))
+```
+
+## LS Raw
+
+```{r, fig.height=8}
+LS_raw <- ggplot(df %>% filter(!is.na(LS_raw_cluster))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  facet_grid(LS_raw_cluster ~ Season_num, scales = "free") + 
+  scale_y_continuous(labels = comma) +
+  my_theme + 
+  labs(x = "Episode Number")
+
+ggplotly(LS_raw) %>% 
+  layout(title = "S1 & S2 C3 Trends on S1 LS Raw Clusters",
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 100, 
+                       r = 50, 
+                       b = 100, 
+                       t = 125))
+```
+
+## LS Growth
+
+```{r, fig.height=8}
+LS_growth <- ggplot(df %>% filter(!is.na(LS_growth_cluster))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  facet_grid(LS_growth_cluster ~ Season_num, scales = "free") + 
+  scale_y_continuous(labels = comma) +
+  my_theme + 
+  labs(x = "Episode Number")
+
+ggplotly(LS_growth) %>% 
+  layout(title = "S1 & S2 C3 Trends on S1 LS Growth Clusters",
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 100, 
+                       r = 50, 
+                       b = 100, 
+                       t = 125))
+```
+
+## C3 Raw + Growth
+
+```{r, fig.height=8}
+raw_growth_C3 <- ggplot(df %>% filter(!is.na(raw_growth_C3_cluster))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  facet_grid(raw_growth_C3_cluster ~ Season_num, scales = "free") + 
+  scale_y_continuous(labels = comma) +
+  my_theme + 
+  labs(x = "Episode Number")
+
+ggplotly(raw_growth_C3) %>% 
+  layout(title = "S1 & S2 C3 Trends on S1 C3 Raw+Growth Clusters",
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 100, 
+                       r = 50, 
+                       b = 100, 
+                       t = 125))
+```
+
+## LS Raw + Growth
+
+```{r, fig.height=8}
+raw_growth_LS <- ggplot(df %>% filter(!is.na(raw_growth_LS_cluster))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  facet_grid(raw_growth_LS_cluster ~ Season_num, scales = "free") + 
+  scale_y_continuous(labels = comma) +
+  my_theme + 
+  labs(x = "Episode Number")
+
+ggplotly(raw_growth_LS) %>% 
+  layout(title = "S1 & S2 C3 Trends on S1 C3 Raw+Growth Clusters",
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 100, 
+                       r = 50, 
+                       b = 100, 
+                       t = 125))
+```
+
+## C3 + LS Raw
+
+```{r, fig.height=8}
+C3_LS_raw <- ggplot(df %>% filter(!is.na(C3_LS_raw_cluster))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  facet_grid(C3_LS_raw_cluster ~ Season_num, scales = "free") + 
+  scale_y_continuous(labels = comma) +
+  my_theme + 
+  labs(x = "Episode Number")
+
+ggplotly(C3_LS_raw) %>% 
+  layout(title = "S1 & S2 C3 Trends on S1 C3+LS Raw Clusters",
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 100, 
+                       r = 50, 
+                       b = 100, 
+                       t = 125))
+```
+
+## C3 + LS Raw Differences
+
+```{r, fig.height=8}
+C3_LS_raw_diff <- ggplot(df %>% filter(!is.na(C3_LS_raw_diff_cluster))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  facet_grid(C3_LS_raw_diff_cluster ~ Season_num, scales = "free") + 
+  scale_y_continuous(labels = comma) +
+  my_theme + 
+  labs(x = "Episode Number")
+
+ggplotly(C3_LS_raw_diff) %>% 
+  layout(title = "S1 & S2 C3 Trends on S1 C3+LS Raw Differences Clusters",
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 100, 
+                       r = 50, 
+                       b = 100, 
+                       t = 125))
+```
+
+## C3 + LS Raw Averages
+
+```{r, fig.height=8}
+C3_LS_raw_avg <- ggplot(df %>% filter(!is.na(C3_LS_raw_avg_cluster))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  facet_grid(C3_LS_raw_avg_cluster ~ Season_num, scales = "free") + 
+  scale_y_continuous(labels = comma) +
+  my_theme + 
+  labs(x = "Episode Number")
+
+ggplotly(C3_LS_raw_avg) %>% 
+  layout(title = "S1 & S2 C3 Trends on S1 C3+LS Raw Averages Clusters",
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 100, 
+                       r = 50, 
+                       b = 100, 
+                       t = 125))
+```
+
+## C3 + LS Growth 
+
+```{r, fig.height=8}
+C3_LS_growth <- ggplot(df %>% filter(!is.na(C3_LS_growth_cluster))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  facet_grid(C3_LS_growth_cluster ~ Season_num, scales = "free") + 
+  scale_y_continuous(labels = comma) +
+  my_theme + 
+  labs(x = "Episode Number")
+
+ggplotly(C3_LS_growth) %>% 
+  layout(title = "S1 & S2 C3 Trends on S1 C3+LS Growth Clusters",
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 100, 
+                       r = 50, 
+                       b = 100, 
+                       t = 125))
+```
+
+## C3 + LS Growth Differences
+
+```{r, fig.height=8}
+C3_LS_growth_diff <- ggplot(df %>% filter(!is.na(C3_LS_growth_diff_cluster))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  facet_grid(C3_LS_growth_diff_cluster ~ Season_num, scales = "free") + 
+  scale_y_continuous(labels = comma) +
+  my_theme + 
+  labs(x = "Episode Number")
+
+ggplotly(C3_LS_growth_diff) %>% 
+  layout(title = "S1 & S2 C3 Trends on S1 C3+LS Growth Differences Clusters",
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 100, 
+                       r = 50, 
+                       b = 100, 
+                       t = 125))
+```
+
+## C3 + LS Growth Averages
+
+```{r, fig.height=8}
+C3_LS_growth_avg <- ggplot(df %>% filter(!is.na(C3_LS_growth_avg_cluster))) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") +
+  facet_grid(C3_LS_growth_avg_cluster ~ Season_num, scales = "free") + 
+  scale_y_continuous(labels = comma) +
+  my_theme + 
+  labs(x = "Episode Number")
+
+ggplotly(C3_LS_growth_avg) %>% 
+  layout(title = "S1 & S2 C3 Trends on S1 C3+LS Growth Averages Clusters",
+         autosize = FALSE, width = 650, height = 800, 
+         margin = list(l = 100, 
+                       r = 50, 
+                       b = 100, 
+                       t = 125))
+```
+
