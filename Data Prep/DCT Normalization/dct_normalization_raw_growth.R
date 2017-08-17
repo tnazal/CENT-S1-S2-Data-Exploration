@@ -11,7 +11,7 @@ library(tidyr)
 df <- read.csv("CENT_showlevel.csv") %>% select(-X)
 
 #keep only shows that have both a first and second season in the data
-#with 4 or more episodes
+#with 4 or more episodes (otherwise DCT normalization on raw data will not work)
 df <- df %>% group_by(Network, Show_Name) %>%
   filter(all(c(1, 2) %in% Season_num)) %>% 
   ungroup() %>% 
@@ -21,11 +21,12 @@ df <- df %>% group_by(Network, Show_Name) %>%
   group_by(Network, Show_Name) %>%
   filter(all(c(1, 2) %in% Season_num)) 
 
-#remove show with single episode starting at episode 6
+#remove show with single episode in season starting at episode 6
 df <- df[df$Show_Name != "RHOM", ]
 
 
-#transformation function
+#Discrete Cosine Transformation function
+#see PDFs on GitHub for literature on DCT
 dct <- function(x){
   get_dct_transform(
     x, 
@@ -37,7 +38,11 @@ dct <- function(x){
 }
 
 
+
 #C3 Raw and Growth 
+
+#create list of episode impressions/growth for each show & season 
+#to create DCT values from impressions/growth on each episode
 df_curves_C3_raw <- df %>% 
   group_by(Network, Show_Name, Season_num) %>% 
   summarise(imps = list(C3_Impressions))
@@ -47,6 +52,8 @@ df_curves_C3_growth <- df %>%
   group_by(Network, Show_Name, Season_num) %>% 
   summarise(growth = list(C3_Growth))
 
+#map impressions/growth as DCT values between -1 and 1 over 100 periods each
+#adding 100 to row number for growth to append to raw impressions
 df_with_dct_C3_raw <- df_curves_C3_raw %>% 
   mutate(dct_values = map(imps, dct)) %>% 
   select(-imps) %>% 
@@ -61,10 +68,12 @@ df_with_dct_C3_growth <- df_curves_C3_growth %>%
   group_by(Network, Show_Name, Season_num) %>% 
   mutate(period = row_number() + 100)
 
+#combine raw impressions and growth
 dct_C3_raw_growth <- rbind(df_with_dct_C3_raw, 
                            df_with_dct_C3_growth) %>% 
   arrange(Show_Name, Season_num, period)
 
+#convert data to wide format
 dct_spread_C3_raw_growth <- dct_C3_raw_growth %>% 
   spread(key = period, value = dct_values)
 
@@ -72,7 +81,9 @@ write.csv(dct_C3_raw_growth, "dct_C3_raw_growth.csv")
 write.csv(dct_spread_C3_raw_growth, "dct_spread_C3_raw_growth.csv")
 
 
+
 #LS Raw and Growth
+
 df_curves_LS_raw <- df %>% 
   group_by(Network, Show_Name, Season_num) %>% 
   summarise(imps = list(LS_Impressions))
