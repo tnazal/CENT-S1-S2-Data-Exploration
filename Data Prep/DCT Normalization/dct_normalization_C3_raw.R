@@ -11,7 +11,7 @@ library(tidyr)
 df <- read.csv("CENT_showlevel.csv") %>% select(-X)
 
 #keep only shows that have both a first and second season in the data
-#with 3 or more episodes
+#with 3 or more episodes (otherwise DCT normalization on raw data will not work)
 df <- df %>% group_by(Network, Show_Name) %>%
   filter(all(c(1, 2) %in% Season_num)) %>% 
   ungroup() %>% 
@@ -21,11 +21,12 @@ df <- df %>% group_by(Network, Show_Name) %>%
   group_by(Network, Show_Name) %>% 
   filter(all(c(1, 2) %in% Season_num))
 
-#remove show with single episode starting at episode 6
+#remove show with single episode in season starting at episode 6
 df <- df[df$Show_Name != "RHOM", ]
 
 
-#transformation function
+#Discrete Cosine Transformation function
+#see PDFs on GitHub for literature on DCT
 dct <- function(x){
   get_dct_transform(
     x, 
@@ -37,10 +38,13 @@ dct <- function(x){
 }
 
 
+#create list of episode impressions for each show & season 
+#to create DCT values from impressions on each episode
 df_curves <- df %>% 
   group_by(Network, Show_Name, Season_num) %>% 
   summarise(imps = list(C3_Impressions))
 
+#map impressions as DCT values between -1 and 1 over 100 periods
 df_with_dct <- df_curves %>% 
   mutate(dct_values = map(imps, dct)) %>% 
   select(-imps) %>% 
@@ -48,6 +52,7 @@ df_with_dct <- df_curves %>%
   group_by(Network, Show_Name, Season_num) %>% 
   mutate(period = row_number()) 
 
+#convert data to wide format
 df_final <- df_with_dct %>% 
   spread(key = period, value = dct_values)
 
@@ -55,7 +60,7 @@ write.csv(df_with_dct, "dct_C3_raw.csv")
 write.csv(df_final, "dct_spread_C3_raw.csv")
 
 
-#S1 & S2 appended
+#S1 & S2 normalized separately and appended
 dct_s1_s2 <- df_curves %>% 
   mutate(dct_values = map(imps, dct)) %>% 
   select(-imps) %>% 
@@ -67,7 +72,7 @@ dct_s1_s2 <- df_curves %>%
 write.csv(dct_s1_s2, "dct_C3_raw_s1_s2.csv")
 
 
-#S1 & S2 continuous normalization
+#S1 & S2 normalized continuously together
 dct_cont <- df %>%
   group_by(Network, Show_Name) %>% 
   filter(Season_num == 1 | Season_num == 2) %>% 
