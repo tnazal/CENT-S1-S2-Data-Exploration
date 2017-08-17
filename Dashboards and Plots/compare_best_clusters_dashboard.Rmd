@@ -1258,5 +1258,3 @@ renderDataTable({
               `Start Changes` = max(unique_starts_season) - 1)
 }, options = list(scrollY = '200px'))
 ```
-
-
