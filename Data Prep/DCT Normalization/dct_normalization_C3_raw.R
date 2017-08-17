@@ -72,7 +72,7 @@ dct_s1_s2 <- df_curves %>%
 write.csv(dct_s1_s2, "dct_C3_raw_s1_s2.csv")
 
 
-#S1 - S2 continuously normalized together
+#S1 to S2 continuously normalized together
 dct_cont <- df %>%
   group_by(Network, Show_Name) %>% 
   filter(Season_num == 1 | Season_num == 2) %>% 
