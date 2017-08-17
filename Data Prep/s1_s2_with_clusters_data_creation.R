@@ -5,7 +5,7 @@ library(dplyr)
 data <- read.csv("CENT_showlevel.csv") %>% select(-X)
 
 
-#keep only S1 & S2 shows used in clustering
+#keep only S1 & S2 shows that were used in clustering
 data <- data %>% group_by(Network, Show_Name) %>%
   filter(all(c(1, 2) %in% Season_num)) %>% 
   ungroup() %>% 
@@ -25,7 +25,7 @@ s1_shows_best_clusters <- read.csv("s1_shows_best_clusters.csv") %>% select(-X)
 
 
 #edit date format for program start, rounding to nearest half hour for grouping
-#and add variable for program duration
+#and add variable for program duration in minutes
 data$Start_Time <- as.POSIXlt(round(as.double(strptime(as.character(data$Start_Time), 
                                                        "%H:%M:%S"))/(30*60))*(30*60), 
                               origin = (as.POSIXlt('1970-01-01')))
