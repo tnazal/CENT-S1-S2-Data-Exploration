@@ -11,7 +11,7 @@ library(tidyr)
 df <- read.csv("CENT_showlevel.csv") %>% select(-X)
 
 #keep only shows that have both a first and second season in the data
-#with 3 or more episodes
+#with 3 or more episodes (otherwise DCT normalization on raw data will not work)
 df <- df %>% group_by(Network, Show_Name) %>%
   filter(all(c(1, 2) %in% Season_num)) %>% 
   ungroup() %>% 
@@ -21,11 +21,12 @@ df <- df %>% group_by(Network, Show_Name) %>%
   group_by(Network, Show_Name) %>%
   filter(all(c(1, 2) %in% Season_num)) 
 
-#remove show with single episode starting at episode 6
+#remove show with single episode in season starting at episode 6
 df <- df[df$Show_Name != "RHOM", ]
 
 
-#transformation function
+#Discrete Cosine Transformation function
+#see PDFs on GitHub for literature on DCT
 dct <- function(x){
   get_dct_transform(
     x, 
@@ -37,7 +38,8 @@ dct <- function(x){
 }
 
 
-#to cluster C3 & LS appended
+#create list of episode impressions for each show & season 
+#to create DCT values from impressions on each episode
 df_curves_C3 <- df %>% 
   group_by(Network, Show_Name, Season_num) %>% 
   summarise(imps = list(C3_Impressions))
@@ -46,6 +48,7 @@ df_curves_LS <- df %>%
   group_by(Network, Show_Name, Season_num) %>% 
   summarise(imps = list(LS_Impressions))
 
+#map impressions as DCT values between -1 and 1 over 100 periods
 df_with_dct_C3 <- df_curves_C3 %>% 
   mutate(dct_values = map(imps, dct)) %>% 
   select(-imps) %>% 
@@ -53,6 +56,7 @@ df_with_dct_C3 <- df_curves_C3 %>%
   group_by(Network, Show_Name, Season_num) %>% 
   mutate(period = row_number())
 
+#add 100 to row number to append LS to C3
 df_with_dct_LS <- df_curves_LS %>% 
   mutate(dct_values = map(imps, dct)) %>% 
   select(-imps) %>% 
@@ -60,9 +64,11 @@ df_with_dct_LS <- df_curves_LS %>%
   group_by(Network, Show_Name, Season_num) %>% 
   mutate(period = row_number() + 100)
 
+#combine C3 and LS
 dct_C3_LS_raw <- rbind(df_with_dct_C3, df_with_dct_LS) %>% 
   arrange(Show_Name, Season_num, period)
 
+#convert data to wide format
 dct_spread_C3_LS_raw <- dct_C3_LS %>% 
   spread(key = period, value = dct_values)
 
@@ -70,7 +76,7 @@ write.csv(dct_C3_LS_raw, "dct_C3_LS_raw.csv")
 write.csv(dct_spread_C3_LS_raw, "dct_spread_C3_LS_raw.csv")
 
 
-#to cluster on differences
+#to cluster on C3 - LS differences
 C3_LS_diff_curves <- df %>% 
   group_by(Network, Show_Name, Season_num) %>% 
   summarise(imps = list(diff_C3_LS))
@@ -89,7 +95,7 @@ write.csv(dct_C3_LS_diff, "dct_C3_LS_diff.csv")
 write.csv(dct_spread_C3_LS_diff, "dct_spread_C3_LS_diff.csv")
 
 
-#to cluster on averages
+#to cluster on C3 & LS averages
 C3_LS_avg_curves <- df %>% 
   group_by(Network, Show_Name, Season_num) %>% 
   summarise(imps = list(avg_C3_LS))
