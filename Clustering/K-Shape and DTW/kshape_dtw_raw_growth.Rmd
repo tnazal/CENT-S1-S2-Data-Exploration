@@ -32,11 +32,13 @@ library(fpc)
 From example here: https://cran.r-project.org/web/packages/dtwclust/vignettes/dtwclust.pdf.
 
 ```{r}
+#read in long and wide format data
 dct_df <- read.csv("dct_C3_raw_growth.csv")
 dct_spread <- read.csv("dct_spread_C3_raw_growth.csv")
 ```
 
 ```{r}
+#filter wide data to only cluster on season 1
 cluster_C3 <- dct_spread %>% 
   filter(Season_num == 1) %>%
   ungroup() %>%
@@ -46,6 +48,9 @@ cluster_C3 <- dct_spread %>%
 ## K-Shape Clustering 
 
 ```{r}
+#partitional clustering with 2 through 5 clusters
+#using shape-based distance for the curves
+#clustering around shape centroid
 kshape_C3 <- tsclust(cluster_C3, 
                      type = 'partitional',
                      k = 2:5,
@@ -56,20 +61,18 @@ kshape_C3 <- tsclust(cluster_C3,
                      seed = 12)
 
 names(kshape_C3) <- paste0('k_', 2:5)
+
+#apply internal clustering validity indices
+#including silhouette, Dunn, and others (see ?cvi documentation in R)
 sapply(kshape_C3, cvi, type = 'internal')
+
+#give best cluster number based on silhouette width
+#a measure of how similar the object is to its own cluster compared to others
 which.max(sapply(kshape_C3, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(kshape_C3$k_5@cluster)
-```
-
-```{r}
-plot(kshape_C3$k_5, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
+#export cluster predictions to the main data set and visualize in ggplot
 clusters_C3_shape5_spread <- dct_spread %>% filter(Season_num == 1)
 clusters_C3_shape5_spread$cluster_shape_5 <- kshape_C3$k_5@cluster
 
@@ -94,6 +97,10 @@ ggplotly(clusters_C3_shape5_plot) %>%
 ## Dynamic Time Warp Clustering
 
 ```{r}
+#partitional clustering with 2 through 5 clusters
+#using dynamic time warping distance for the curves
+#with partitioning around mediods
+#see dtwclust documentation in R for further information
 dtw_C3 <- tsclust(cluster_C3,
                   type = 'partitional',
                   k = 2:5,
@@ -106,20 +113,17 @@ dtw_C3 <- tsclust(cluster_C3,
                   seed = 12)
 
 names(dtw_C3) <- paste0('k_', 2:5)
+
+#apply internal clustering validity indices
 sapply(dtw_C3, cvi)
+
+#give best cluster number based on silhouette width
+#a measure of how similar the object is to its own cluster compared to others
 which.max(sapply(dtw_C3, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(dtw_C3$k_5@cluster)
-```
-
-```{r}
-plot(dtw_C3$k_5, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
+#export cluster predictions to the main data set and visualize in ggplot
 clusters_C3_dtw5_spread <- dct_spread %>% filter(Season_num == 1)
 clusters_C3_dtw5_spread$cluster_dtw_5 <- dtw_C3$k_5@cluster
 
@@ -141,7 +145,10 @@ ggplotly(clusters_C3_dtw5_plot) %>%
          margin = list(t = 150))
 ```
 
+# Clustering Season 1 on LS Raw & Growth Appended
+
 ```{r}
+#same code as for C3
 dct_LS <- read.csv("dct_LS_raw_growth.csv")
 dct_spread_LS <- read.csv("dct_spread_LS_raw_growth.csv")
 cluster_LS <- dct_spread_LS %>%
@@ -166,15 +173,6 @@ which.max(sapply(kshape_LS, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(kshape_LS$k_5@cluster)
-```
-
-```{r}
-plot(kshape_LS$k_5, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
 clusters_LS_shape5_spread <- dct_spread
 clusters_LS_shape5_spread$cluster_shape_5<- kshape_LS$k_5@cluster
 
@@ -217,15 +215,6 @@ which.max(sapply(dtw_LS, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(dtw_LS$k_3@cluster)
-```
-
-```{r}
-plot(dtw_LS$k_3, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
 clusters_LS_dtw3_spread <- dct_spread_LS
 clusters_LS_dtw3_spread$cluster_dtw_3 <- dtw_LS$k_3@cluster
 
