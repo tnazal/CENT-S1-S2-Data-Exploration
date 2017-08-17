@@ -34,11 +34,13 @@ library(fpc)
 From example here: https://cran.r-project.org/web/packages/dtwclust/vignettes/dtwclust.pdf.
 
 ```{r}
+#read in long and wide format data
 dct_df <- read.csv("dct_C3_LS_raw.csv")
 dct_spread <- read.csv("dct_spread_C3_LS_raw.csv")
 ```
 
 ```{r}
+#filter wide data to only cluster on season 1
 cluster_s1 <- dct_spread %>% 
   filter(Season_num == 1) %>%
   ungroup() %>%
@@ -48,6 +50,9 @@ cluster_s1 <- dct_spread %>%
 ## K-Shape Clustering 
 
 ```{r}
+#partitional clustering with 2 through 5 clusters
+#using shape-based distance for the curves
+#clustering around shape centroid
 kshape_s1 <- tsclust(cluster_s1, 
                      type = 'partitional',
                      k = 2:5,
@@ -58,20 +63,18 @@ kshape_s1 <- tsclust(cluster_s1,
                      seed = 12)
 
 names(kshape_s1) <- paste0('k_', 2:5)
+
+#apply internal clustering validity indices
+#including silhouette, Dunn, and others (see ?cvi documentation in R)
 sapply(kshape_s1, cvi, type = 'internal')
+
+#give best cluster number based on silhouette width
+#a measure of how similar the object is to its own cluster compared to others
 which.max(sapply(kshape_s1, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(kshape_s1$k_5@cluster)
-```
-
-```{r}
-plot(kshape_s1$k_5, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
+#export cluster predictions to the main data set and visualize in ggplot
 clusters_s1_shape5_spread <- dct_spread %>% filter(Season_num == 1)
 clusters_s1_shape5_spread$cluster_shape_5 <- kshape_s1$k_5@cluster
 
@@ -97,6 +100,10 @@ ggplotly(clusters_s1_shape5_plot) %>%
 ## Dynamic Time Warp Clustering
 
 ```{r}
+#partitional clustering with 2 through 5 clusters
+#using dynamic time warping distance for the curves
+#with partitioning around mediods
+#see dtwclust documentation in R for further information
 dtw_s1 <- tsclust(cluster_s1,
                   type = 'partitional',
                   k = 2:5,
@@ -109,20 +116,17 @@ dtw_s1 <- tsclust(cluster_s1,
                   seed = 12)
 
 names(dtw_s1) <- paste0('k_', 2:5)
+
+#apply internal clustering validity indices
 sapply(dtw_s1, cvi)
+
+#give best cluster number based on silhouette width
+#a measure of how similar the object is to its own cluster compared to others
 which.max(sapply(dtw_s1, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(dtw_s1$k_4@cluster)
-```
-
-```{r}
-plot(dtw_s1$k_4, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
+#export cluster predictions to the main data set and visualize in ggplot
 clusters_s1_dtw4_spread <- dct_spread %>% filter(Season_num == 1)
 clusters_s1_dtw4_spread$cluster_dtw_4 <- dtw_s1$k_4@cluster
 
@@ -148,6 +152,7 @@ ggplotly(clusters_s1_dtw4_plot) %>%
 # S1 Clustering on C3-LS Differencs 
 
 ```{r}
+#same code as before 
 dct_diff <- read.csv("dct_C3_LS_diff.csv")
 dct_spread_diff <- read.csv("dct_spread_C3_LS_diff.csv")
 ```
@@ -175,15 +180,6 @@ which.max(sapply(kshape_diff, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(kshape_diff$k_4@cluster)
-```
-
-```{r}
-plot(kshape_diff$k_4, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
 clusters_diff_shape4_spread <- dct_spread_diff %>% filter(Season_num == 1)
 clusters_diff_shape4_spread$cluster_shape_4 <- kshape_diff$k_4@cluster
 
@@ -203,7 +199,6 @@ ggplotly(clusters_diff_shape4_plot) %>%
   layout(title = "S1 with 4 K-Shape Clusters (C3-LS Differences)", 
          margin = list(t = 150))
 ```
-
 
 ## Dynamic Time Warp Clustering
 
@@ -225,15 +220,6 @@ which.max(sapply(dtw_diff, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(dtw_diff$k_3@cluster)
-```
-
-```{r}
-plot(dtw_diff$k_3, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
 clusters_diff_dtw3_spread <- dct_spread_diff %>% filter(Season_num == 1)
 clusters_diff_dtw3_spread$cluster_dtw_3 <- dtw_diff$k_3@cluster
 
@@ -254,10 +240,10 @@ ggplotly(clusters_diff_dtw3_plot) %>%
          margin = list(t = 150))
 ```
 
-
 # Season 1 Clustering on C3 & LS Averages
 
 ```{r}
+#same code as before
 dct_avg <- read.csv("dct_C3_LS_avg.csv")
 dct_spread_avg <- read.csv("dct_spread_C3_LS_avg.csv")
 cluster_avg <- dct_spread_avg %>%
@@ -282,15 +268,6 @@ which.max(sapply(kshape_avg, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(kshape_avg$k_4@cluster)
-```
-
-```{r}
-plot(kshape_avg$k_4, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
 clusters_avg_shape4_spread <- dct_spread_avg %>% filter(Season_num == 1)
 clusters_avg_shape4_spread$cluster_shape_4 <- kshape_avg$k_4@cluster
 
@@ -331,15 +308,6 @@ which.max(sapply(dtw_avg, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(dtw_avg$k_2@cluster)
-```
-
-```{r}
-plot(dtw_avg$k_2, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
 clusters_avg_dtw2_spread <- dct_spread_avg
 clusters_avg_dtw2_spread$cluster_dtw_2 <- dtw_avg$k_2@cluster
 
