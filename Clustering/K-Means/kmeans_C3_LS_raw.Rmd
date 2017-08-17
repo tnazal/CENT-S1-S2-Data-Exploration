@@ -35,11 +35,13 @@ library(fpc)
 Using examples from https://cran.r-project.org/web/packages/broom/vignettes/kmeans.html.
 
 ```{r}
+#read in long and wide format data
 dct_df <- read.csv("dct_C3_LS_raw.csv") %>% select(-X)
 dct_spread <- read.csv("dct_spread_C3_LS_raw.csv") %>% select(-X)
 ```
 
 ```{r}
+#filter wide data to only cluster on season 1
 cluster_s1 <- dct_spread %>% 
   filter(Season_num == 1) %>%
   ungroup() %>%
@@ -49,17 +51,22 @@ cluster_s1 <- dct_spread %>%
 ## General K-Means Clustering
 
 ```{r}
+#explore the effect of clustering on between 1 and 5 clusters 
+#(perform clustering 5 times, each time using value 1 through 5)
 set.seed(12)
 kclusts_s1 <- data.frame(k = 1:5) %>% 
   group_by(k) %>% 
   do(kclust = kmeans(cluster_s1, centers = .$k, nstart = 20))
 
+#add each cluster classification to the original season 1 dataset
 assignments_s1 <- kclusts_s1 %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s1))
 ```
 
 ### Optimal Number of Clusters
 
 ```{r}
+#elbow method representing the variance within each cluster (total within sum of squares)
+#the bend (or elbow) indicates that clusters beyond that point have little additional value
 fviz_nbclust(cluster_s1, 
              kmeans, 
              method = "wss",
@@ -67,6 +74,8 @@ fviz_nbclust(cluster_s1,
 ```
 
 ```{r}
+#optimal number of clusters using average silhouette
+#a measure of how similar the object is to its own cluster compared to others
 fviz_nbclust(cluster_s1, 
              kmeans, 
              method = "silhouette",
@@ -74,6 +83,8 @@ fviz_nbclust(cluster_s1,
 ```
 
 ```{r}
+#optimal number of clusters using gap statistics
+#compares change in within-cluster dispersion with expected from null distribution
 fviz_nbclust(cluster_s1, 
              kmeans, 
              method = "gap_stat",
@@ -81,6 +92,7 @@ fviz_nbclust(cluster_s1,
 ```
 
 ```{r}
+#optimal number of clusters using partitioning around mediods and gap statistic
 fviz_nbclust(cluster_s1, 
              cluster::pam, 
              method = "gap_stat",
@@ -88,6 +100,8 @@ fviz_nbclust(cluster_s1,
 ```
 
 ```{r}
+#optimal number of clusters using hierarchical clustering
+#using Euclidean distance to calculate dissimilarities between observations
 fviz_nbclust(cluster_s1, 
              hcut, 
              hc_method = "single",
@@ -97,6 +111,8 @@ fviz_nbclust(cluster_s1,
 ```
 
 ```{r}
+#optimal number of clusters using hierarchical clustering
+#using Pearson correlation as distance measure
 fviz_nbclust(cluster_s1, 
              hcut, 
              hc_method = "single",
@@ -109,6 +125,7 @@ fviz_nbclust(cluster_s1,
 ### 3 Clusters (K-Means)
 
 ```{r}
+#bind selected K number of clusters to both sets of data with normalized dct values and visualize
 clusters3_s1_spread <- assignments_s1 %>% 
   filter(k == 3) %>% 
   ungroup() %>% 
@@ -139,6 +156,7 @@ ggplotly(clusters3_s1_plot) %>%
 #### List Show Names within Clusters
 
 ```{r}
+#list names of shows in each cluster
 s1_3clusters <- list(as.character(unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 1,]$Show_Name)),
                      as.character(unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 2,]$Show_Name)),
                      as.character(unique(clusters3_s1[clusters3_s1$cluster_kmeans_3 == 3,]$Show_Name)))
@@ -147,6 +165,8 @@ s1_3clusters
 
 ```{r}
 # GROUPINGS BY CLUSTER
+
+#same plot as before, but legend is grouped by cluster for easier distinction
 by_cluster_3kmeans <- clusters3_s1 %>% 
   filter(Season_num == 1) %>% 
   plot_ly(x = ~period, 
@@ -169,6 +189,7 @@ by_cluster_3kmeans
 ### 5 Clusters (K-Means)
 
 ```{r}
+#same code as with 3 clusters
 clusters5_s1_spread <- assignments_s1 %>% 
   filter(k == 5) %>% 
   ungroup() %>% 
@@ -237,6 +258,7 @@ by_cluster_5kmeans
 # S1 Curve Clustering on C3-LS Differences
 
 ```{r}
+#same code as before for clustering
 dct_df_diff <- read.csv("dct_C3_LS_diff.csv") %>% select(-X)
 dct_spread_diff <- read.csv("dct_spread_C3_LS_diff.csv") %>% select(-X)
 ```
@@ -347,11 +369,14 @@ s1_diff_5kmeans
 
 ```{r}
 # S1 CLUSTERS & S2 TRENDS
+
+#create subset of show curves from season 2
 s2_spread <- dct_spread_diff %>% 
   filter(Season_num == 2) %>%
   ungroup() %>%
   select(-Network, -Season_num)
 
+#change column names range to append to season 1 curves with cluster variable
 s2_spread_newcols <- c(paste("X", 101:200, sep = ""))
 colnames(s2_spread)[2:ncol(s2_spread)] <- c(s2_spread_newcols)
 
@@ -361,6 +386,7 @@ s1_diff_5clusters_s2_trends <- bind_cols(clusters5_s1_diff_spread,
 s1_diff_5clusters_s2_trends <- merge(s1_diff_5clusters_s2_trends[, c("cluster_kmeans_5", "Show_Name")], 
                                      dct_df_diff, by = "Show_Name")
 
+#re-number rows to make continuous over 200 periods for both seasons
 s1_diff_5clusters_s2_trends <- s1_diff_5clusters_s2_trends %>% 
   filter(Season_num == 1 | Season_num == 2) %>% 
   group_by(Network, Show_Name) %>% 
@@ -402,6 +428,10 @@ by_cluster_5kmeans_diff
 
 ```{r}
 # S1-S2 Trends Clustered on S1 Clusters
+
+#merge season 1 cluster data frame and continuous trends data frame
+#to visualize season 1 and season 2 normalized continuously
+#and clustered on season 1 clusters
 dct_spread_diff_cont <- read.csv("dct_spread_C3_LS_diff_cont.csv") %>% select(-X)
 dct_diff_cont <- read.csv("dct_C3_LS_diff_cont.csv")
 
@@ -446,6 +476,7 @@ s1_clusters_cont_trends_plot
 # S1 Curve Clustering on C3 & LS Averages
 
 ```{r}
+#same code as before for clustering
 dct_df_avg <- read.csv("dct_C3_LS_avg.csv") %>% select(-X)
 dct_spread_avg <- read.csv("dct_spread_C3_LS_avg.csv") %>% select(-X)
 ```
