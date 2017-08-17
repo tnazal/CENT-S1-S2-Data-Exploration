@@ -1,0 +1,165 @@
+---
+title: "Prediction trials"
+output: html_document
+---
+```{r}
+library(ggplot2)
+library(plotly)
+library(dplyr)
+library(plm)
+```
+
+#funtions / themes
+```{r}
+mytheme <- theme(panel.background = element_blank(), 
+        panel.grid.major = element_line(color = "#d8d8d8", linetype = "dotted"), 
+        panel.grid.major.x = element_blank(), 
+        plot.title = element_text(hjust = 0.5),
+        axis.ticks.y=element_blank(),
+        strip.background = element_blank())
+
+mape <- function(predicted, actual){
+  (abs(actual - predicted) / actual) * 100
+}
+```
+
+#Data Wrangling 
+```{r}
+d <- read.csv("s1_s2_data.csv") %>% select(-X, -C3_s1_cluster, -LS_s1_cluster)
+clusters_lookup <- read.csv("best_clusters_lookup.csv")
+d <- d %>% filter(Show_Name %in% clusters_lookup$Show_Name, Season_num <3)
+d$Date <- as.Date(d$Date)
+
+#fix growth NA
+d$C3_Growth <- ifelse(is.na(d$C3_Growth), 0, d$C3_Growth)
+
+#Month of year
+d$MOY <- months(d$Date, T)
+
+#Season 2 dependent variable creation for each observation
+  #First Episode  
+  d <- left_join(d, d %>% group_by(Show_Name) %>%
+                    filter(Season_num == 2, Episode_num == 1) %>%
+                    mutate(Season2_ep1 = mean(C3_Impressions)) %>% 
+                 select(Show_Name, Season2_ep1))
+  #Mean
+  d <- left_join(d, d %>% group_by(Show_Name) %>%
+                    filter(Season_num == 2) %>%
+                    mutate(Season2_mean = mean(C3_Impressions)) %>%
+                    filter(Episode_num == 1) %>% 
+                 select(Show_Name, Season2_mean))
+   
+#creates a variable per clustering scheme, assigns cluster based on Show Name
+for(n in 2:ncol(clusters_lookup)){
+  d[paste(colnames(clusters_lookup)[n])] <- as.factor(clusters_lookup[[n]][match(d[["Show_Name"]],
+                                                                                 clusters_lookup[["Show_Name"]])])
+}
+  
+rm(n, clusters_lookup)
+```
+
+#Plot S1 eps, S2 first
+```{r, fig.height= 7, fig.width=10}
+ggplotly(ggplot(d %>% filter(Season_num == 1 | (Season_num == 2 & Episode_num == 1)) %>%
+                  group_by(Show_Name) %>% 
+                  mutate(Episode_num = ifelse(Season_num == 2,
+                                              max(Episode_num) + 1, Episode_num)),
+       aes(x = Episode_num, y = C3_Impressions)) +
+  geom_point(aes(color = Show_Name, shape = as.factor(Season_num))) +
+  geom_smooth(aes(color = Show_Name),method='lm', formula=y~x) +
+  mytheme)
+
+```
+
+```{r}
+sub <- d %>% 
+  filter(Season_num == 1 | (Season_num == 2 & Episode_num == 1)) %>% 
+  group_by(Show_Name) %>% 
+  mutate(Episode_num = ifelse(Season_num == 2, NA, Episode_num))
+
+plot <- ggplot(sub %>% filter(Show_Name == "BOTCHED"),
+               aes(x = cum_ep, y = C3_Impressions)) + 
+  geom_point(aes(shape = as.factor(Season_num), color = as.factor(Season_num))) + 
+  geom_point(aes(x = max(cum_ep), y = unique(Season2_mean), shape = "S2 Average", color = "S2 Average")) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions, color = as.factor(Season_num)), method = "lm", formula = y ~ x) + 
+  mytheme + labs(x = NULL, y = NULL, color = NULL, shape = NULL) +
+  scale_y_continuous(labels = comma) +
+  scale_x_continuous(breaks = pretty_breaks())
+
+ggplotly(plot) %>% 
+  layout(title = "S1 Impressions with S2 Premiere and Average",
+         font = list(size = 12),
+         yaxis = list(title = ""), 
+         xaxis = list(title = "Episode Number"),
+         margin = list(l = 100, 
+                       r = 0, 
+                       b = 50, 
+                       t = 50))
+```
+
+```{r}
+data <- d %>% filter(Show_Name == "BOTCHED") %>% filter(Season_num == 1 | (Season_num == 2 & Episode_num == 1))
+sub2 <- d %>% filter(Show_Name == "BOTCHED") %>% filter(Season_num == 2 & Episode_num == 1)
+sub3 <- d %>% filter(Show_Name == "BOTCHED") %>% filter(Season_num == 1)
+m <- lm(C3_Impressions ~ Episode_num, data = sub3)
+
+plot_ly(data, x = ~cum_ep, y = ~C3_Impressions, symbol = ~Season_num, symbols = c('circle', 'x')) %>%
+  add_trace(sub2, x = ~max(cum_ep), y = ~Season2_mean, mode = "markers", symbol = "Season 2 Average", symbols = c('square')) %>% 
+  add_lines(sub3, x = ~Episode_num, y = ~fitted(lm(C3_Impressions ~ Episode_num)), 
+              type = "scatter", mode = "line", 
+              color = "S1 C3 Impressions Linear", 
+              opacity = 0.6) %>% 
+  add_ribbons(data = augment(m), 
+              ymin = ~.fitted - .se.fit,
+              ymax = ~.fitted + .se.fit,
+              line = list(color = 'rgba(7, 164, 181, 0.05)'),
+              fillcolor = 'rgba(7, 164, 181, 0.2)',
+              name = "Standard Error")
+            
+```
+
+
+#models
+```{r}
+model_1st <- plm(Season2_ep1 ~ Network + Broadcast_Year + MOY + DOW +
+                   Start_Time + C3_Impressions + C3_Growth + C3_Rebase,
+                 data = d %>% filter(Season_num == 1),
+                 index = c("Episode_num", "Show_Name"),
+                 model = "random")
+
+model_1st2 <- plm(Season2_ep1 ~ Network + Broadcast_Year + MOY + DOW +
+                   Start_Time + C3_Impressions + C3_Growth + C3_Rebase +
+                    C3_RAW_kmeans_5,
+                 data = d %>% filter(Season_num == 1),
+                 index = c("Episode_num", "Show_Name"),
+                 model = "random")
+
+model_mean <- plm(Season2_mean ~ Network + Broadcast_Year + MOY + DOW +
+                   Start_Time + C3_Impressions + C3_Growth + C3_Rebase,
+                 data = d %>% filter(Season_num == 1),
+                 index = c("Episode_num", "Show_Name"),
+                 model = "random")
+
+model_mean2 <- plm(Season2_mean ~ Network + Broadcast_Year + MOY + DOW +
+                   Start_Time + C3_Impressions +
+                    C3_RAW_kmeans_5,
+                 data = d %>% filter(Season_num == 1),
+                 index = c("Episode_num", "Show_Name"),
+                 model = "random")
+
+
+summary(model_1st)
+coef(model_1st)
+
+
+length(predict(model_1st))
+
+a <- d %>% filter(Season_num == 1)
+mean(mape(predict(model_1st), d[d$Season_num == 1,]$Season2_ep1))
+mean(mape(predict(model_1st2), d[d$Season_num == 1,]$Season2_ep1))
+
+mean(mape(predict(model_mean), d[d$Season_num == 1,]$Season2_ep1))
+mean(mape(predict(model_mean2), d[d$Season_num == 1,]$Season2_ep1))
+
+```
+
