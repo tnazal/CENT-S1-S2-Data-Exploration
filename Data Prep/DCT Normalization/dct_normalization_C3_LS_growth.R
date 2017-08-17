@@ -11,7 +11,7 @@ library(tidyr)
 df <- read.csv("CENT_showlevel.csv") %>% select(-X)
 
 #keep only shows that have both a first and second season in the data
-#with 4 or more episodes
+#with 4 or more episodes (otherwise DCT normalization on raw data will not work)
 df <- df %>% group_by(Network, Show_Name) %>%
   filter(all(c(1, 2) %in% Season_num)) %>% 
   ungroup() %>% 
@@ -21,11 +21,12 @@ df <- df %>% group_by(Network, Show_Name) %>%
   group_by(Network, Show_Name) %>%
   filter(all(c(1, 2) %in% Season_num)) 
 
-#remove show with single episode starting at episode 6
+#remove show with single episode in season starting at episode 6
 df <- df[df$Show_Name != "RHOM", ]
 
 
-#transformation function
+#Discrete Cosine Transformation function
+#see PDFs on GitHub for literature on DCT
 dct <- function(x){
   get_dct_transform(
     x, 
@@ -37,7 +38,8 @@ dct <- function(x){
 }
 
 
-#to cluster C3 & LS appended
+#create list of episode growth for each show & season 
+#to create DCT values from growth on each episode
 df_curves_C3_growth <- df %>%
   filter(!is.na(C3_Growth)) %>% 
   group_by(Network, Show_Name, Season_num) %>% 
@@ -48,6 +50,7 @@ df_curves_LS_growth <- df %>%
    group_by(Network, Show_Name, Season_num) %>% 
    summarise(growth = list(LS_Growth))
 
+#map growth as DCT values between -1 and 1 over 100 periods
 df_with_dct_C3_growth <- df_curves_C3_growth %>% 
   mutate(dct_values = map(growth, dct)) %>% 
   select(-growth) %>% 
@@ -55,6 +58,7 @@ df_with_dct_C3_growth <- df_curves_C3_growth %>%
   group_by(Network, Show_Name, Season_num) %>% 
   mutate(period = row_number())
 
+#add 100 to row number to append LS to C3
 df_with_dct_LS_growth <- df_curves_LS_growth %>% 
   mutate(dct_values = map(growth, dct)) %>% 
   select(-growth) %>% 
@@ -62,9 +66,11 @@ df_with_dct_LS_growth <- df_curves_LS_growth %>%
   group_by(Network, Show_Name, Season_num) %>% 
   mutate(period = row_number() + 100)
 
+#combine C3 and LS
 dct_C3_LS_growth <- rbind(df_with_dct_C3_growth, df_with_dct_LS_growth) %>% 
   arrange(Show_Name, Season_num, period)
 
+#convert data to wide format
 dct_spread_C3_LS_growth <- dct_C3_LS_growth %>% 
   spread(key = period, value = dct_values)
 
@@ -72,7 +78,7 @@ write.csv(dct_C3_LS_growth, "dct_C3_LS_growth.csv")
 write.csv(dct_spread_C3_LS_growth, "dct_spread_C3_LS_growth.csv")
 
 
-#to cluster on differences 
+#to cluster on C3 - LS differences 
 df_curves_C3_LS_diff_growth <- df %>% 
   filter(!is.na(diff_C3_LS_growth)) %>% 
   group_by(Network, Show_Name, Season_num) %>% 
@@ -92,7 +98,7 @@ write.csv(df_with_dct_C3_LS_diff_growth, "dct_C3_LS_diff_growth.csv")
 write.csv(df_final_diff, "dct_spread_C3_LS_diff_growth.csv")
 
 
-#to cluster on averages
+#to cluster on C3 & LS averages
 df_curves_C3_LS_avg_growth <- df %>% 
   filter(!is.na(avg_C3_LS_growth)) %>% 
   group_by(Network, Show_Name, Season_num) %>% 
