@@ -34,11 +34,13 @@ library(fpc)
 From example here: https://cran.r-project.org/web/packages/dtwclust/vignettes/dtwclust.pdf.
 
 ```{r}
+#read in long and wide format data
 dct_df <- read.csv("dct_C3_LS_growth.csv")
 dct_spread <- read.csv("dct_spread_C3_LS_growth.csv")
 ```
 
 ```{r}
+#filter wide data to only cluster on season 1
 cluster_s1 <- dct_spread %>% 
   filter(Season_num == 1) %>%
   ungroup() %>%
@@ -48,6 +50,9 @@ cluster_s1 <- dct_spread %>%
 ## K-Shape Clustering 
 
 ```{r}
+#partitional clustering with 2 through 5 clusters
+#using shape-based distance for the curves
+#clustering around shape centroid
 kshape_s1 <- tsclust(cluster_s1, 
                      type = 'partitional',
                      k = 2:5,
@@ -58,20 +63,18 @@ kshape_s1 <- tsclust(cluster_s1,
                      seed = 12)
 
 names(kshape_s1) <- paste0('k_', 2:5)
+
+#apply internal clustering validity indices
+#including silhouette, Dunn, and others (see ?cvi documentation in R)
 sapply(kshape_s1, cvi, type = 'internal')
+
+#give best cluster number based on silhouette width
+#a measure of how similar the object is to its own cluster compared to others
 which.max(sapply(kshape_s1, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(kshape_s1$k_5@cluster)
-```
-
-```{r}
-plot(kshape_s1$k_5, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
+#export cluster predictions to the main data set and visualize in ggplot
 clusters_s1_shape5_spread <- dct_spread %>% filter(Season_num == 1)
 clusters_s1_shape5_spread$cluster_shape_5 <- kshape_s1$k_5@cluster
 
@@ -97,6 +100,10 @@ ggplotly(clusters_s1_shape5_plot) %>%
 ## Dynamic Time Warp Clustering
 
 ```{r}
+#partitional clustering with 2 through 5 clusters
+#using dynamic time warping distance for the curves
+#with partitioning around mediods
+#see dtwclust documentation in R for further information
 dtw_s1 <- tsclust(cluster_s1,
                   type = 'partitional',
                   k = 2:5,
@@ -109,20 +116,17 @@ dtw_s1 <- tsclust(cluster_s1,
                   seed = 12)
 
 names(dtw_s1) <- paste0('k_', 2:5)
+
+#apply internal clustering validity indices
 sapply(dtw_s1, cvi)
+
+#give best cluster number based on silhouette width
+#a measure of how similar the object is to its own cluster compared to others
 which.max(sapply(dtw_s1, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(dtw_s1$k_2@cluster)
-```
-
-```{r}
-plot(dtw_s1$k_2, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
+#export cluster predictions to the main data set and visualize in ggplot
 clusters_s1_dtw2_spread <- dct_spread %>% filter(Season_num == 1)
 clusters_s1_dtw2_spread$cluster_dtw_2 <- dtw_s1$k_2@cluster
 
@@ -148,6 +152,7 @@ ggplotly(clusters_s1_dtw2_plot) %>%
 # S1 Clustering on C3-LS Growth Differencs 
 
 ```{r}
+#same code as before
 dct_diff <- read.csv("dct_C3_LS_diff_growth.csv")
 dct_spread_diff <- read.csv("dct_spread_C3_LS_diff_growth.csv")
 ```
@@ -175,35 +180,25 @@ which.max(sapply(kshape_diff, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(kshape_diff$k_2@cluster)
-```
+clusters_diff_shape4_spread <- dct_spread_diff %>% filter(Season_num == 1)
+clusters_diff_shape4_spread$cluster_shape_4 <- kshape_diff$k_4@cluster
 
-```{r}
-plot(kshape_diff$k_2, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
-clusters_diff_shape2_spread <- dct_spread_diff %>% filter(Season_num == 1)
-clusters_diff_shape2_spread$cluster_shape_2 <- kshape_diff$k_2@cluster
-
-clusters_diff_shape2 <- merge(clusters_diff_shape2_spread[, c("cluster_shape_2", "Show_Name")], 
+clusters_diff_shape4 <- merge(clusters_diff_shape4_spread[, c("cluster_shape_4", "Show_Name")], 
                                dct_diff, by = "Show_Name")
 ```
 
 ```{r}
-clusters_diff_shape2_plot <- clusters_diff_shape2 %>%
+clusters_diff_shape4_plot <- clusters_diff_shape4 %>% filter(Season_num == 1) %>% 
   ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
   geom_line() + 
-  facet_wrap(~ cluster_shape_2, nrow = 2) +  
+  facet_wrap(~ cluster_shape_4, nrow = 4) +  
   theme(axis.title.x = element_blank(), 
         axis.title.y = element_blank())
 
-ggplotly(clusters_diff_shape2_plot) %>% 
-  layout(title = "S1 with 2 K-Shape Clusters (C3-LS Growth Differences)", 
+ggplotly(clusters_diff_shape4_plot) %>% 
+  layout(title = "S1 with 4 K-Shape Clusters (C3-LS Growth Differences)", 
          margin = list(t = 150))
 ```
-
 
 ## Dynamic Time Warp Clustering
 
@@ -225,15 +220,6 @@ which.max(sapply(dtw_diff, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(dtw_diff$k_4@cluster)
-```
-
-```{r}
-plot(dtw_diff$k_4, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
 clusters_diff_dtw4_spread <- dct_spread_diff %>% filter(Season_num == 1)
 clusters_diff_dtw4_spread$cluster_dtw_4 <- dtw_diff$k_4@cluster
 
@@ -254,10 +240,10 @@ ggplotly(clusters_diff_dtw4_plot) %>%
          margin = list(t = 150))
 ```
 
-
 # Season 1 Clustering on C3 & LS Growth Averages
 
 ```{r}
+#same code as before
 dct_avg <- read.csv("dct_C3_LS_avg_growth.csv")
 dct_spread_avg <- read.csv("dct_spread_C3_LS_avg_growth.csv")
 ```
@@ -285,15 +271,6 @@ which.max(sapply(kshape_avg, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(kshape_avg$k_5@cluster)
-```
-
-```{r}
-plot(kshape_avg$k_5, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
 clusters_avg_shape5_spread <- dct_spread_avg %>% filter(Season_num == 1)
 clusters_avg_shape5_spread$cluster_shape_5 <- kshape_avg$k_5@cluster
 
@@ -313,7 +290,6 @@ ggplotly(clusters_avg_shape5_plot) %>%
   layout(title = "S1 with 5 K-Shape Clusters (C3 & LS Growth Averages)", 
          margin = list(t = 150))
 ```
-
 
 ## Dynamic Time Warp Clustering
 
@@ -335,15 +311,6 @@ which.max(sapply(dtw_avg, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(dtw_avg$k_3@cluster)
-```
-
-```{r}
-plot(dtw_avg$k_3, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
 clusters_avg_dtw3_spread <- dct_spread_avg %>% filter(Season_num == 1)
 clusters_avg_dtw3_spread$cluster_dtw_3 <- dtw_avg$k_3@cluster
 
@@ -370,16 +337,16 @@ ggplotly(clusters_avg_dtw3_plot) %>%
 # create distance matrices for clusters
 s1_5clusters_d <- dist(clusters_s1_shape5_spread[, 5:205])
 s1_2clusters_d <- dist(clusters_s1_dtw2_spread[, 5:205])
-diff_2clusters_d <- dist(clusters_diff_shape2_spread[, 5:105])
-diff_4clusters_d <- dist(clusters_diff_dtw4_spread[, 5:105])
+diff_4clusters_d_kshape <- dist(clusters_diff_shape4_spread[, 5:105])
+diff_4clusters_d_dtw <- dist(clusters_diff_dtw4_spread[, 5:105])
 avg_5clusters_d <- dist(clusters_avg_shape5_spread[, 5:105])
 avg_3clusters_d <- dist(clusters_avg_dtw3_spread[, 5:105])
 
 # diagnostics
 diagnostics_kshape_C3_LS_growth_s1_5cl <- cluster.stats(s1_5clusters_d, as.numeric(clusters_s1_shape5_spread$cluster_shape_5))
 diagnostics_dtw_C3_LS_growth_s1_2cl <- cluster.stats(s1_2clusters_d, as.numeric(clusters_s1_dtw2_spread$cluster_dtw_2))
-diagnostics_kshape_C3_LS_growth_diff_s1_2cl <- cluster.stats(diff_2clusters_d, as.numeric(clusters_diff_shape2_spread$cluster_shape_2))
-diagnostics_dtw_C3_LS_growth_diff_s1_4cl <- cluster.stats(diff_4clusters_d, as.numeric(clusters_diff_dtw4_spread$cluster_dtw_4))
+diagnostics_kshape_C3_LS_growth_diff_s1_4cl <- cluster.stats(diff_4clusters_d_kshape, as.numeric(clusters_diff_shape4_spread$cluster_shape_4))
+diagnostics_dtw_C3_LS_growth_diff_s1_4cl <- cluster.stats(diff_4clusters_d_dtw, as.numeric(clusters_diff_dtw4_spread$cluster_dtw_4))
 diagnostics_kshape_C3_LS_growth_avg_s1_5cl <- cluster.stats(avg_5clusters_d, as.numeric(clusters_avg_shape5_spread$cluster_shape_5))
 diagnostics_dtw_C3_LS_growth_avg_s1_3cl <- cluster.stats(avg_3clusters_d, as.numeric(clusters_avg_dtw3_spread$cluster_dtw_3))
 
