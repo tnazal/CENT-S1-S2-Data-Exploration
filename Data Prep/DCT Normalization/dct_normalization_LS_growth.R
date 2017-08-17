@@ -11,7 +11,7 @@ library(tidyr)
 df <- read.csv("CENT_showlevel.csv") %>% select(-X)
 
 #keep only shows that have both a first and second season in the data
-#with 4 or more episodes
+#with 4 or more episodes (otherwise DCT normalization on raw data will not work)
 df <- df %>% group_by(Network, Show_Name) %>%
   filter(all(c(1, 2) %in% Season_num)) %>% 
   ungroup() %>% 
@@ -21,11 +21,12 @@ df <- df %>% group_by(Network, Show_Name) %>%
   group_by(Network, Show_Name) %>%
   filter(all(c(1, 2) %in% Season_num)) 
 
-#remove show with single episode starting at episode 6
+#remove show with single episode in season starting at episode 6
 df <- df[df$Show_Name != "RHOM", ]
 
 
-#transformation function
+#Discrete Cosine Transformation function
+#see PDFs on GitHub for literature on DCT
 dct <- function(x){
   get_dct_transform(
     x, 
@@ -37,11 +38,14 @@ dct <- function(x){
 }
 
 
+#create list of episode growth for each show & season 
+#to create DCT values from growth on each episode
 df_curves <- df %>%
   filter(!is.na(LS_Growth)) %>% 
   group_by(Network, Show_Name, Season_num) %>% 
   summarise(LS_growth = list(LS_Growth))
 
+#map growth as DCT values between -1 and 1 over 100 periods
 df_with_dct <- df_curves %>%
   mutate(dct_values = map(LS_growth, dct)) %>% 
   select(-LS_growth) %>% 
@@ -49,6 +53,7 @@ df_with_dct <- df_curves %>%
   group_by(Network, Show_Name, Season_num) %>% 
   mutate(period = row_number()) 
 
+#convert data to wide format
 df_final <- df_with_dct %>% 
   spread(key = period, value = dct_values)
 
@@ -56,7 +61,7 @@ write.csv(df_with_dct, "dct_LS_growth.csv")
 write.csv(df_final, "dct_spread_LS_growth.csv")
 
 
-#S1 & S2 appended
+#S1 & S2 normalized separately and appended
 dct_s1_s2 <- df_curves %>% 
   mutate(dct_values = map(LS_growth, dct)) %>% 
   select(-LS_growth) %>% 
@@ -68,7 +73,7 @@ dct_s1_s2 <- df_curves %>%
 write.csv(dct_s1_s2, "dct_LS_growth_s1_s2.csv")
 
 
-#S1 & S2 continuous normalization
+#S1 to S2 continuously normalized together
 dct_cont <- df %>%
   filter(Season_num == 1 | Season_num == 2) %>%
   filter(!is.na(LS_Growth)) %>% 
@@ -86,3 +91,4 @@ dct_spread_cont <- dct_cont  %>%
 
 write.csv(dct_cont, "dct_LS_growth_cont.csv")
 write.csv(dct_spread_cont, "dct_spread_LS_growth_cont.csv")
+
