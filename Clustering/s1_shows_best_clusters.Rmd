@@ -8,6 +8,11 @@ library(dplyr)
 ```
 
 ```{r}
+#for each cluster schema, read in DCT normalized data 
+#with cluster assignments based on best_clusters.csv from diagnostics
+#keep only the show names and their cluster assignment
+#renaming to proper cluster schema
+
 kmeans_C3_raw_s1_5cl <- read.csv("kmeans_C3_raw_s1_5cl.csv")
 kmeans_C3_raw_s1_5cl <- unique(kmeans_C3_raw_s1_5cl[, c("Show_Name", "cluster_kmeans_5")])
 kmeans_C3_raw_s1_5cl <- rename(kmeans_C3_raw_s1_5cl, 
@@ -70,6 +75,8 @@ kmeans_C3_LS_growth_avg_s1_5cl <- rename(kmeans_C3_LS_growth_avg_s1_5cl,
 ```
 
 ```{r}
+#merge all different cluster schemas, matching to each show
+
 s1_clusters <- Reduce(function(x, y) merge(x, y, all = TRUE), 
                       list(kmeans_C3_raw_s1_5cl, 
                            kmeans_C3_growth_s1_5cl, 
