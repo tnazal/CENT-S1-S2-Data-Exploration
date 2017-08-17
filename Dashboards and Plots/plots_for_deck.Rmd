@@ -1,0 +1,214 @@
+---
+title: "Plots for Deck"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, echo = FALSE)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(scales)
+library(gridExtra)
+```
+
+```{r}
+my_theme <-  theme(panel.background = element_blank(), 
+                   panel.grid.major = element_line(color = "#d8d8d8", linetype = "dotted"), 
+                   panel.grid.major.x = element_blank(), 
+                   plot.title = element_text(hjust = 0.5),
+                   axis.title.y = element_blank(),
+                   axis.line.y = element_blank(),
+                   axis.ticks.y = element_blank(),
+                   axis.line.x = element_line(color = "#d8d8d8", linetype = "dashed"),
+                   strip.background = element_blank(), 
+                   legend.title = element_blank())
+```
+
+```{r, fig.height= 12, fig.width=10}
+d <- read.csv("kmeans_C3_raw_s1_5cl.csv")
+
+plot <- ggplot(d %>% filter(Season_num == 1)) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name)) + 
+  facet_wrap(~ cluster_kmeans_5, nrow = 5) + 
+  my_theme +
+  theme(legend.position = "none") +
+  labs(x = "")
+
+ggplotly(plot) %>% 
+  layout(title = "Season 1 with 5 K-Means Clusters (C3 Raw)", 
+         xaxis = list(title = "DCT Period"), 
+         margin = list(l = 50, 
+                       r = 50, 
+                       b = 50, 
+                       t = 125))
+```
+
+```{r, fig.height= 12, fig.width=10}
+d <- read.csv("s1_s2_data.csv") %>% filter(Episode_num < 15)
+
+grid.arrange(
+ggplot(d %>% filter(C3_raw_cluster == 1)) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), size = 1, 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") + 
+  facet_grid(~ Season_num) + 
+  guides(color=guide_legend(ncol=2)) +
+  theme(plot.margin = unit(x = c(0.2,3.4,0.5,0), units = "cm")) +  
+  scale_y_continuous(labels = comma) + 
+  my_theme + 
+  theme(legend.position = "none") + 
+  labs(x = ""),
+
+ggplot(d %>% filter(C3_raw_cluster == 2)) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), size = 1, 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") + 
+  facet_grid(~ Season_num) + 
+  guides(color=guide_legend(ncol=2)) +
+  theme(plot.margin = unit(x = c(0.2,2.3,0.5,0), units = "cm")) +  
+  scale_y_continuous(labels = comma) + 
+  my_theme + 
+  theme(legend.position = "none", 
+        strip.text.x = element_blank()) + 
+  labs(x = ""),
+
+ggplot(d %>% filter(C3_raw_cluster == 3)) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), size = 1, 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") + 
+  facet_grid(~ Season_num) + 
+  guides(color=guide_legend(ncol=2)) +
+  theme(plot.margin = unit(x = c(0.2,2.9,0.5,0), units = "cm")) +  
+  scale_y_continuous(labels = comma) + 
+  my_theme + 
+  theme(legend.position = "none", 
+        strip.text.x = element_blank()) + 
+  labs(x = ""),
+
+ggplot(d %>% filter(C3_raw_cluster == 4)) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), size = 1, 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") + 
+  facet_grid(~ Season_num) + 
+  guides(color=guide_legend(ncol=2)) +
+  theme(plot.margin = unit(x = c(0.2,3.5,0.5,0), units = "cm")) +  
+  scale_y_continuous(labels = comma) + 
+  my_theme + 
+  theme(legend.position = "none", 
+        strip.text.x = element_blank()) + 
+  labs(x = ""),
+
+ggplot(d %>% filter(C3_raw_cluster == 5)) +
+  geom_line(aes(x = Episode_num, y = C3_Impressions, color = Show_Name), size = 1, 
+            se = F, method = "lm", alpha = 1, formula = y ~ 0 + x) +
+  geom_smooth(aes(x = Episode_num, y = C3_Impressions), 
+              color = "black", se = F, method = lm, linetype = "dashed") + 
+  facet_grid(~ Season_num) + 
+  guides(color=guide_legend(ncol=2)) +
+  theme(plot.margin = unit(x = c(0.2,2.6,0.5,0), units = "cm")) +  
+  scale_y_continuous(labels = comma) + 
+  my_theme + 
+  theme(legend.position = "none", 
+        strip.text.x = element_blank()) + 
+  labs(x = "Episode Number"),
+ncol = 1
+)
+```
+
+```{r, fig.height= 12, fig.width=10}
+d <- read.csv("kmeans_C3_raw_s1_5cl_s2trends.csv")
+
+grid.arrange(
+ggplot(d %>% filter(cluster_kmeans_5 == 1)) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name), size = 1) +
+  guides(color=guide_legend(ncol=2)) +
+  theme(plot.margin = unit(x = c(0.2,3.4,0.5,0), units = "cm")) + 
+  my_theme + 
+  labs(x = ""),
+
+ggplot(d %>% filter(cluster_kmeans_5 == 2)) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name), size = 1) +
+  guides(color=guide_legend(ncol=2)) +
+  theme(plot.margin = unit(x = c(0.2,2.3,0.5,0), units = "cm")) + 
+  my_theme + 
+  labs(x = ""),
+
+ggplot(d %>% filter(cluster_kmeans_5 == 3)) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name), size = 1) +
+  guides(color=guide_legend(ncol=2)) +
+  theme(plot.margin = unit(x = c(0.2,2.9,0.5,0), units = "cm")) + 
+  my_theme + 
+  labs(x = ""),
+
+ggplot(d %>% filter(cluster_kmeans_5 == 4)) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name), size = 1) +
+  guides(color=guide_legend(ncol=2)) +
+  theme(plot.margin = unit(x = c(0.2,3.5,0.5,0), units = "cm")) +
+  my_theme + 
+  labs(x = ""),
+
+ggplot(d %>% filter(cluster_kmeans_5 == 5)) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name), size = 1) + 
+  guides(color=guide_legend(ncol=2)) +
+  theme(plot.margin = unit(x = c(0.2,2.6,0.5,0), units = "cm")) + 
+  my_theme + 
+  labs(x = "DCT Period"),
+ncol = 1
+)
+```
+
+```{r, fig.height= 12, fig.width=10}
+d <- read.csv("kmeans_C3_raw_s1_5cl_cont_trends.csv")
+
+grid.arrange(
+ggplot(d %>% filter(s1_cluster == 1)) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name), size = 1) +
+  guides(color=guide_legend(ncol=2)) +
+  theme(plot.margin = unit(x = c(0.2,3.4,0.5,0), units = "cm")) + 
+  my_theme +
+  theme(legend.position = "none") + 
+  labs(x = ""),
+
+ggplot(d %>% filter(s1_cluster == 2)) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name), size = 1) +
+  guides(color=guide_legend(ncol=2)) +
+  theme(plot.margin = unit(x = c(0.2,2.3,0.5,0), units = "cm")) + 
+  my_theme +
+  theme(legend.position = "none") + 
+  labs(x = ""),
+
+ggplot(d %>% filter(s1_cluster == 3)) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name), size = 1) +
+  guides(color=guide_legend(ncol=2)) +
+  theme(plot.margin = unit(x = c(0.2,2.9,0.5,0), units = "cm")) + 
+  my_theme +
+  theme(legend.position = "none") + 
+  labs(x = ""),
+
+ggplot(d %>% filter(s1_cluster == 4)) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name), size = 1) +
+  guides(color=guide_legend(ncol=2)) +
+  theme(plot.margin = unit(x = c(0.2,3.5,0.5,0), units = "cm")) +
+  my_theme +
+  theme(legend.position = "none") + 
+  labs(x = ""),
+
+ggplot(d %>% filter(s1_cluster == 5)) +
+  geom_line(aes(x = period, y = dct_values, color = Show_Name), size = 1) + 
+  guides(color=guide_legend(ncol=2)) +
+  theme(plot.margin = unit(x = c(0.2,2.6,0.5,0), units = "cm")) + 
+  my_theme +
+  theme(legend.position = "none") +
+  labs(x = "DCT Period"),
+ncol = 1
+)
+```
