@@ -1,0 +1,127 @@
+---
+title: "CENT Cluster Modeling"
+output: 
+  flexdashboard::flex_dashboard:
+    source_code: embed
+    vertical_layout: scroll
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+options(scipen = 999, digits = 3)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(scales)
+library(plotly)
+```
+
+```{r}
+data <- read.csv("s1_s2_data.csv") %>% select(-X)
+
+data <- left_join(data, 
+                  data %>% group_by(Show_Name) %>%
+                    filter(Season_num == 2) %>%
+                    mutate(Season2_C3_mean = mean(C3_Impressions), 
+                           Season2_LS_mean = mean(LS_Impressions)) %>%
+                    filter(Episode_num == 1) %>% 
+                 select(Show_Name, Season2_C3_mean, Season2_LS_mean))
+```
+
+```{r}
+my_theme <- theme(panel.background = element_blank(), 
+                  panel.grid.major = element_line(color = "#d8d8d8", linetype = "dotted"), 
+                  panel.grid.major.x = element_blank(), 
+                  plot.title = element_text(hjust = 0.5),
+                  legend.position = "bottom",
+                  axis.line.y = element_blank(),
+                  axis.ticks.y = element_blank(),
+                  axis.title.x = element_blank(),
+                  axis.line.x = element_line(color = "#d8d8d8", linetype = "dashed"),
+                  strip.background = element_blank())
+```
+
+Impressions Plots with Linear Fit
+===================================================================================================
+
+Sidebar {.sidebar data-width=150}
+---------------------------------------------------------------------------------------------------
+
+```{r}
+selectInput("show", label = "Show:",
+            choices = unique(data$Show_Name))
+```
+
+Column
+---------------------------------------------------------------------------------------------------
+
+### C3
+
+```{r}
+renderPlotly({
+  sub <- data %>% 
+    filter(Season_num == 1 | (Season_num == 2 & Episode_num == 1)) %>% 
+    group_by(Show_Name) %>% 
+    mutate(Episode_num = ifelse(Season_num == 2, NA, Episode_num))
+
+  plot <- ggplot(sub %>% filter(Show_Name == as.character(input$show)),
+                 aes(x = cum_ep, y = C3_Impressions)) + 
+    geom_point(aes(shape = as.factor(Season_num), 
+                   color = as.factor(Season_num))) + 
+    geom_point(aes(x = max(cum_ep), y = unique(Season2_C3_mean), 
+                   shape = "S2 Average", color = "S2 Average")) +
+    geom_smooth(aes(x = Episode_num, y = C3_Impressions, 
+                    color = as.factor(Season_num)), 
+                method = "lm", formula = y ~ x) + 
+    my_theme + labs(x = NULL, y = NULL, color = NULL, shape = NULL) +
+    scale_y_continuous(labels = comma) +
+    scale_x_continuous(breaks = pretty_breaks())
+
+  ggplotly(plot, height = 400, width = 1000) %>% 
+    layout(title = paste("S1 Imps with S2 Premiere & Avg for", as.character(input$show)),
+           font = list(size = 10),
+           yaxis = list(title = ""), 
+           xaxis = list(title = "Episode Number"),
+           margin = list(l = 100, 
+                         r = 0, 
+                         b = 50, 
+                         t = 50))
+})
+```
+
+### LS
+
+```{r}
+renderPlotly({
+  sub <- data %>% 
+    filter(Season_num == 1 | (Season_num == 2 & Episode_num == 1)) %>% 
+    group_by(Show_Name) %>% 
+    mutate(Episode_num = ifelse(Season_num == 2, NA, Episode_num))
+
+  plot <- ggplot(sub %>% filter(Show_Name == as.character(input$show)),
+                 aes(x = cum_ep, y = LS_Impressions)) + 
+    geom_point(aes(shape = as.factor(Season_num), 
+                   color = as.factor(Season_num))) + 
+    geom_point(aes(x = max(cum_ep), y = unique(Season2_LS_mean), 
+                   shape = "S2 Average", color = "S2 Average")) +
+    geom_smooth(aes(x = Episode_num, y = LS_Impressions, 
+                    color = as.factor(Season_num)), 
+                method = "lm", formula = y ~ x) + 
+    my_theme + labs(x = NULL, y = NULL, color = NULL, shape = NULL) +
+    scale_y_continuous(labels = comma) +
+    scale_x_continuous(breaks = pretty_breaks())
+
+  ggplotly(plot, height = 400, width = 1000) %>% 
+    layout(title = paste("S1 Imps with S2 Premiere & Avg for", as.character(input$show)),
+           font = list(size = 10),
+           yaxis = list(title = ""), 
+           xaxis = list(title = "Episode Number"),
+           margin = list(l = 100, 
+                         r = 0, 
+                         b = 50, 
+                         t = 50))
+})
+```

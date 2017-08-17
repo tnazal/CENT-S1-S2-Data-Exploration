@@ -1,0 +1,249 @@
+---
+title: "Predictions"
+output: html_document
+---
+
+```{r}
+#######################################################
+# Inputs: s1_s2_data.csv, best_clusters_lookup.csv
+# 
+# Purpose: Generates Anova table for different 
+#          clustering  groups, and forecast comparison
+#######################################################
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(ggplot2)
+library(plotly)
+library(tidyr)
+library(broom)
+library(dplyr)
+library(plm)
+library(lme4)
+```
+
+# Funtions/Themes
+
+```{r}
+#define Mean Absolute Percentage Error
+#to measure prediction accuracy
+mape <- function(predicted, actual){
+  (abs(actual - predicted) / actual) * 100
+}
+```
+
+# Data Wrangling 
+
+```{r}
+d <- read.csv("s1_s2_data.csv") %>% 
+  filter(Show_Name != "BOTCHED POST OP",
+         Show_Name != "BURNING LOVE") %>% 
+  select(-X)
+d$Date <- as.Date(d$Date)
+
+#fix growth NAs
+d$C3_Growth <- ifelse(is.na(d$C3_Growth), 0, d$C3_Growth)
+
+#month of year
+d$MOY <- months(d$Date, T)
+
+#Season 2 dependent variable creation for each observation
+  #First Episode  
+  d <- left_join(d, d %>% group_by(Show_Name) %>%
+                    filter(Season_num == 2, Episode_num == 1) %>%
+                    mutate(Season2_ep1 = mean(C3_Impressions)) %>% 
+                 select(Show_Name, Season2_ep1))
+  #Mean
+  d <- left_join(d, d %>% group_by(Show_Name) %>%
+                    filter(Season_num == 2) %>%
+                    mutate(Season2_mean = mean(C3_Impressions)) %>%
+                    filter(Episode_num == 1) %>% 
+                 select(Show_Name, Season2_mean))
+   
+#creates a variable per clustering schema, assigns cluster based on Show Name
+  
+clusters_lookup <- read.csv("best_clusters_lookup.csv") 
+  
+for(n in 2:ncol(clusters_lookup)){
+  d[paste(colnames(clusters_lookup)[n])] <- as.factor(clusters_lookup[[n]][match(d[["Show_Name"]],
+                                                                                 clusters_lookup[["Show_Name"]])])
+}
+  
+d <- d %>% select(-C3_raw_cluster, -C3_growth_cluster) 
+
+d[c(37:46)] <- as.data.frame(lapply(d[c(37:46)], as.factor))
+
+rm(n, clusters_lookup)
+```
+
+# Simple Linear Models for ANOVA
+
+```{r}
+#empty lists to fill
+lms_s1 <- list(NA)
+lms_s2 <- list(NA)
+
+#runs ANOVA per clustering variable as a unique variable in a linear model over C3 impressions
+for (n in c(37:46, 50:59)){
+  lms_s1[n] <-  anova(lm(C3_Impressions ~., data = d %>% filter(Season_num == 1) %>% select(13, n)))$`Pr(>F)`[1]
+  lms_s2[n] <-  anova(lm(C3_Impressions ~., data = d %>% filter(Season_num == 2) %>% select(13, n)))$`Pr(>F)`[1]
+}
+
+#creates the data frame
+anovas_df <- as.data.frame(cbind(clustering = colnames(d)[c(37:46, 50:59)],
+                                 anova_pval_S1 = round(as.numeric(lms_s1[c(37:46, 50:59)]), 3),
+                                 anova_pval_S2 = round(as.numeric(lms_s2[c(37:46, 50:59)]), 3)))
+
+#data type formatting 
+anovas_df$anova_pval_S1 <- as.numeric(as.character(anovas_df$anova_pval_S1))
+anovas_df$anova_pval_S2 <- as.numeric(as.character(anovas_df$anova_pval_S2))
+
+write.csv(anovas_df, "anovas.csv")
+```
+
+# Models and MAPEs
+
+```{r}
+#creates table with MAPEs for prediction with random effects model by clustering schema
+#predictions made within sample, over the mwean of season
+mapes <- as.data.frame(cbind(
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | Show_Name) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | Show_Name),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+  
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | LS_raw_cluster) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | LS_raw_cluster),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+  
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | LS_growth_cluster) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | LS_growth_cluster),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+  
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | raw_growth_C3_cluster) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | raw_growth_C3_cluster),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | raw_growth_LS_cluster) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | raw_growth_LS_cluster),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | C3_LS_raw_cluster) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | C3_LS_raw_cluster),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | C3_LS_raw_diff_cluster) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | C3_LS_raw_diff_cluster),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | C3_LS_raw_avg_cluster) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | C3_LS_raw_avg_cluster),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | C3_LS_growth_cluster) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | C3_LS_growth_cluster),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | C3_LS_growth_diff_cluster) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | C3_LS_growth_diff_cluster),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | C3_LS_growth_avg_cluster) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | C3_LS_growth_avg_cluster),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | C3_RAW_kmeans_3) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | C3_RAW_kmeans_3),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | C3_RAW_kmeans_5) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | C3_RAW_kmeans_5),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | C3_RAW_kshape_2) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | C3_RAW_kshape_2),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | C3_GROWTH_kmeans_4) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | C3_GROWTH_kmeans_4),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | C3_GROWTH_kmeans_5) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | C3_GROWTH_kmeans_5),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | C3_GROWTH_DTW_3) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | C3_GROWTH_DTW_3),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+           mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | LS_RAW_DTW_3) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | LS_RAW_DTW_3),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | LS_RAW_tadpole_5) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | LS_RAW_tadpole_5),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | LS_GROWTH_DTW_3) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | LS_GROWTH_DTW_3),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean)),
+          
+          mape(mean(predict(lmer(C3_Impressions ~ Broadcast_Year + DOW + MOY + Start_Time +
+                  (1 | LS_GROWTH_tadpole_5) + unique_DOWs_season + unique_starts_season +
+                  (unique_DOWs_season + unique_starts_season | LS_GROWTH_tadpole_5),
+              data = d %>% filter(Season_num == 1)),
+              newdata = d %>% filter(Season_num == 1))), mean((d %>% filter(Season_num == 1))$Season2_mean))
+          ))
+          
+mapes <- as.data.frame(t(mapes))
+mapes$clusters <- c("Benchmark", colnames(d[c(37:46, 50:59)]))
+
+mapes <- mapes[, c(2,1)]
+colnames(mapes)[2] <- "Mape"
+rownames(mapes) <- NULL
+
+write.csv(mapes, "mapes.csv")
+```
