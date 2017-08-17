@@ -31,12 +31,16 @@ library(fpc)
 
 # Season 1 Time Series Clustering
 
+From example here: https://cran.r-project.org/web/packages/dtwclust/vignettes/dtwclust.pdf.
+
 ```{r}
+#read in long and wide format data
 dct_df <- read.csv("dct_C3_growth.csv")
 dct_spread <- read.csv("dct_spread_C3_growth.csv")
 ```
 
 ```{r}
+#filter wide data to only cluster on season 1
 cluster_s1 <- dct_spread %>% 
   filter(Season_num == 1) %>%
   ungroup() %>%
@@ -46,6 +50,9 @@ cluster_s1 <- dct_spread %>%
 ## K-Shape Clustering 
 
 ```{r}
+#partitional clustering with 2 through 5 clusters
+#using shape-based distance for the curves
+#clustering around shape centroid
 kshape_s1 <- tsclust(cluster_s1, 
                      type = 'partitional',
                      k = 2:5,
@@ -56,20 +63,18 @@ kshape_s1 <- tsclust(cluster_s1,
                      seed = 12)
 
 names(kshape_s1) <- paste0('k_', 2:5)
+
+#apply internal clustering validity indices
+#including silhouette, Dunn, and others (see ?cvi documentation in R)
 sapply(kshape_s1, cvi, type = 'internal')
+
+#give best cluster number based on silhouette width
+#a measure of how similar the object is to its own cluster compared to others
 which.max(sapply(kshape_s1, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(kshape_s1$k_5@cluster)
-```
-
-```{r}
-plot(kshape_s1$k_5, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
+#export cluster predictions to the main data set and visualize in ggplot
 clusters_s1_shape5_spread <- dct_spread %>% filter(Season_num == 1)
 clusters_s1_shape5_spread$cluster_shape_5 <- kshape_s1$k_5@cluster
 
@@ -92,6 +97,7 @@ ggplotly(clusters_s1_shape5_plot) %>%
 ```
 
 ```{r}
+#list shows in each cluster
 s1_5clusters_kshape_growth <- list(as.character(unique(clusters_s1_shape5[clusters_s1_shape5$cluster_shape_5 == 1,]$Show_Name)), 
                                    as.character(unique(clusters_s1_shape5[clusters_s1_shape5$cluster_shape_5 == 2,]$Show_Name)),
                                    as.character(unique(clusters_s1_shape5[clusters_s1_shape5$cluster_shape_5 == 3,]$Show_Name)),
@@ -102,11 +108,14 @@ s1_5clusters_kshape_growth
 
 ```{r}
 # PLOT FOR S1 CLUSTERS & S2 TRENDS
+
+#create subset of show curves from season 2
 s2_spread <- dct_spread %>% 
   filter(Season_num == 2) %>%
   ungroup() %>%
   select(-X, -Network, -Season_num)
 
+#change column names range to append to season 1 curves with cluster variable
 s2_spread_newcols <- c(paste("X", 101:200, sep = ""))
 colnames(s2_spread)[2:ncol(s2_spread)] <- c(s2_spread_newcols)
 
@@ -117,6 +126,7 @@ s1_5clusters_kshape_s2_trends <- merge(s1_5clusters_kshape_s2_trends[, c("cluste
                                                                          "Show_Name")], 
                                        dct_df, by = "Show_Name")
 
+#re-number rows to make continuous over 200 periods for both seasons
 dct_s1_5clusters_kshape_s2_trends <- s1_5clusters_kshape_s2_trends %>% 
   filter(Season_num == 1 | Season_num == 2) %>% 
   group_by(Network, Show_Name) %>% 
@@ -137,6 +147,10 @@ ggplotly(s1_5clusters_kshape_s2_trends_plot) %>%
 ## Dynamic Time Warp Clustering
 
 ```{r}
+#partitional clustering with 2 through 5 clusters
+#using dynamic time warping distance for the curves
+#with partitioning around mediods
+#see dtwclust documentation in R for further information
 dtw_s1 <- tsclust(cluster_s1,
                   type = 'partitional',
                   k = 2:5,
@@ -149,20 +163,17 @@ dtw_s1 <- tsclust(cluster_s1,
                   seed = 12)
 
 names(dtw_s1) <- paste0('k_', 2:5)
+
+#apply internal clustering validity indices
 sapply(dtw_s1, cvi)
+
+#give best cluster number based on silhouette width
+#a measure of how similar the object is to its own cluster compared to others
 which.max(sapply(dtw_s1, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(dtw_s1$k_3@cluster)
-```
-
-```{r}
-plot(dtw_s1$k_3, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
+#export cluster predictions to the main data set and visualize in ggplot
 clusters_s1_dtw3_spread <- dct_spread %>% filter(Season_num == 1)
 clusters_s1_dtw3_spread$cluster_dtw_3 <- dtw_s1$k_3@cluster
 
@@ -225,6 +236,7 @@ ggplotly(s1_3clusters_dtw_s2_trends_plot) %>%
 # Season 2 Time Series Clustering
 
 ```{r}
+#same code as for season 1
 cluster_s2 <- dct_spread %>% 
   filter(Season_num == 2) %>%
   ungroup() %>%
@@ -249,15 +261,6 @@ which.max(sapply(kshape_s2, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(kshape_s2$k_2@cluster)
-```
-
-```{r}
-plot(kshape_s2$k_2, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
 clusters_s2_shape2_spread <- dct_spread %>% filter(Season_num == 2)
 clusters_s2_shape2_spread$cluster_shape_2 <- kshape_s2$k_2@cluster
 
@@ -305,15 +308,6 @@ which.max(sapply(dtw_s2, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(dtw_s2$k_3@cluster)
-```
-
-```{r}
-plot(dtw_s2$k_3, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
 clusters_s2_dtw3_spread <- dct_spread %>% filter(Season_num == 2)
 clusters_s2_dtw3_spread$cluster_dtw_3 <- dtw_s2$k_3@cluster
 
@@ -350,6 +344,8 @@ s2_3clusters_dtw_growth
 # S1-S2 Continuous Time Series Clustering
 
 ```{r}
+#code is the same as clustering on one season
+#but using season 1 to season 2 normalized together
 dct_cont <- read.csv("dct_C3_growth_cont.csv")
 dct_spread_cont <- read.csv("dct_spread_C3_growth_cont.csv")
 cluster_cont <- dct_spread_cont %>%
@@ -374,15 +370,6 @@ which.max(sapply(kshape_cont, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(kshape_cont$k_4@cluster)
-```
-
-```{r}
-plot(kshape_cont$k_4, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
 clusters_cont_shape4_spread <- dct_spread_cont
 clusters_cont_shape4_spread$cluster_shape_4 <- kshape_cont$k_4@cluster
 
@@ -431,15 +418,6 @@ which.max(sapply(dtw_cont, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(dtw_cont$k_3@cluster)
-```
-
-```{r}
-plot(dtw_cont$k_3, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
 clusters_cont_dtw3_spread <- dct_spread_cont
 clusters_cont_dtw3_spread$cluster_dtw_3 <- dtw_cont$k_3@cluster
 
@@ -475,6 +453,7 @@ cont_3clusters_dtw_growth
 # S1-S2 Non-Continuous Time Series Clustering
 
 ```{r}
+#create data frame for season 1 and season 2 appended over 200 periods
 temp1 <- filter(dct_spread, Season_num == 1)
 temp2 <- filter(dct_spread, Season_num == 2)
 temp2_newcols <- c(paste("X", 101:200, sep = ""))
@@ -505,15 +484,6 @@ which.max(sapply(kshape_s1_s2, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(kshape_s1_s2$k_2@cluster)
-```
-
-```{r}
-plot(kshape_s1_s2$k_2, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
 clusters_s1_s2_shape2_spread <- dct_spread_s1_s2
 clusters_s1_s2_shape2_spread$cluster_shape_2 <- kshape_s1_s2$k_2@cluster
 
@@ -560,15 +530,6 @@ which.max(sapply(dtw_s1_s2, cvi, type = 'internal')['Sil',])
 ```
 
 ```{r}
-table(dtw_s1_s2$k_5@cluster)
-```
-
-```{r}
-plot(dtw_s1_s2$k_5, type = 'sc')
-```
-
-```{r}
-# export cluster predictions to the main data set
 clusters_s1_s2_dtw5_spread <- dct_spread_s1_s2
 clusters_s1_s2_dtw5_spread$cluster_dtw_5 <- dtw_s1_s2$k_5@cluster
 
