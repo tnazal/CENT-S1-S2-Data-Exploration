@@ -34,11 +34,13 @@ library(fpc)
 Using examples from https://cran.r-project.org/web/packages/broom/vignettes/kmeans.html.
 
 ```{r}
+#read in long and wide format data
 dct_df <- read.csv("dct_C3_raw_growth.csv") %>% select(-X)
 dct_spread <- read.csv("dct_spread_C3_raw_growth.csv") %>% select(-X)
 ```
 
 ```{r}
+#filter wide data to only cluster on season 1
 cluster_s1_C3 <- dct_spread %>% 
   filter(Season_num == 1) %>%
   ungroup() %>%
@@ -48,17 +50,22 @@ cluster_s1_C3 <- dct_spread %>%
 ## General K-Means Clustering
 
 ```{r}
+#explore the effect of clustering on between 1 and 5 clusters 
+#(perform clustering 5 times, each time using value 1 through 5)
 set.seed(12)
 kclusts_s1 <- data.frame(k = 1:5) %>% 
   group_by(k) %>% 
   do(kclust = kmeans(cluster_s1_C3, centers = .$k, nstart = 20))
 
+#add each cluster classification to the original season 1 dataset
 assignments_s1_C3 <- kclusts_s1 %>% group_by(k) %>% do(augment(.$kclust[[1]], cluster_s1_C3))
 ```
 
 ### Optimal Number of Clusters
 
 ```{r}
+#elbow method representing the variance within each cluster (total within sum of squares)
+#the bend (or elbow) indicates that clusters beyond that point have little additional value
 fviz_nbclust(cluster_s1_C3, 
              kmeans, 
              method = "wss",
@@ -66,6 +73,8 @@ fviz_nbclust(cluster_s1_C3,
 ```
 
 ```{r}
+#optimal number of clusters using average silhouette
+#a measure of how similar the object is to its own cluster compared to others
 fviz_nbclust(cluster_s1_C3, 
              kmeans, 
              method = "silhouette",
@@ -73,6 +82,8 @@ fviz_nbclust(cluster_s1_C3,
 ```
 
 ```{r}
+#optimal number of clusters using gap statistics
+#compares change in within-cluster dispersion with expected from null distribution
 fviz_nbclust(cluster_s1_C3, 
              kmeans, 
              method = "gap_stat",
@@ -80,6 +91,7 @@ fviz_nbclust(cluster_s1_C3,
 ```
 
 ```{r}
+#optimal number of clusters using partitioning around mediods and gap statistic
 fviz_nbclust(cluster_s1_C3, 
              cluster::pam, 
              method = "gap_stat",
@@ -87,6 +99,8 @@ fviz_nbclust(cluster_s1_C3,
 ```
 
 ```{r}
+#optimal number of clusters using hierarchical clustering
+#using Euclidean distance to calculate dissimilarities between observations
 fviz_nbclust(cluster_s1_C3, 
              hcut, 
              hc_method = "single",
@@ -96,6 +110,8 @@ fviz_nbclust(cluster_s1_C3,
 ```
 
 ```{r}
+#optimal number of clusters using hierarchical clustering
+#using Pearson correlation as distance measure
 fviz_nbclust(cluster_s1_C3, 
              hcut, 
              hc_method = "single",
@@ -108,6 +124,7 @@ fviz_nbclust(cluster_s1_C3,
 ### 4 Clusters (K-Means)
 
 ```{r}
+#bind selected K number of clusters to both sets of data with normalized dct values and visualize
 clusters4_s1_spread_C3 <- assignments_s1_C3 %>% 
   filter(k == 4) %>% 
   ungroup() %>% 
@@ -134,6 +151,7 @@ ggplotly(clusters4_s1_C3_plot) %>%
 ### 5 Clusters (K-Means)
 
 ```{r}
+#same code as with 4 clusters
 clusters5_s1_spread_C3 <- assignments_s1_C3 %>% 
   filter(k == 5) %>% 
   ungroup() %>% 
@@ -168,6 +186,7 @@ ggplotly(clusters5_s1_C3_plot) %>%
 Using examples from https://cran.r-project.org/web/packages/broom/vignettes/kmeans.html.
 
 ```{r}
+#same code as for C3 above
 dct_df <- read.csv("dct_LS_raw_growth.csv") %>% select(-X)
 dct_spread <- read.csv("dct_spread_LS_raw_growth.csv") %>% select(-X)
 ```
