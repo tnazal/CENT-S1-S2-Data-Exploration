@@ -15,7 +15,7 @@ library(dplyr)
 ```
 
 ```{r}
-# read in kmeans diagnostics files
+#read in kmeans diagnostics files for each schema
 diagnostics_kmeans_C3_raw <- read.csv("diagnostics_kmeans_C3_raw.csv") %>% select(-X)
 diagnostics_kmeans_C3_growth <- read.csv("diagnostics_kmeans_C3_growth.csv") %>% select(-X)
 diagnostics_kmeans_LS_raw <- read.csv("diagnostics_kmeans_LS_raw.csv") %>% select(-X)
@@ -26,7 +26,7 @@ diagnostics_kmeans_raw_growth <- read.csv("diagnostics_kmeans_raw_growth.csv") %
 ```
 
 ```{r}
-# combine all kmeans diagnostics
+#combine all kmeans diagnostics
 diagnostics_kmeans <- rbind(diagnostics_kmeans_C3_raw, diagnostics_kmeans_C3_growth, 
                             diagnostics_kmeans_LS_raw, diagnostics_kmeans_LS_growth, 
                             diagnostics_kmeans_C3_LS_raw, diagnostics_kmeans_C3_LS_growth, 
@@ -34,7 +34,7 @@ diagnostics_kmeans <- rbind(diagnostics_kmeans_C3_raw, diagnostics_kmeans_C3_gro
 ```
 
 ```{r}
-# read in kshape/dtw diagnostics files
+#read in kshape/dtw diagnostics files for each schema
 diagnostics_kshape_dtw_C3_raw <- read.csv("diagnostics_kshape_dtw_C3_raw.csv") %>% select(-X)
 diagnostics_kshape_dtw_C3_growth <- read.csv("diagnostics_kshape_dtw_C3_growth.csv") %>% select(-X)
 diagnostics_kshape_dtw_LS_raw <- read.csv("diagnostics_kshape_dtw_LS_raw.csv") %>% select(-X)
@@ -45,7 +45,7 @@ diagnostics_kmeans_raw_growth <- read.csv("diagnostics_kmeans_raw_growth.csv") %
 ```
 
 ```{r}
-# combine all kshape/dtw diagnostics
+#combine all kshape/dtw diagnostics
 diagnostics_kshape_dtw <- rbind(diagnostics_kshape_dtw_C3_raw, diagnostics_kshape_dtw_C3_growth, 
                                 diagnostics_kshape_dtw_LS_raw, diagnostics_kshape_dtw_LS_growth, 
                                 diagnostics_kshape_dtw_C3_LS_raw, diagnostics_kshape_dtw_C3_LS_growth, 
@@ -53,7 +53,7 @@ diagnostics_kshape_dtw <- rbind(diagnostics_kshape_dtw_C3_raw, diagnostics_kshap
 ```
 
 ```{r}
-# read in pca diagnostics files
+#read in pca diagnostics files for each schema
 diagnostics_pca_C3_raw <- read.csv("diagnostics_pca_C3_raw.csv") %>% select(-X)
 diagnostics_pca_C3_growth <- read.csv("diagnostics_pca_C3_growth.csv") %>% select(-X)
 diagnostics_pca_LS_raw <- read.csv("diagnostics_pca_LS_raw.csv") %>% select(-X)
@@ -64,7 +64,7 @@ diagnostics_pca_raw_growth <- read.csv("diagnostics_pca_raw_growth.csv") %>% sel
 ```
 
 ```{r}
-# combine all pca diagnostics
+#combine all pca diagnostics
 diagnostics_pca <- rbind(diagnostics_pca_C3_raw, diagnostics_pca_C3_growth, 
                          diagnostics_pca_LS_raw, diagnostics_pca_LS_growth, 
                          diagnostics_pca_C3_LS_raw, diagnostics_pca_C3_LS_growth, 
@@ -72,7 +72,7 @@ diagnostics_pca <- rbind(diagnostics_pca_C3_raw, diagnostics_pca_C3_growth,
 ```
 
 ```{r}
-# read in tadpole diagnostics files
+#read in tadpole diagnostics files for each schema
 diagnostics_tadpole_C3_raw <- read.csv("diagnostics_tadpole_C3_raw.csv") %>% select(-X)
 diagnostics_tadpole_C3_growth <- read.csv("diagnostics_tadpole_C3_growth.csv") %>% select(-X)
 diagnostics_tadpole_LS_raw <- read.csv("diagnostics_tadpole_LS_raw.csv") %>% select(-X)
@@ -83,7 +83,7 @@ diagnostics_tadpole_raw_growth <- read.csv("diagnostics_tadpole_raw_growth.csv")
 ```
 
 ```{r}
-# combine all tadpole diagnostics
+#combine all tadpole diagnostics
 diagnostics_tadpole <- rbind(diagnostics_tadpole_C3_raw, diagnostics_tadpole_C3_growth, 
                              diagnostics_tadpole_LS_raw, diagnostics_tadpole_LS_growth, 
                              diagnostics_tadpole_C3_LS_raw, diagnostics_tadpole_C3_LS_growth, 
@@ -91,18 +91,19 @@ diagnostics_tadpole <- rbind(diagnostics_tadpole_C3_raw, diagnostics_tadpole_C3_
 ```
 
 ```{r}
-# combine all diagnostics
+#combine all diagnostics
 diagnostics <- rbind(diagnostics_kmeans, diagnostics_kshape_dtw, 
                      diagnostics_pca, diagnostics_tadpole)
 ```
 
 ```{r}
-# write new file with all diagnostics
+#write new file with all diagnostics
 write.csv(diagnostics, "diagnostics.csv")
 ```
 
 ```{r}
-# determine best clusters
+#determine best clusters within different schemas/seasons
+#based on smallest/largest value depending on distance measure 
 best_clusters <- diagnostics %>% group_by(stream, data, season) %>% 
   summarise(largest_between = paste(cluster.number[which.max(average.between)], 
                                     algorithm[which.max(average.between)], sep = " "), 
@@ -127,4 +128,3 @@ best_clusters$best <- apply(best_clusters, 1, function(x) names(which(table(x) =
 best_clusters <- apply(best_clusters, 2, as.character)
 write.csv(best_clusters, "best_clusters.csv")
 ```
-
