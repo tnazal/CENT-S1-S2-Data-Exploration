@@ -1,0 +1,328 @@
+---
+title: "CENT S1-S2 TADpole Clustering on C3 & LS Impressions"
+output:
+  html_notebook: default
+  html_document: default
+---
+
+```{r}
+##################################################################################
+# inputs: dct_C3_LS_growth.csv, dct_spread_C3_LS_growth.csv, 
+#         dct_C3_LS_diff_growth.csv, dct_spread_C3_LS_diff_growth.csv, 
+#         dct_C3_LS_avg_growth.csv, dct_spread_C3_LS_avg_growth.csv
+#
+# purpose: tadpole clustering on S1 C3 & LS growth appended, 
+#          differences, and averages
+##################################################################################
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(plyr)
+library(dplyr)
+library(dtwclust)
+library(ggplot2)
+library(tidyr)
+library(plotly)
+library(fpc)
+```
+
+# C3 & LS Growth Appended
+
+## TADpole Clustering, 5 Clusters
+
+```{r}
+#read and filter data
+dct_spread <- read.csv("dct_spread_C3_LS_growth.csv")
+dct_df <- read.csv("dct_C3_LS_growth.csv")
+
+dtw_df_s1 <- dct_spread %>% 
+  filter(Season_num == 1) %>%
+  select(-X, -Network, -Season_num, -Show_Name)
+```
+
+```{r}
+#Run TadPole clustering. arguments adjusted a-posteriori based on visualizations
+set.seed(12)
+tadpole_clust5_s1 <- tsclust(dtw_df_s1, type = "tadpole", k = 5L, 
+                             control = tadpole_control(dc = 2, window.size = 25))
+
+#Attach clusters to DCT data
+tadpole_clust5_s1_df <- dct_spread %>% 
+  filter(Season_num == 1) %>% 
+  select(-Season_num)
+
+tadpole_clust5_s1_df$cluster <- tadpole_clust5_s1@cluster  
+
+#long data format
+tadpole5_s1_long <- gather(tadpole_clust5_s1_df, key = period, value = dct_values ,X1:X200) %>% 
+  select(-X)
+tadpole5_s1_long$period <- as.numeric(sub("X", "", tadpole5_s1_long$period))
+tadpole5_s1_long$period <- as.numeric(tadpole5_s1_long$period)
+
+#plot
+tadpole5_s1_plot <- tadpole5_s1_long %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster, nrow = 3)
+
+ggplotly(tadpole5_s1_plot) %>% 
+  layout(title = "Season 1 with 5 TADpole Clusters (C3 & LS Growth)", 
+         margin = list(t = 150))
+```
+
+### Shows in Each Cluster
+
+```{r}
+tadpole_s1_5clusters <- list(as.character(unique(tadpole_clust5_s1_df[tadpole_clust5_s1_df$cluster == 1,]$Show_Name)),
+                             as.character(unique(tadpole_clust5_s1_df[tadpole_clust5_s1_df$cluster == 2,]$Show_Name)),
+                             as.character(unique(tadpole_clust5_s1_df[tadpole_clust5_s1_df$cluster == 3,]$Show_Name)),
+                             as.character(unique(tadpole_clust5_s1_df[tadpole_clust5_s1_df$cluster == 4,]$Show_Name)),
+                             as.character(unique(tadpole_clust5_s1_df[tadpole_clust5_s1_df$cluster == 5,]$Show_Name)))
+tadpole_s1_5clusters
+```
+
+## TADpole Clustering, 4 Clusters
+
+```{r}
+set.seed(12)
+tadpole_clust4_s1 <- tsclust(dtw_df_s1, type = "tadpole", k = 4L, 
+                             control = tadpole_control(dc = 2, window.size = 25))
+
+tadpole_clust4_s1_df<- dct_spread %>% 
+  filter(Season_num == 1) %>% 
+  select(-Season_num)
+
+tadpole_clust4_s1_df$cluster <- tadpole_clust4_s1@cluster  
+
+tadpole4_s1_long <- gather(tadpole_clust4_s1_df, key = period, value = dct_values ,X1:X200) %>% 
+  select(-X)
+tadpole4_s1_long$period <- as.numeric(sub("X", "", tadpole4_s1_long$period))
+tadpole4_s1_long$period <- as.numeric(tadpole4_s1_long$period)
+
+tadpole4_s1_plot <- tadpole4_s1_long %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster, nrow = 4)
+
+ggplotly(tadpole4_s1_plot) %>% 
+  layout(title = "Season 1 with 4 TADpole Clusters (C3 & LS Growth)", 
+         margin = list(t = 150))
+```
+
+
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+
+
+# C3-LS Differences
+
+## TADpole Clustering, 5 Clusters
+```{r}
+dct_spread <- read.csv("dct_spread_C3_LS_diff_growth.csv")
+dct_df <- read.csv("dct_C3_LS_diff_growth.csv")
+
+dtw_df_diff <- dct_spread %>% 
+  filter(Season_num == 1) %>%
+  select(-X, -Network, -Season_num, -Show_Name)
+```
+
+```{r}
+set.seed(12)
+tadpole_clust5_diff <- tsclust(dtw_df_diff, type = "tadpole", k = 5L, 
+                               control = tadpole_control(dc = 2, window.size = 10))
+
+tadpole_clust5_diff_df<- dct_spread %>% 
+  filter(Season_num == 1) %>% 
+  select(-Season_num)
+
+tadpole_clust5_diff_df$cluster <- tadpole_clust5_diff@cluster  
+
+tadpole5_diff_long <- gather(tadpole_clust5_diff_df, key = period, value = dct_values ,X1:X100) %>% 
+  select(-X)
+tadpole5_diff_long$period <- as.numeric(sub("X", "", tadpole5_diff_long$period ))
+tadpole5_diff_long$period <- as.numeric(tadpole5_diff_long$period)
+
+tadpole5_diff_plot <- tadpole5_diff_long %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster)
+
+ggplotly(tadpole5_diff_plot) %>% 
+  layout(title = "Season 1 with 5 TADpole Clusters (C3-LS Growth Differences)", 
+         margin = list(t = 150))
+```
+
+## TADpole Clustering, 3 Clusters
+
+```{r}
+set.seed(12)
+tadpole_clust3_diff <- tsclust(dtw_df_diff, type = "tadpole", k = 3L, 
+                               control = tadpole_control(dc = 2, window.size = 10))
+
+tadpole_clust3_diff_df<- dct_spread %>% 
+  filter(Season_num == 1) %>% 
+  select(-Season_num)
+
+tadpole_clust3_diff_df$cluster <- tadpole_clust3_diff@cluster  
+
+tadpole3_diff_long <- gather(tadpole_clust3_diff_df, key = period, value = dct_values ,X1:X100) %>% 
+  select(-X)
+tadpole3_diff_long$period <- as.numeric(sub("X", "", tadpole3_diff_long$period ))
+tadpole3_diff_long$period <- as.numeric(tadpole3_diff_long$period)
+
+tadpole3_diff_plot <- tadpole3_diff_long %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster, nrow = 3)
+
+ggplotly(tadpole3_diff_plot) %>% 
+  layout(title = "Season 1 with 3 TADpole Clusters (C3-LS Growth Differences)", 
+         margin = list(t = 150))
+```
+
+
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+
+
+#C3 & LS Growth Averages
+
+## TADpole Clustering, 5 Clusters
+```{r}
+dct_spread <- read.csv("dct_spread_C3_LS_avg_growth.csv")
+dct_df <- read.csv("dct_C3_LS_avg_growth.csv")
+
+dtw_df_avg <- dct_spread %>% 
+  filter(Season_num == 1) %>%
+  select(-X, -Network, -Season_num, -Show_Name)
+```
+
+```{r}
+set.seed(12)
+tadpole_clust5_avg <- tsclust(dtw_df_avg, type = "tadpole", k = 5L, 
+                              control = tadpole_control(dc = 2, window.size = 5))
+
+tadpole_clust5_avg_df<- dct_spread %>% 
+  filter(Season_num == 1) %>% 
+  select(-Season_num)
+
+tadpole_clust5_avg_df$cluster <- tadpole_clust5_avg@cluster  
+
+tadpole5_avg_long <- gather(tadpole_clust5_avg_df, key = period, value = dct_values ,X1:X100) %>% 
+  select(-X)
+tadpole5_avg_long$period <- as.numeric(sub("X", "", tadpole5_avg_long$period ))
+tadpole5_avg_long$period <- as.numeric(tadpole5_avg_long$period)
+
+tadpole5_avg_plot <- tadpole5_avg_long %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster)
+
+ggplotly(tadpole5_avg_plot) %>% 
+  layout(title = "Season 1 with 5 TADpole Clusters (C3 & LS Averages)", 
+         margin = list(t = 150))
+```
+
+## TADpole Clustering, 3 Clusters
+
+```{r}
+set.seed(12)
+tadpole_clust3_avg <- tsclust(dtw_df_avg, type = "tadpole", k = 3L, 
+                              control = tadpole_control(dc = 2, window.size = 10))
+
+tadpole_clust3_avg_df<- dct_spread %>% 
+  filter(Season_num == 1) %>% 
+  select(-Season_num)
+
+tadpole_clust3_avg_df$cluster <- tadpole_clust3_avg@cluster  
+
+tadpole3_avg_long <- gather(tadpole_clust3_avg_df, key = period, value = dct_values ,X1:X100) %>% 
+  select(-X)
+tadpole3_avg_long$period <- as.numeric(sub("X", "", tadpole3_avg_long$period ))
+tadpole3_avg_long$period <- as.numeric(tadpole3_avg_long$period)
+
+tadpole3_avg_plot <- tadpole3_avg_long %>% 
+  ggplot(aes(x = period, y = dct_values, color = Show_Name)) + 
+  geom_line() + 
+  facet_wrap(~ cluster, nrow = 3)
+
+ggplotly(tadpole3_avg_plot) %>% 
+  layout(title = "Season 1 with 3 TADpole Clusters (C3 & LS Averages)", 
+         margin = list(t = 150))
+```
+
+# Diagnostics
+ 
+```{r}
+# create distance matrices for clusters
+tadpole_s1_5cl_d <- dist(tadpole_clust5_s1_df[, 4:203])
+tadpole_s1_4cl_d <- dist(tadpole_clust4_s1_df[, 4:203])
+tadpole_diff_5cl_d <- dist(tadpole_clust5_diff_df[, 4:103])
+tadpole_diff_3cl_d <- dist(tadpole_clust3_diff_df[, 4:103])
+tadpole_avg_5cl_d <- dist(tadpole_clust5_avg_df[, 4:103])
+tadpole_avg_3cl_d <- dist(tadpole_clust3_avg_df[, 4:103])
+
+# diagnostics
+diagnostics_tadpole_C3_LS_growth_s1_5cl <- cluster.stats(tadpole_s1_5cl_d, as.numeric(tadpole_clust5_s1_df$cluster))
+diagnostics_tadpole_C3_LS_growth_s1_4cl <- cluster.stats(tadpole_s1_4cl_d, as.numeric(tadpole_clust4_s1_df$cluster))
+diagnostics_tadpole_C3_LS_growth_diff_s1_5cl <- cluster.stats(tadpole_diff_5cl_d, as.numeric(tadpole_clust5_diff_df$cluster))
+diagnostics_tadpole_C3_LS_growth_diff_s1_3cl <- cluster.stats(tadpole_diff_3cl_d, as.numeric(tadpole_clust3_diff_df$cluster))
+diagnostics_tadpole_C3_LS_growth_avg_s1_5cl <- cluster.stats(tadpole_avg_5cl_d, as.numeric(tadpole_clust5_avg_df$cluster))
+diagnostics_tadpole_C3_LS_growth_avg_s1_3cl <- cluster.stats(tadpole_avg_3cl_d, as.numeric(tadpole_clust3_avg_df$cluster))
+
+# gather diagnostic names and list all diagnostics objects
+d_names <- ls()[grep("diagnostics", ls())]
+d_list <- mget(ls()[grep("diagnostics", ls())])
+
+# generate df with statsitics of interest for comparison
+diagnostic_df <- as.data.frame(NA)
+
+for (n in 1:length(d_names)){
+  diagnostic_df[n, 1] <- paste(d_names[n])
+  diagnostic_df[n, 2] <- d_list[[n]]["average.between"]
+  diagnostic_df[n, 3] <- d_list[[n]]["average.within"]
+  diagnostic_df[n, 4] <- d_list[[n]]["wb.ratio"]
+  diagnostic_df[n, 5] <- d_list[[n]]["widestgap"]
+  diagnostic_df[n, 6] <- d_list[[n]]["dunn2"]
+  diagnostic_df[n, 7] <- d_list[[n]]["avg.silwidth"]
+  diagnostic_df[n, 8] <- d_list[[n]]["within.cluster.ss"]
+  diagnostic_df[n, 9] <- d_list[[n]]["cluster.number"]
+}
+
+# add information for decision making
+colnames(diagnostic_df)[1] <- "name"
+
+diagnostic_df$name <- sub("diagnostics_", "", diagnostic_df$name)
+
+diagnostic_df$algorithm <- ifelse(grepl("kmeans", diagnostic_df$name) == 1, "kmeans", 
+                                  ifelse(grepl("kshape", diagnostic_df$name) == 1, "kshape", 
+                                         ifelse(grepl("PCA", diagnostic_df$name) == 1, "PCA", 
+                                                ifelse(grepl("tadpole", diagnostic_df$name) == 1, "TADpole", 
+                                                       ifelse(grepl("dtw", diagnostic_df$name) == 1, "DTW", 0)))))
+
+diagnostic_df$season <- ifelse(grepl("s1", diagnostic_df$name) == 1, "s1", 
+                               ifelse(grepl("s2", diagnostic_df$name) == 1, "s2",
+                                      ifelse(grepl("sep", diagnostic_df$name) == 1, "sep",
+                                             ifelse(grepl("cont", diagnostic_df$name) == 1, "cont", 0))))
+
+diagnostic_df$stream <- ifelse(grepl("C3_LS", diagnostic_df$name) == 1, "C3+LS",
+                                             ifelse(grepl("LS", diagnostic_df$name) == 1, "LS",
+                                                    ifelse(grepl("C3", diagnostic_df$name) == 1, "C3", 0)))
+
+diagnostic_df$data <- ifelse(grepl("raw_diff", diagnostic_df$name) == 1, "raw diff",
+                             ifelse(grepl("raw_avg", diagnostic_df$name) == 1, "raw avg",
+                                    ifelse(grepl("growth_diff", diagnostic_df$name) == 1, "growth diff",
+                                           ifelse(grepl("growth_avg", diagnostic_df$name) == 1, "growth avg", 
+                                                  ifelse(grepl("raw_growth", diagnostic_df$name) == 1, "raw+growth",
+                                                         ifelse(grepl("growth", diagnostic_df$name) == 1, "growth",
+                                                                ifelse(grepl("raw", diagnostic_df$name) == 1, "raw",0)))))))
+```
+
+```{r}
+# write table
+write.csv(diagnostic_df, "diagnostics_tadpole_C3_LS_growth.csv")
+```
